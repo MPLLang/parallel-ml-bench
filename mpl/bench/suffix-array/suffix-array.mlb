@@ -1,4 +1,4 @@
-../../lib/sources.mlb
+../../lib.mlb
 AS.sml
 BruteForce.sml
 PrefixDoubling.sml

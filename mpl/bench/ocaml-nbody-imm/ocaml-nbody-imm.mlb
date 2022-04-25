@@ -1,4 +1,4 @@
-../../lib/sources.mlb
+../../lib.mlb
 local
   $(SML_LIB)/smlnj-lib/Util/smlnj-lib.mlb
 in

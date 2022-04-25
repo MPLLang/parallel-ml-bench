@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+
+git submodule update --init --recursive
+echo "[INFO] submodules initialized"
+
+(cd mpl && smlpkg sync)
+echo "[INFO] smlpkg lib sync'ed"
+
+$ROOT/scripts/install_mpls

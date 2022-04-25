@@ -1,4 +1,4 @@
-../../lib/sources.mlb
+../../lib.mlb
 BinarySearch.sml
 FullExpandPow2Flatten.sml
 AllBSFlatten.sml

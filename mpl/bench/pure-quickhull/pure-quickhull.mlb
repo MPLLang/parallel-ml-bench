@@ -1,4 +1,4 @@
-../../lib/sources.mlb
+../../lib.mlb
 TreeSeq.sml
 Split.sml
 Quickhull.sml

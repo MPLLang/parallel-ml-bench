@@ -1,4 +1,4 @@
-../../lib/sources.mlb
+../../lib.mlb
 ../ldd/LDD.sml
 Connectivity.sml
 main.sml

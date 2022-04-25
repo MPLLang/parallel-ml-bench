@@ -1,4 +1,4 @@
-../../lib/sources.mlb
+../../lib.mlb
 FastHashRand.sml
 CityGen.sml
 Skyline.sml
