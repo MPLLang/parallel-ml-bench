@@ -1,0 +1,137 @@
+#!/usr/bin/python
+
+import itertools
+import re
+import subprocess
+import json
+
+def json_careful_loads(s):
+  try:
+    return json.loads(s)
+  except Exception as e:
+    sys.stderr.write("[ERR] Error while parsing json: {}\n".format(e))
+    sys.exit(1)
+
+def _matches(restriction, assignment):
+  for key,value in restriction.items():
+    if not (key in assignment and re.match(value, assignment[key])):
+      return False
+  return True
+
+def _makeCmd(template, assignment):
+  cmd = template
+  row = {}
+
+  for key,value in assignment.items():
+    row[key] = value
+    def replacer(m):
+      # first handle possibility of <key>
+      if re.match('<{}>'.format(key), m.group(0)):
+        return value
+      # now check for <key?foo>
+      replacementMatch = re.match(r'<{}\?([^>]*)>'.format(key), m.group(0))
+      if replacementMatch:
+        return re.sub(r'({})', lambda _: value, replacementMatch.group(1))
+      raise Exception("Unexpected match failure")
+    pattern = r'(<{}>)|(<{}\?[^>]*>)'.format(key, key)
+    cmd = re.sub(pattern, replacer, cmd)
+
+  cmd = re.sub(r'(<[-\w]+\?[^>]*>)', lambda _: "", cmd)
+  row['cmd'] = cmd.strip()
+
+  return row
+
+def gencmds(templateSpecs, assignmentGroupSpecs):
+  rows = []
+  # seen = set()
+
+  for aSpec in assignmentGroupSpecs:
+    x = [[(k, v) for v in vs] for k,vs in aSpec]
+    # x = [[(k, v) for v in vs] for k,vs in aSpec.items()]
+    for assignment in itertools.product(*x):
+      assignment = dict(assignment)
+      for tSpec in templateSpecs:
+        if _matches(tSpec['match'], assignment):
+          row = _makeCmd(tSpec['template'], assignment)
+          rows.append(row)
+          break
+
+  return rows
+
+
+def jqfilter(selectExpr, rows):
+  allRows = json.dumps(rows)
+  query = ".[] | select({})".format(selectExpr)
+  cmd = ['jq', '-cM', query]
+  jqProcess = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+  output, err = jqProcess.communicate(input=allRows)
+
+  newRows = []
+  for line in output.splitlines():
+    newRows.append(json_careful_loads(line))
+
+  return newRows
+
+# scripty part =============================================================
+
+if __name__ == "__main__":
+  import argparse, sys, os
+
+  parser = argparse.ArgumentParser()
+
+  parser.add_argument('-v', '--verbose', action='store_true', dest='verbose')
+
+  parser.add_argument('-b', '--bare',
+    action = 'store_true',
+    dest = 'bare',
+    help = "don't print each generated command with its assigned keys (json format)")
+
+  parser.add_argument('spec', metavar='SPEC_FILE',
+    help = "key/value assignments (json format)")
+
+  args = parser.parse_args()
+
+  def eprint(msg):
+    sys.stderr.write(msg)
+    sys.stderr.write('\n')
+
+  def vprint(msg):
+    if args.verbose:
+      eprint(msg)
+
+  try:
+    with open(args.spec, 'r') as f:
+      vprint("[INFO] Reading command specs from '{}'".format(args.spec))
+      specFileContents = json.loads(f.read())
+  except IOError:
+    eprint("[ERR] Cannot find file '{}'\n".format(args.spec))
+    sys.exit(1)
+
+  templateSpecs = specFileContents['templates']
+  globalkvs = specFileContents['globals']
+  selectExpr = specFileContents['jqselect']
+  assignmentGroupSpecs = specFileContents['specs']
+
+  for aSpec in assignmentGroupSpecs:
+    for key in aSpec:
+      if not re.match(r'^[-\w]*$', key):
+        msg = "Invalid key '{}'; must consist of only alphanumeric characters and '_' or '-'"
+        eprint(msg.format(key))
+        sys.exit(1)
+      if key == 'cmd':
+        msg = "Invalid key 'cmd'; this key is reserved"
+        eprint(msg.format(key))
+        sys.exit(1)
+
+  def makeOne(aGroup):
+    return list(aGroup.items()) + list(globalkvs.items())
+
+  assignmentGroupSpecs = map(makeOne, assignmentGroupSpecs)
+  rows = jqfilter(selectExpr, gencmds(templateSpecs, assignmentGroupSpecs))
+
+  for row in rows:
+    if args.bare:
+      print(row['cmd'])
+    else:
+      print(json.dumps(row))
+

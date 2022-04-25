@@ -1,0 +1,146 @@
+#!/usr/bin/python
+
+import sys, signal, socket, time, threading, subprocess, multiprocessing
+from datetime import datetime
+
+NCPU = multiprocessing.cpu_count()
+
+def getGitRoot():
+  return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
+    stdout=subprocess.PIPE).communicate()[0].rstrip()
+
+_currentChildren = []
+
+def _signalHandler(signal, frame):
+  global _currentChildren
+  sys.stderr.write("[ERR] Interrupted.\n")
+  if _currentChildren:
+    for child in _currentChildren:
+      child.kill()
+  sys.exit(1)
+signal.signal(signal.SIGINT, _signalHandler)
+
+def _killer():
+  global _currentChildren
+  if _currentChildren:
+    for child in _currentChildren:
+      try:
+        child.kill()
+      except Exception as e:
+        sys.stderr.write("[WARN] Error while trying to kill process {}: {}\n".format(child.pid, str(e)))
+
+def runcmds(rows, timeout=300.0, silent=False):
+  global _currentChildren
+  numCmds = sum(int(row.get('trials', '1')) for row in rows)
+  cmdNum = 0
+
+  for row in rows:
+    ntrials = int(row.get('trials', '1'))
+    for _ in xrange(0, ntrials):
+      row = row.copy()
+      cmdNum += 1
+      row['host'] = socket.gethostname()
+      row['timestamp'] = datetime.now().strftime("%y-%m-%d %H:%M:%S.%f")
+
+      numToSpawn = (1 if 'multi' not in row else int(row['multi']))
+
+      if not silent:
+        sys.stderr.write('[{}/{}] {}{}\n'.format(
+          cmdNum,
+          numCmds,
+          ("" if numToSpawn == 1 else "[MULTI {}] ".format(numToSpawn)),
+          row['cmd'])
+        )
+
+      for i in range(0, numToSpawn):
+        if 'cwd' in row:
+          subproc = subprocess.Popen(row['cmd'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=row['cwd'])
+        else:
+          subproc = subprocess.Popen(row['cmd'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _currentChildren.append(subproc)
+
+      timer = threading.Timer(timeout, _killer)
+      row['stdout'] = ''
+      row['stderr'] = ''
+      ts = time.time()
+      try:
+        timer.start()
+        row['stdout'], row['stderr'] = _currentChildren[0].communicate()
+        for i in range(1, numToSpawn):
+          row['stdout{}'.format(i)], row['stderr{}'.format(i)] = _currentChildren[i].communicate()
+      finally:
+        timer.cancel()
+        row['elapsed'] = time.time() - ts
+
+      row['returncode'] = _currentChildren[0].returncode
+      for i in range(1, numToSpawn):
+        row['returncode{}'.format(i)] = _currentChildren[i].returncode
+
+      _currentChildren = []
+
+      yield row
+
+# scripty part =============================================================
+
+if __name__ == "__main__":
+  import argparse, json, os.path
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-t', '--timeout', type=float, default=300.0, dest='timeout')
+  parser.add_argument('-s', '--silent', action='store_true', dest='silent')
+  parser.add_argument('-o', '--output', type=argparse.FileType('a'), default=sys.stdout, dest='output')
+  parser.add_argument('-b', '--bare', action = 'store_true', dest = 'bare')
+  parser.add_argument('-c', '--compile', action = 'store_true', dest = 'compile')
+  args = parser.parse_args()
+
+  root = getGitRoot()
+
+  if args.bare:
+    rows = [{'cmd':x.rstrip('\n')} for x in sys.stdin]
+  else:
+    rows = [ json.loads(x) for x in sys.stdin ]
+
+  if args.compile:
+    binsToMake = set()
+    for r in rows:
+      binFile = '{}.{}.bin'.format(r['bench'], r['config'])
+      suffix = os.path.join('bin', binFile)
+      prefix = root
+      if 'cwd' in r:
+        prefix = os.path.join(prefix, r['cwd'])
+      if not os.path.isfile(os.path.join(prefix, suffix)):
+        binsToMake.add((prefix, binFile))
+
+    places = set(prefix for (prefix, _) in binsToMake)
+
+    for place in places:
+      binsToMakeHere = filter(lambda (prefix, _): prefix == place, binsToMake)
+      binsToMakeHere = map(lambda (_, b): b, binsToMakeHere)
+      if len(binsToMakeHere) == 0:
+        continue
+
+      sys.stderr.write("[WARN] missing binaries in {}:\n".format(place))
+      for b in binsToMakeHere:
+        sys.stderr.write("  " + b + "\n")
+
+      jobs = max(4, NCPU/2)
+      cmd = "make -C {} -j {} ".format(place, jobs) + (" ".join(binsToMakeHere))
+      sys.stderr.write("[INFO] " + cmd + "\n")
+
+      output = None
+      shouldQuit = False
+      try:
+        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+      except subprocess.CalledProcessError as e:
+        output = e.output
+        shouldQuit = True
+      sys.stderr.write(output + "\n")
+      if shouldQuit:
+        sys.exit(1)
+
+  for result in runcmds(rows, timeout=args.timeout, silent=args.silent):
+    s = '{}\n'.format(json.dumps(result))
+    args.output.write(s)
+    if not args.silent:
+      sys.stderr.write(result['stdout'] + '\n')
+      sys.stderr.write(result['stderr'] + '\n')

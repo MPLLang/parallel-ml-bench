@@ -1,0 +1,5 @@
+{
+  "compiler": "mlton",
+  "flags": ["-codegen", "c", "-default-type", "int64", "-default-type", "word64"],
+  "compat": "mlton"
+}

@@ -1,0 +1,145 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "mpl", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 10 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 10 -warmup 5"
+      }
+    ],
+
+  "globals":
+    {
+      "procs": [
+        "1", "2", "4", "8", "16"
+      ],
+      "config": ["mlton", "mpl"],
+      "cwd": ["mpl"],
+      "exp": ["time"],
+      "trials": ["1"]
+    },
+
+  "jqselect": "(true)",
+
+  "specs":
+    [
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-N 100000000"]
+      },
+      {
+        "tag": ["dmm"],
+        "bench": ["dmm"],
+        "args": ["-N 1024"]
+      },
+      {
+        "tag": ["skyline"],
+        "bench": ["skyline"],
+        "args": ["-size 1000000"]
+      },
+      {
+        "tag": ["raytracer"],
+        "bench": ["ray"],
+        "args": ["-n 1000 -m 1000"]
+      },
+      {
+        "tag": ["tinykaboom"],
+        "bench": ["tinykaboom"],
+        "args": ["-width 100 -height 100 -frames 10 -fps 1"]
+      },
+      {
+        "tag": ["game-of-life"],
+        "bench": ["ocaml-game-of-life"],
+        "args": ["-n_times 100 -board_size 1024"]
+      },
+      {
+        "tag": ["msort-strings"],
+        "bench": ["msort-strings"],
+        "args": ["../inputs/words64.txt"]
+      },
+      {
+        "tag": ["nearest-nbrs"],
+        "bench": ["nn"],
+        "args": ["-N 1000000"]
+      },
+      {
+        "tag": ["quickhull"],
+        "bench": ["quickhull"],
+        "args": ["-N 20000000"]
+      },
+      {
+        "tag": ["reverb"],
+        "bench": ["reverb"],
+        "args": ["../inputs/mangore-waltz.wav"]
+      },
+      {
+        "tag": ["seam-carve"],
+        "bench": ["seam-carve"],
+        "args": ["../inputs/pano.ppm -num-seams 100"]
+      },
+      {
+        "tag": ["dedup"],
+        "bench": ["dedup"],
+        "args": ["../inputs/words256.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["suffix-array"],
+        "bench": ["suffix-array"],
+        "args": ["--benchmark -N 10000000"]
+      },
+      {
+        "tag": ["grep"],
+        "bench": ["grep"],
+        "args": ["EE ../inputs/words256.txt --benchmark"]
+      },
+      {
+        "tag": ["bfs-tree"],
+        "bench": ["bfs-tree-entangled-fixed"],
+        "args": ["~/data/graph/adj/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["centrality"],
+        "bench": ["centrality"],
+        "args": ["~/data/graph/adj/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["palindrome"],
+        "bench": ["palindrome"],
+        "args": ["-N 1000000"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["../inputs/words256.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["nqueens"],
+        "bench": ["nqueens"],
+        "args": ["-N 13"]
+      },
+      {
+        "tag": ["ldd"],
+        "bench": ["ldd"],
+        "args": ["~/data/graph/adj/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["triangle-count"],
+        "bench": ["triangle-count"],
+        "args": ["~/data/graph/adj/rmat-1M-symm-bin"]
+      },
+      {
+        "tag": ["range-query"],
+        "bench": ["range-tree"],
+        "args": ["-n 1000000 -q 1000000"]
+      },
+      {
+        "tag": ["delaunay-triangulate"],
+        "bench": ["delaunay"],
+        "args": ["-n 1000000"]
+      }
+    ]
+}

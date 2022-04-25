@@ -1,0 +1,67 @@
+#!/usr/bin/python
+
+import argparse, sys, os, json, subprocess, errno
+from distutils.spawn import find_executable
+
+if find_executable("mpl-switch") is None:
+  sys.stderr.write("[ERR] mpl-switch needs to be installed. see https://github.com/MPLLang/mpl-switch\n")
+  sys.exit(1)
+
+subprocess.check_call(["mpl-switch", "init"])
+
+def getGitRoot():
+  return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
+    stdout=subprocess.PIPE).communicate()[0].rstrip()
+
+root = os.path.join(getGitRoot(), 'mpl')
+
+# find all mpl-switch-commit mentions in config/*.json
+mpl_switch_commits = set()
+for fp in os.listdir(os.path.join(root, "config")):
+  ext = os.path.splitext(fp)[-1].lower()
+  if ext == ".json":
+    with open(os.path.join(root, "config", fp), 'r') as f:
+      config = json.loads(f.read())
+    if "mpl-switch-commit" in config:
+      mpl_switch_commits.add((config["mpl-switch-commit"], config["compiler"]))
+
+# print(mpl_switch_commits)
+
+def isInstalled((commit, compilerPath)):
+  compilerPath = os.path.join(
+    os.path.expanduser("~"),
+    ".mpl",
+    "versions",
+    commit,
+    "bin",
+    compilerPath
+  )
+  return os.path.exists(compilerPath)
+
+toInstall = [ c for (c, p) in mpl_switch_commits if not isInstalled((c, p)) ]
+
+if len(toInstall) == 0:
+  print("[INFO] all necessary versions of mpl already installed")
+  sys.exit(0)
+
+print("[INFO] the following mpl versions will be installed:")
+for x in toInstall:
+  print("  {}".format(x))
+if raw_input("install now [y/n]? ") != "y":
+  print("[INFO] aborting installation for now.")
+  sys.exit(0)
+
+for x in toInstall:
+  cmd = ["mpl-switch", "install", x]
+  print("[INFO] installing {} (this will take a while)...".format(x))
+  compileProcess = \
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  out, err = compileProcess.communicate()
+  if compileProcess.returncode == 0:
+    print("[INFO] successfully installed {}".format(x))
+  else:
+    sys.stderr.write(out + "\n" + err + "\n")
+    sys.stderr.write("[ERR] installation failed\n")
+    sys.exit(1)
+
+
