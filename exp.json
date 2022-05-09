@@ -170,6 +170,11 @@
         "tag": ["linearrec"],
         "bench": ["linearrec"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["mcss"],
+        "bench": ["mcss"],
+        "args": ["-n 500000000"]
       }
     ]
 }
