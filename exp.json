@@ -155,6 +155,11 @@
         "tag": ["integrate"],
         "bench": ["integrate"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["sparse-mxv"],
+        "args": ["-n 200000000"]
       }
     ]
 }
