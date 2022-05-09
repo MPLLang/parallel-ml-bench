@@ -140,6 +140,16 @@
         "tag": ["delaunay-triangulate"],
         "bench": ["delaunay"],
         "args": ["-n 1000000"]
+      },
+      {
+        "tag": ["linefit"],
+        "bench": ["linefit"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["bignum-add"],
+        "bench": ["bignum-add"],
+        "args": ["-n 500000000"]
       }
     ]
 }
