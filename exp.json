@@ -150,6 +150,11 @@
         "tag": ["bignum-add"],
         "bench": ["bignum-add"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["integrate"],
+        "bench": ["integrate"],
+        "args": ["-n 500000000"]
       }
     ]
 }
