@@ -165,6 +165,11 @@
         "tag": ["wc"],
         "bench": ["wc"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linearrec"],
+        "bench": ["linearrec"],
+        "args": ["-n 500000000"]
       }
     ]
 }
