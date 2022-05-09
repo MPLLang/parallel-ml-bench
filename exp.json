@@ -160,6 +160,11 @@
         "tag": ["sparse-mxv"],
         "bench": ["sparse-mxv"],
         "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["wc"],
+        "bench": ["wc"],
+        "args": ["-n 500000000"]
       }
     ]
 }
