@@ -2,7 +2,7 @@ structure CLA = CommandLineArgs
 structure Seq = ArraySequence
 
 (* chosen by subdirectory *)
-structure Grep = MkGrep(DelayedSeq)
+structure Grep = MkGrep(OldDelayedSeq)
 
 (*
 val pattern = CLA.parseString "pattern" ""
