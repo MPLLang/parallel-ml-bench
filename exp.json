@@ -13,9 +13,6 @@
 
   "globals":
     {
-      "procs": [
-        "1", "2", "4", "8", "16"
-      ],
       "config": ["mlton", "mpl"],
       "cwd": ["mpl"],
       "exp": ["time"],
@@ -32,7 +29,7 @@
         "args": ["-N 100000000"]
       },
       {
-        "tag": ["dmm"],
+        "tag": ["dense-matmul"],
         "bench": ["dmm"],
         "args": ["-N 1024"]
       },
@@ -84,7 +81,7 @@
       {
         "tag": ["dedup"],
         "bench": ["dedup"],
-        "args": ["../inputs/words256.txt --verbose --no-output"]
+        "args": ["../inputs/words256-shuffled.txt --verbose --no-output"]
       },
       {
         "tag": ["suffix-array"],
@@ -94,17 +91,17 @@
       {
         "tag": ["grep"],
         "bench": ["grep"],
-        "args": ["EE ../inputs/words256.txt --benchmark"]
+        "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
       },
       {
-        "tag": ["bfs-tree"],
-        "bench": ["bfs-tree-entangled-fixed"],
-        "args": ["~/data/graph/adj/rmat-10M-symm-bin"]
+        "tag": ["bfs"],
+        "bench": ["bfs"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
         "tag": ["centrality"],
         "bench": ["centrality"],
-        "args": ["~/data/graph/adj/rmat-10M-symm-bin"]
+        "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
         "tag": ["palindrome"],
@@ -122,14 +119,14 @@
         "args": ["-N 13"]
       },
       {
-        "tag": ["ldd"],
+        "tag": ["low-d-decomp"],
         "bench": ["ldd"],
-        "args": ["~/data/graph/adj/rmat-10M-symm-bin"]
+        "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
         "tag": ["triangle-count"],
         "bench": ["triangle-count"],
-        "args": ["~/data/graph/adj/rmat-1M-symm-bin"]
+        "args": ["../inputs/rmat-1M-symm-bin"]
       },
       {
         "tag": ["range-query"],
@@ -137,7 +134,7 @@
         "args": ["-n 1000000 -q 1000000"]
       },
       {
-        "tag": ["delaunay-triangulate"],
+        "tag": ["delaunay"],
         "bench": ["delaunay"],
         "args": ["-n 1000000"]
       },

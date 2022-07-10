@@ -17,8 +17,8 @@ rm -f $ROOT/mpl/bin/*.bin
 ##   ... | jq -c 'select(.config == "mpl")'
 
 ( \
-  $GEN $ROOT/exp.json \
+  $GEN $@ $ROOT/exp.json \
 ) \
-| $RUN --compile --output $RESULTS $@
+| $RUN --compile --output $RESULTS
 
 echo "[INFO] wrote results to $RESULTS"

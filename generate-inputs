@@ -1,0 +1,54 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+
+if [[ ! -f $ROOT/inputs/words256.txt ]]; then
+  echo "[INFO] Generating 'words256.txt'...";
+  ff=$ROOT/inputs/words64.txt;
+  cat $ff $ff $ff $ff > $ROOT/inputs/words256.txt;
+fi
+
+# if [[ ! -f $ROOT/inputs/words64-shuffled.txt ]]; then
+#   echo "[INFO] Generating 'words64-shuffled.txt'...";
+#   inf=$ROOT/inputs/words64.txt;
+#   outf=$ROOT/inputs/words64-shuffled.txt;
+#   make -C mpl shuf.mlton.bin;
+#   mpl/bin/shuf.mlton.bin $inf -o $outf;
+# fi
+
+if [[ ! -f $ROOT/inputs/words256-shuffled.txt ]]; then
+  echo "[INFO] Generating 'words256-shuffled.txt'...";
+  inf=$ROOT/inputs/words256.txt;
+  outf=$ROOT/inputs/words256-shuffled.txt;
+  make -C mpl shuf.mlton.bin;
+  mpl/bin/shuf.mlton.bin $inf -o $outf;
+fi
+
+echo "[INFO] Generating graphs..."
+TMP=$(mktemp -d)
+( \
+  cd $TMP \
+  && git clone https://github.com/cmuparlay/pbbsbench \
+  && cd pbbsbench \
+  && git submodule update --init --recursive \
+  && cd testData/graphData \
+  && make rMatGraph \
+  && echo "[INFO] rMatGraph -s 15210 -o -j 10000000 $ROOT/inputs/rmat-10M-symm" \
+  && ./rMatGraph -s 15210 -o -j 10000000 $ROOT/inputs/rmat-10M-symm \
+  && cd $ROOT \
+  && make -C mpl graphio.mlton.bin \
+  && echo "[INFO] mpl/bin/graphio.mlton.bin inputs/rmat-10M-symm -outfile inputs/rmat-10M-symm-bin" \
+  && mpl/bin/graphio.mlton.bin $ROOT/inputs/rmat-10M-symm -outfile $ROOT/inputs/rmat-10M-symm-bin \
+  && rm -f $ROOT/inputs/rmat-10M-symm \
+  && cd $TMP/pbbsbench/testData/graphData \
+  && echo "[INFO] rMatGraph -s 15210 -o -j 1000000 $ROOT/inputs/rmat-1M-symm" \
+  && ./rMatGraph -s 15210 -o -j 1000000 $ROOT/inputs/rmat-1M-symm \
+  && cd $ROOT \
+  && make -C mpl graphio.mlton.bin \
+  && echo "[INFO] mpl/bin/graphio.mlton.bin inputs/rmat-1M-symm -outfile inputs/rmat-1M-symm-bin" \
+  && mpl/bin/graphio.mlton.bin $ROOT/inputs/rmat-1M-symm -outfile $ROOT/inputs/rmat-1M-symm-bin \
+  && rm -f $ROOT/inputs/rmat-1M-symm
+)
+
+rm -rf $TMP
+

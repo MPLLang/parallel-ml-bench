@@ -29,7 +29,7 @@ def _killer():
       except Exception as e:
         sys.stderr.write("[WARN] Error while trying to kill process {}: {}\n".format(child.pid, str(e)))
 
-def runcmds(rows, timeout=300.0, silent=False):
+def runcmds(rows, timeout=600.0, silent=False):
   global _currentChildren
   numCmds = sum(int(row.get('trials', '1')) for row in rows)
   cmdNum = 0
