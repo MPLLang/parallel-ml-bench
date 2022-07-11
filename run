@@ -10,6 +10,7 @@ RESULTS=$ROOT/results/$NOW
 
 rm -f $ROOT/mpl/bin/*.bin
 rm -f $ROOT/cpp/bin/*.bin
+rm -f $ROOT/ocaml/bin/*.bin
 
 ## NOTE: when filtering with jq, remember to pass -c
 ## (compact output, ensures each line is a single json object)
@@ -19,7 +20,8 @@ rm -f $ROOT/cpp/bin/*.bin
 
 ( \
   $GEN $@ $ROOT/exp.json; \
-  $GEN $@ $ROOT/cpp-exp.json \
+  $GEN $@ $ROOT/cpp-exp.json; \
+  $GEN $@ $ROOT/ocaml-exp.json \
 ) \
 | $RUN --compile --output $RESULTS
 

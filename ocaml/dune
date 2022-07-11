@@ -1,0 +1,19 @@
+(include_subdirs unqualified)
+
+(executable
+ (name msort)
+ (libraries cla seq merge benchmark util quicksort)
+ (modules msort)
+ (modes native))
+
+(executable
+ (name msort_strings)
+ (libraries cla seq merge benchmark util quicksort readfile tokenize)
+ (modules msort_strings)
+ (modes native))
+
+(executable
+ (name primes)
+ (libraries cla seqbasis benchmark)
+ (modules primes)
+ (modes native))

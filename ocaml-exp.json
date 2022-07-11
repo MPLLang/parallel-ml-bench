@@ -1,0 +1,38 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "ocaml", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <procs?-procs {} ><args?{} ><args1?{}> -repeat 10 -warmup 5"
+      }
+    ],
+
+  "globals":
+    {
+      "config": ["ocaml"],
+      "cwd": ["ocaml"],
+      "exp": ["time"],
+      "trials": ["1"]
+    },
+
+  "jqselect": "(true)",
+
+  "specs":
+    [
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-N 100000000"]
+      },
+      {
+        "tag": ["msort"],
+        "bench": ["msort"],
+        "args": ["-N 10000000"]
+      },
+      {
+        "tag": ["msort-strings"],
+        "bench": ["msort_strings"],
+        "args": ["-f ../inputs/words64.txt"]
+      }
+    ]
+}

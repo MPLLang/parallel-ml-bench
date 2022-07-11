@@ -59,6 +59,11 @@
         "args": ["../inputs/words64.txt"]
       },
       {
+        "tag": ["msort"],
+        "bench": ["msort"],
+        "args": ["-N 10000000"]
+      },
+      {
         "tag": ["nearest-nbrs"],
         "bench": ["nn"],
         "args": ["-N 1000000"]

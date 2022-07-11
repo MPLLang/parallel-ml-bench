@@ -12,7 +12,13 @@ Software requirements:
   * [mpl-switch](https://github.com/MPLLang/mpl-switch)
   * [smlpkg](https://github.com/diku-dk/smlpkg)
   * [jq](https://stedolan.github.io/jq/)
-  * [numactl](https://github.com/numactl/numactl) (for C++ experiments only)
+  * C++ experiments only:
+    - [numactl](https://github.com/numactl/numactl)
+  * OCaml experiments only:
+    - OCaml version `5.0.0+trunk`
+    - [`opam`](https://github.com/ocaml/opam) version `2.1.0`
+    - [`domainslib`](https://github.com/ocaml-multicore/domainslib) version `0.4.2`
+    - [`dune`](https://github.com/ocaml/dune)
 
 ## Setup
 
@@ -57,16 +63,24 @@ so far will still be available in the results file.
 
 ## TODO
 
+Infrastructure and benchmarks
   * [x] update inputs (need words256, input graphs, etc.)
   * [ ] report script (speedup plots, summary table, etc.)
   * [ ] benchmarks documentation
-  * [x] MPL infrastructure
-  * [x] MPL benchmarks
-  * [x] C++ infrastructure
-  * [ ] C++ benchmarks
-  * [ ] Java infrastructure
-  * [ ] Java benchmarks
-  * [ ] OCaml infrastructure
-  * [ ] OCaml benchmarks
-  * [ ] Go infrastructure
-  * [ ] Go benchmarks
+  * [x] MPL: infrastructure
+  * [x] MPL: benchmarks
+  * [x] C++: infrastructure
+  * [ ] C++: **more benchmarks**
+  * [ ] Java: infrastructure
+  * [ ] Java: benchmarks
+  * [x] OCaml: infrastructure
+  * [ ] OCaml: **more benchmarks**
+  * [ ] Go: infrastructure
+  * [ ] Go: benchmarks
+
+Performance optimization
+  * [ ] Try z-sort for nearest neighbors. Would this improve performance
+  for neighbors component of Delaunay, too?
+  * [ ] Compare direction-optimizing BFS with C++ Ligra
+  * [ ] Check delayed-seq performance vs hand-optimized for delayed-seq
+  benchmarks
