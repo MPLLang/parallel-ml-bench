@@ -9,6 +9,7 @@ mkdir -p $ROOT/results
 RESULTS=$ROOT/results/$NOW
 
 rm -f $ROOT/mpl/bin/*.bin
+rm -f $ROOT/cpp/bin/*.bin
 
 ## NOTE: when filtering with jq, remember to pass -c
 ## (compact output, ensures each line is a single json object)
@@ -17,7 +18,8 @@ rm -f $ROOT/mpl/bin/*.bin
 ##   ... | jq -c 'select(.config == "mpl")'
 
 ( \
-  $GEN $@ $ROOT/exp.json \
+  $GEN $@ $ROOT/exp.json; \
+  $GEN $@ $ROOT/cpp-exp.json \
 ) \
 | $RUN --compile --output $RESULTS
 

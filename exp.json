@@ -6,7 +6,7 @@
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 10 -warmup 5"
       },
       {
-        "match": { "config": "mlton", "exp": "time" },
+        "match": { "config": "mlton", "exp": "time", "procs": "1" },
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 10 -warmup 5"
       }
     ],

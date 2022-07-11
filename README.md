@@ -12,6 +12,7 @@ Software requirements:
   * [mpl-switch](https://github.com/MPLLang/mpl-switch)
   * [smlpkg](https://github.com/diku-dk/smlpkg)
   * [jq](https://stedolan.github.io/jq/)
+  * [numactl](https://github.com/numactl/numactl) (for C++ experiments only)
 
 ## Setup
 
@@ -23,7 +24,7 @@ $ cd parallel-ml-bench
 
 Then, run the init script. This should take approximately 15 minutes. It
 installs all necessary  versions of `mpl` and generates inputs. Note that
-the generated inputs require approximately 2.5GB of disk space.
+the generated inputs require approximately 5GB of disk space.
 ```
 $ ./init
 ```
@@ -59,3 +60,13 @@ so far will still be available in the results file.
   * [x] update inputs (need words256, input graphs, etc.)
   * [ ] report script (speedup plots, summary table, etc.)
   * [ ] benchmarks documentation
+  * [x] MPL infrastructure
+  * [x] MPL benchmarks
+  * [x] C++ infrastructure
+  * [ ] C++ benchmarks
+  * [ ] Java infrastructure
+  * [ ] Java benchmarks
+  * [ ] OCaml infrastructure
+  * [ ] OCaml benchmarks
+  * [ ] Go infrastructure
+  * [ ] Go benchmarks
