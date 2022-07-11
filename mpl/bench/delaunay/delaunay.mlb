@@ -1,4 +1,9 @@
 ../../lib.mlb
+(*local
+  ../grep/OldDelayedSeq.sml
+in
+  structure DelayedSeq = OldDelayedSeq
+end*)
 Split.sml
 DelaunayTriangulation.sml
 main.sml

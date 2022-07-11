@@ -31,7 +31,11 @@ TMP=$(mktemp -d)
   && git clone https://github.com/cmuparlay/pbbsbench \
   && cd pbbsbench \
   && git submodule update --init --recursive \
-  && cd testData/graphData \
+  && cd testData/geometryData \
+  && make randPoints \
+  && echo "[INFO] randPoints -s 1000000 $ROOT/inputs/uniform-circle-1M" \
+  && ./randPoints -s 1000000 $ROOT/inputs/uniform-circle-1M \
+  && cd ../graphData \
   && make rMatGraph \
   && echo "[INFO] rMatGraph -s 15210 -o -j 10000000 $ROOT/inputs/rmat-10M-symm" \
   && ./rMatGraph -s 15210 -o -j 10000000 $ROOT/inputs/rmat-10M-symm \

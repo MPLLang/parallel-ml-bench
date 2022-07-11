@@ -27,6 +27,11 @@
         "tag": ["primes"],
         "bench": ["primes"],
         "args": ["-n 100000000"]
+      },
+      {
+        "tag": ["delaunay"],
+        "bench": ["delaunay"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
       }
     ]
 }

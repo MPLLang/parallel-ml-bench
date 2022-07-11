@@ -62,7 +62,8 @@ bin_folder:
 
 
 PROGRAMS=\
-	primes
+	primes \
+	delaunay
 
 all_cpp: $(PROGRAMS:%=%.cpp.bin)
 
