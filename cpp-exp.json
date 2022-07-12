@@ -32,6 +32,11 @@
         "tag": ["delaunay"],
         "bench": ["delaunay"],
         "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["nearest-nbrs"],
+        "bench": ["nearest-nbrs"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
       }
     ]
 }

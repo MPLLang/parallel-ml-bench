@@ -2,6 +2,7 @@ structure NN = NearestNeighbors
 structure CLA = CommandLineArgs
 
 val n = CLA.parseInt "N" 1000000
+val inputFile = CLA.parseString "input" ""
 val leafSize = CLA.parseInt "leafSize" 16
 val grain = CLA.parseInt "grain" 100
 val seed = CLA.parseInt "seed" 15210
@@ -15,8 +16,25 @@ fun genReal i =
   end
 
 fun genPoint i = (genReal (2*i), genReal (2*i + 1))
-val (input, tm) = Util.getTime (fn _ => Seq.tabulate genPoint n)
-val _ = print ("generated input in " ^ Time.fmt 4 tm ^ "s\n")
+
+val input =
+  case inputFile of
+    "" =>
+      let
+        val (input, tm) = Util.getTime (fn _ => Seq.tabulate genPoint n)
+      in
+        print ("generated input in " ^ Time.fmt 4 tm ^ "s\n");
+        input
+      end
+
+  | filename =>
+      let
+        val (points, tm) = Util.getTime (fn _ =>
+          ParseFile.readSequencePoint2d filename)
+      in
+        print ("parsed input points in " ^ Time.fmt 4 tm ^ "s\n");
+        points
+      end
 
 fun nnEx() =
   let
@@ -30,6 +48,8 @@ fun nnEx() =
   end
 
 val (tree, nbrs) = Benchmark.run "running nearest neighbors" nnEx
+val _ =
+  print ("result " ^ Util.summarizeArraySlice 12 Int.toString nbrs ^ "\n")
 
 (* now input[nbrs[i]] is the closest point to input[i] *)
 

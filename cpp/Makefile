@@ -63,7 +63,8 @@ bin_folder:
 
 PROGRAMS=\
 	primes \
-	delaunay
+	delaunay \
+	nearest-nbrs
 
 all_cpp: $(PROGRAMS:%=%.cpp.bin)
 
