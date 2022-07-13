@@ -1,6 +1,6 @@
 
-Dedup.java.bin: phony
-	javac Dedup.java
+%.java.bin: phony
+	javac $*.java
 
 .PHONY: phony
 phony:

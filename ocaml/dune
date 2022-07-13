@@ -1,9 +1,9 @@
 (include_subdirs unqualified)
 
 (executable
- (name msort)
+ (name msort_ints)
  (libraries cla seq merge benchmark util quicksort)
- (modules msort)
+ (modules msort_ints)
  (modes native))
 
 (executable

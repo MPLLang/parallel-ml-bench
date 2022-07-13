@@ -25,8 +25,8 @@
         "args": ["-N 100000000"]
       },
       {
-        "tag": ["msort"],
-        "bench": ["msort"],
+        "tag": ["msort-ints"],
+        "bench": ["msort_ints"],
         "args": ["-N 10000000"]
       },
       {

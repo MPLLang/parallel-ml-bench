@@ -24,9 +24,9 @@
   "specs":
     [
       {
-        "tag": ["dedup-ints"],
-        "bench": ["Dedup"],
-        "args": ["-n 1000000"]
+        "tag": ["sort-longs"],
+        "bench": ["SortLongs"],
+        "args": ["-n 10000000"]
       }
     ]
 }
