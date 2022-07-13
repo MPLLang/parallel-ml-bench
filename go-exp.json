@@ -32,6 +32,11 @@
         "tag": ["matthew-sort-int64"],
         "bench": ["matthew-sort"],
         "args": ["-n 10000000"]
+      },
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-n 100000000"]
       }
     ]
 }
