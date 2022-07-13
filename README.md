@@ -71,8 +71,8 @@ Infrastructure and benchmarks
   * [x] MPL: benchmarks
   * [x] C++: infrastructure
   * [ ] C++: **more benchmarks**
-  * [ ] Java: infrastructure
-  * [ ] Java: benchmarks
+  * [x] Java: infrastructure
+  * [ ] Java: **more benchmarks**
   * [x] OCaml: infrastructure
   * [ ] OCaml: **more benchmarks**
   * [ ] Go: infrastructure

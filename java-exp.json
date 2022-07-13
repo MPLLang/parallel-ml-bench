@@ -1,0 +1,32 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "java", "procs": "(?!1$)" },
+        "template": "/usr/bin/time -v numactl -i all -- java -XX:+UseG1GC -XX:ParallelGCThreads=<procs> -Djava.util.concurrent.ForkJoinPool.common.parallelism=<procs> <bench> <args?{}> <args1?{}> -repeat 10 -warmup 5"
+      },
+      {
+        "match": { "config": "java" },
+        "template": "/usr/bin/time -v java -XX:+UseG1GC -XX:ParallelGCThreads=<procs> -Djava.util.concurrent.ForkJoinPool.common.parallelism=<procs> <bench> <args?{}> <args1?{}> -repeat 10 -warmup 5"
+      }
+    ],
+
+  "globals":
+    {
+      "config": ["java"],
+      "cwd": ["java"],
+      "exp": ["time"],
+      "trials": ["1"]
+    },
+
+  "jqselect": "(true)",
+
+  "specs":
+    [
+      {
+        "tag": ["dedup-ints"],
+        "bench": ["Dedup"],
+        "args": ["-n 1000000"]
+      }
+    ]
+}
