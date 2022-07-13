@@ -1,0 +1,3 @@
+Problems:
+  - local imports don't seem to work?
+  - is GOPATH the problem? I don't understand GOPATH...
