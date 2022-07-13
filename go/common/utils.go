@@ -4,18 +4,35 @@ import (
   "os"
   "fmt"
   "strconv"
-	// "math"
+  "golang.org/x/exp/constraints"
 )
 
-func min(x,y int) int {
+func min[T constraints.Ordered](x,y T) T {
   if x < y {
     return x
   }
   return y
 }
 
+func max[T constraints.Ordered](x,y T) T {
+  if x > y {
+    return x
+  }
+  return y
+}
+
+
 func string_to_int(s string) int {
   x, err := strconv.Atoi(s)
+  if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+  }
+  return x
+}
+
+func string_to_float64(s string) float64 {
+  x, err := strconv.ParseFloat(s, 64)
   if err != nil {
       fmt.Println(err)
       os.Exit(1)
