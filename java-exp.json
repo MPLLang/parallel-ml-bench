@@ -27,6 +27,11 @@
         "tag": ["sort-longs"],
         "bench": ["SortLongs"],
         "args": ["-n 10000000"]
+      },
+      {
+        "tag": ["primes"],
+        "bench": ["Primes"],
+        "args": ["-n 100000000"]
       }
     ]
 }
