@@ -4,21 +4,19 @@ import (
   // "os"
   "fmt"
   // "time"
-	"parallel-ml-bench-go/internal/cla"
-	"parallel-ml-bench-go/internal/utils"
   "runtime"
   "github.com/intel/forGoParallel/psort"
 )
 
 func main() {
-  procs := cla.parseInt("procs", 1)
-  n := cla.parseInt("n", 1000000)
+  procs := parseInt("procs", 1)
+  n := parseInt("n", 1000000)
   runtime.GOMAXPROCS(procs)
   fmt.Printf("procs %d\nn %d\n", procs, n)
 
   xs := make([]int, n)
   for i := 0; i < n; i++ {
-    xs[i] = (int)(utils.hash64(uint64(i)) % uint64(n))
+    xs[i] = (int)(hash64(uint64(i)) % uint64(n))
   }
 
   psort.Sort(psort.IntSlice(xs))

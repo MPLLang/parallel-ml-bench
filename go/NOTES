@@ -1,3 +1,10 @@
 Problems:
   - local imports don't seem to work?
   - is GOPATH the problem? I don't understand GOPATH...
+  - how to do multiple main functions?
+
+Workaround:
+  - don't try to separate by package. everything in package 'main'
+  - each executable defined by own subdirectory
+  - shared code in common/ subdir. use symlinks to fool go into thinking that
+  all these files are local for each executable

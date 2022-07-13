@@ -1,4 +1,4 @@
-module parallel-ml-bench-go
+module main
 
 go 1.18
 
