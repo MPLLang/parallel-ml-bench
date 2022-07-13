@@ -12,13 +12,16 @@ Software requirements:
   * [mpl-switch](https://github.com/MPLLang/mpl-switch)
   * [smlpkg](https://github.com/diku-dk/smlpkg)
   * [jq](https://stedolan.github.io/jq/)
-  * C++ experiments only:
-    - [numactl](https://github.com/numactl/numactl)
+  * [numactl](https://github.com/numactl/numactl) (for C++, Java, Go experiments)
   * OCaml experiments only:
     - OCaml version `5.0.0+trunk`
     - [`opam`](https://github.com/ocaml/opam) version `2.1.0`
     - [`domainslib`](https://github.com/ocaml-multicore/domainslib) version `0.4.2`
     - [`dune`](https://github.com/ocaml/dune)
+  * Java experiments only:
+    - Java version 11
+  * Go experiments only:
+    - Go version 1.18
 
 ## Setup
 
@@ -75,8 +78,8 @@ Infrastructure and benchmarks
   * [ ] Java: **more benchmarks**
   * [x] OCaml: infrastructure
   * [ ] OCaml: **more benchmarks**
-  * [ ] Go: infrastructure
-  * [ ] Go: benchmarks
+  * [x] Go: infrastructure
+  * [ ] Go: **more benchmarks**
 
 Performance optimization
   * [ ] Try z-sort for nearest neighbors. Would this improve performance
