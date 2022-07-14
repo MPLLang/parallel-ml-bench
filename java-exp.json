@@ -32,6 +32,11 @@
         "tag": ["primes"],
         "bench": ["Primes"],
         "args": ["-n 100000000"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["Tokens"],
+        "args": ["-input ../inputs/words256.txt"]
       }
     ]
 }

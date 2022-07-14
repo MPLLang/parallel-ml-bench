@@ -71,6 +71,19 @@ class CommandLineArgs {
     return Double.parseDouble(args[i+1]);
   }
 
+  public static String parseString(String key, String def) {
+    int i = find("-" + key);
+    if (i < 0)
+      return def;
+
+    if (i+1 >= args.length) {
+      System.err.println("missing double value for key -" + key);
+      System.exit(1);
+    }
+
+    return args[i+1];
+  }
+
   public static boolean parseFlag(String key) {
     int i = find("--" + key);
     return (i > 0);
