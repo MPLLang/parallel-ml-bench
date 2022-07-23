@@ -20,10 +20,10 @@ class Primes {
 
     // LongStream.range(0, n+1).parallel().forEach(i -> flags[i] = input[i])
 
-    LongStream.range(0, sqrtPrimes.length).parallel().forEach(i -> {
-      long p = sqrtPrimes[(int)i];
-      long numMultiples = n / p - 1;
-      LongStream.range(0, numMultiples).parallel().forEach(j -> {
+    IntStream.range(0, sqrtPrimes.length).parallel().forEach(i -> {
+      int p = (int)sqrtPrimes[(int)i];
+      int numMultiples = (int)n / p - 1;
+      IntStream.range(0, numMultiples).parallel().forEach(j -> {
         flags[(int)((j+2)*p)] = true;
       });
     });

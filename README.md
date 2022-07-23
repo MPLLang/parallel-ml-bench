@@ -77,7 +77,7 @@ Infrastructure and benchmarks
   * [x] Java: infrastructure
   * [ ] Java: **more benchmarks**
   * [x] OCaml: infrastructure
-  * [ ] OCaml: **more benchmarks**
+  * [x] OCaml: **more benchmarks**
   * [x] Go: infrastructure
   * [ ] Go: **more benchmarks**
 
@@ -85,5 +85,5 @@ Performance optimization
   * [ ] Try z-sort for nearest neighbors. Would this improve performance
   for neighbors component of Delaunay, too?
   * [ ] Compare direction-optimizing BFS with C++ Ligra
-  * [ ] Check delayed-seq performance vs hand-optimized for delayed-seq
+  * [x] Check delayed-seq performance vs hand-optimized for delayed-seq
   benchmarks

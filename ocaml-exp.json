@@ -3,7 +3,11 @@
     [
       {
         "match": { "config": "ocaml", "exp": "time" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <procs?-procs {} ><args?{} ><args1?{}> -repeat 10 -warmup 5"
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <procs?-procs {} ><args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "ocaml", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <procs?-procs {} ><args?{} ><args1?{}> -repeat 20 -warmup 0"
       }
     ],
 
@@ -11,7 +15,7 @@
     {
       "config": ["ocaml"],
       "cwd": ["ocaml"],
-      "exp": ["time"],
+      "exp": ["time","space"],
       "trials": ["1"]
     },
 
@@ -27,12 +31,42 @@
       {
         "tag": ["msort-ints"],
         "bench": ["msort_ints"],
-        "args": ["-N 10000000"]
+        "args": ["-N 20000000"]
       },
       {
         "tag": ["msort-strings"],
         "bench": ["msort_strings"],
         "args": ["-f ../inputs/words64.txt"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["-f ../inputs/words256.txt --no-output"]
+      },
+      {
+        "tag": ["raytracer"],
+        "bench": ["raytracer"],
+        "args": ["-n 1000 -m 1000"]
+      },
+      {
+        "tag": ["game-of-life"],
+        "bench": ["game_of_life"],
+        "args": ["-n_times 100 -board_size 1024"]
+      },
+      {
+        "tag": ["nbody"],
+        "bench": ["nbody"],
+        "args": ["-n 500 -num_bodies 1024"]
+      },
+      {
+        "tag": ["lu-decomp"],
+        "bench": ["lu_decomp"],
+        "args": ["-mat_size 1024"]
+      },
+      {
+        "tag": ["binarytrees5"],
+        "bench": ["binarytrees5"],
+        "args": ["-max_depth 19"]
       }
     ]
 }

@@ -1,0 +1,728 @@
+#!/usr/bin/python
+
+import json
+import sys
+import re
+import copy
+import os
+import argparse
+import subprocess
+import numpy as np
+
+def getGitRoot():
+  return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
+    stdout=subprocess.PIPE).communicate()[0].rstrip()
+
+ROOT = getGitRoot()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--no-plots', action='store_true', dest='no_plots')
+parser.add_argument('input_file', nargs='?', metavar='RESULTS_FILE')
+args = parser.parse_args()
+
+BLUE = '\033[94m'
+#GREEN = '\033[92m'
+GREEN = '\033[38;2;20;139;20m'
+#LIGHT_GREEN = '\033[38;2;138;226;52m'
+LIGHT_GREEN = '\033[38;2;100;226;130m'
+YELLOW = '\033[93m'
+GRAY = '\033[38;2;151;155;147m'
+RED = '\033[91m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
+
+class colortext:
+  def __init__(self, text, color, bold=True):
+    self.text = text
+    self.color = color
+    self.bold = bold
+  def __len__(self):
+    return len(self.text)
+  def __str__(self):
+    return (BOLD if self.bold else "") + self.color + self.text + ENDC
+def green(s):
+  return colortext(s, GREEN)
+def red(s):
+  return colortext(s, RED)
+def orange(s):
+  return colortext(s, YELLOW, bold=True)
+def blue(s):
+  return colortext(s, BLUE)
+def lightgreen(s):
+  return colortext(s, LIGHT_GREEN, bold=True)
+def gray(s):
+  return colortext(s, GRAY, bold=False)
+
+def json_careful_loads(s):
+  try:
+    return json.loads(s)
+  except Exception as e:
+    sys.stderr.write("[ERR] Error while parsing json: {}\n".format(e))
+    sys.exit(1)
+
+def json_careful_readlines(f):
+  return [ json_careful_loads(line.rstrip('\n')) for line in f ]
+
+def safeInsert(dict, key, value):
+  if key not in dict:
+    dict[key] = value
+  else:
+    sys.stderr.write("[WARN] Key {} is already in use; trying _{} instead.\n".format(key))
+    safeInsert(dict, "_" + key, value)
+
+def reCompile(exp):
+  return re.compile(exp, re.MULTILINE)
+
+# def parseCommaInteger(s):
+#   return int(s.replace(",", ""))
+
+# local reclaimed: 32859049984
+# num local: 20999
+# local gc time: 4541
+# promo time: 8
+
+def parseKiB(kibStr):
+  return float(int(kibStr)) * 1024.0 / 1000.0
+
+def parseB(bytesStr):
+  return float(int(bytesStr)) / 1000.0
+
+def parseTimes(stdout):
+  pat = reCompile(r"^time\s+(\d+.\d+).*$")
+  return [float(x) for x in pat.findall(stdout)]
+
+statsPatterns = \
+  [ #("time", float, reCompile(r"^end-to-end\s+(\d+.\d+)s$"))
+  #,
+    ("space", parseKiB, reCompile(r"^\s*Maximum resident set size \(kbytes\): (\d+).*$"))
+  , ("approx-race-factor", parseB, reCompile(r"^entangled bytes: (\d+).*$"))
+  , ("kbytes-pinned-entangled", parseB, reCompile(r"^bytes pinned entangled: (\d+).*$"))
+  # , ("num-local", int, reCompile(r"^num local: (\d+)$"))
+  # , ("local-reclaimed", parseB, reCompile(r"^local reclaimed: (\d+)$"))
+  # , ("local-time", int, reCompile(r"^local gc time: (\d+)$"))
+  # , ("promo-time", int, reCompile(r"^promo time: (\d+)$"))
+  # , ("root-reclaimed", parseB, reCompile(r"^root cc reclaimed: (\d+)$"))
+  # , ("internal-reclaimed", parseB, reCompile(r"^internal cc reclaimed: (\d+)$"))
+  # , ("num-root", int, reCompile(r"^num root cc: (\d+)$"))
+  # , ("num-internal", int, reCompile(r"^num internal cc: (\d+)$"))
+  # , ("root-time", int, reCompile(r"^root cc time: (\d+)$"))
+  # , ("internal-time", int, reCompile(r"^internal cc time: (\d+)$"))
+  # , ("working-set", parseCommaInteger, reCompile(r"^max bytes live: (.*) bytes$"))
+  ]
+
+def renameConfig(c):
+  return c
+
+def renameTag(t):
+  return t
+
+def displayTag(t):
+  sandmarkTags = ["binarytrees5","lu-decomp","game-of-life","nbody"]
+  if t in sandmarkTags:
+    return "SM:" + t
+  if t == "dedup-strings":
+    return "hash-dedup"
+  if t == "dmm":
+    return "dense-matmul"
+  if t == "mis":
+    return "maximal-indep-set"
+  if t == "msort":
+    return "msort-ints"
+  if t == "pfa-bst":
+    return "persistent-arr"
+  if t == "connectivity":
+    return "reachability"
+  return t
+
+
+foundTags = set()
+foundProcs = set()
+
+def parseStats(row):
+  newRow = copy.deepcopy(row)
+  for (name, convert, pat) in statsPatterns:
+    m = pat.search(newRow['stdout'] + newRow['stderr'])
+    if m:
+      safeInsert(newRow, name, convert(m.group(1)))
+  newRow['procs'] = int(newRow.get('procs', '1'))
+  newRow['config'] = renameConfig(row['config'])
+  newRow['tag'] = renameTag(row['tag'])
+
+  allOutput = newRow['stdout'] + newRow['stderr']
+  if 'multi' in newRow:
+    for i in range(1, int(newRow['multi'])):
+      allOutput += newRow['stdout{}'.format(i)] + newRow['stderr{}'.format(i)]
+
+  tms = parseTimes(allOutput)
+  try:
+    newRow['avgtime'] = sum(tms) / len(tms)
+  except:
+    newRow['avgtime'] = None
+
+  # try:
+  #   newRow['space'] = float(newRow['space'])
+  # except KeyError:
+  #   pass
+
+  # try:
+  #   newRow['time'] = float(newRow['elapsed'])
+  # except KeyError:
+  #   pass
+
+  foundTags.add(newRow['tag'])
+  foundProcs.add(newRow['procs'])
+
+  return newRow
+
+def findTrials(data, config, tag, procs):
+  result = []
+  for row in data:
+    if (row['config'] == config and \
+        row['tag'] == tag and \
+        row['procs'] == procs):
+      result.append(row)
+  return result
+
+# ======================================================================
+
+def averageTime(data, config, tag, procs, checkExpType=True):
+  trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or (r['exp'] == 'time') ]
+  tms = [ r['avgtime'] for r in trials if 'avgtime' in r ]
+  try:
+    return tms[-1]
+  except:
+    return None
+
+def averageSpace(data, config, tag, procs, checkExpType=True):
+  trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or r['exp'] == 'space' ]
+  sp = [ r['space'] for r in trials if 'space' in r ]
+
+  try:
+    # sp = sp[-10:] if procs > 1 else sp[-1:]
+    sp = sp[-1:]
+    return sum(sp) / len(sp)
+  except:
+    return None
+
+def approxRaceFactor(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'stats' ]
+  ee = [ r['approx-race-factor'] for r in trials if 'approx-race-factor' in r ]
+  try:
+    return ee[-1]
+  except:
+    return None
+
+# ======================================================================
+
+def tm(t):
+  if t is None:
+    return None
+  if t == 0.0:
+    return int(0)
+  # if t > 10.0:
+  #   return int(round(t))
+  try:
+    if t < 1.0:
+      return round(t, 3)
+    if t < 10.0:
+      return round(t, 2)
+    elif t < 100.0:
+      return round(t, 1)
+    else:
+      return round(t)
+  except TypeError:
+    print ("[ERR] Got type error trying to round {}".format(repr(t)))
+    return None
+
+def ov(x):
+  if x is None:
+    return None
+  return "{:.2f}".format(x)
+
+def ovv(x):
+  if x is None:
+    return None
+  return round(x, 2)
+
+def rat(x):
+  if x is None:
+    return None
+  if x >= 10.0:
+    return str(int(round(x)))
+  if x >= 1:
+    return "{:.1f}".format(x)
+  else:
+    return "{:.2f}".format(x)
+
+def sd(x, y):
+  try:
+    return x / y
+  except:
+    return None
+
+def safemul(x, y):
+  try:
+    return x * y
+  except:
+    return None
+
+def safeadd(x, y):
+  try:
+    return x + y
+  except:
+    return None
+
+def su(x):
+  if x is None:
+    return None
+  return str(int(round(x)))
+
+def bu(x):
+  if x is None:
+    return None
+  return "{:.1f}".format(x)
+
+def noLeadZero(x):
+  try:
+    if "0" == x[:1]:
+      return x[1:]
+  except:
+    pass
+  return x
+
+def sp(kb):
+  if kb is None:
+    return None
+  if kb < 0.001:
+    return "0"
+  num = kb
+  for unit in ['K','M','G']:
+    if num < 100:
+      if num < 1:
+        return noLeadZero("%0.2f %s" % (num, unit))
+      if num < 10:
+        return noLeadZero("%1.1f %s" % (num, unit))
+      return "%d %s" % (round(num), unit)
+      # return "%d %s" % (int(round(num,-1)), unit)
+    num = num / 1000
+  return noLeadZero("%1.1f %s" % (num, 'T'))
+
+def sfmt(xx):
+  if xx is None:
+    return "--"
+  elif type(xx) is str:
+    return xx
+  elif xx < 0.01:
+    return noLeadZero("{:.4f}".format(xx))
+  elif xx < 0.1:
+    return noLeadZero("{:.3f}".format(xx))
+  elif xx < 1.0:
+    return noLeadZero("{:.2f}".format(xx))
+  elif xx < 10.0:
+    return "{:.1f}".format(xx)
+  else:
+    return str(int(round(xx)))
+
+def spg(kb):
+  try:
+    gb = kb / (1000.0 * 1000.0)
+    if gb < .01:
+      return round(gb, 4)
+    elif gb < .1:
+      return round(gb, 3)
+    elif gb < 1.0:
+      return round(gb, 2)
+    elif gb < 10.0:
+      return round(gb, 1)
+    else:
+      return round(gb, 0)
+  except:
+    return None
+
+def spm(kb):
+  try:
+    mb = kb / (1000.0)
+    if mb < .01:
+      return round(mb, 4)
+    elif mb < .1:
+      return round(mb, 3)
+    elif mb < 1.0:
+      return round(mb, 2)
+    elif mb < 10.0:
+      return round(mb, 1)
+    else:
+      return round(mb, 0)
+  except:
+    return None
+
+def makeBold(s):
+  try:
+    return "{\\bf " + s + "}"
+  except Exception as e:
+    sys.stderr.write("[WARN] " + str(e) + "\n")
+    return "--"
+
+def pcd(b, a):
+  try:
+    xx = int(round(100.0 * (b-a) / abs(a)))
+    return xx
+  except:
+    return None
+
+def fmtpcd(xx, highlight=True):
+  try:
+    xx = int(round(xx))
+    result = ("+" if xx >= 0.0 else "") + ("{}\\%".format(xx))
+    if highlight and (xx < 0):
+      return makeBold(result)
+    else:
+      return result
+  except Exception as e:
+    sys.stderr.write("[WARN] " + str(e) + "\n")
+    return "--"
+
+def ov_to_latexpcd(ov, highlight=True):
+  try:
+    xx = int(round(100.0 * (ov-1.0)))
+    result = ("+" if xx >= 0.0 else "") + ("{}\\%".format(xx))
+    if highlight and (xx < 0):
+      return makeBold(result)
+    else:
+      return result
+  except Exception as e:
+    sys.stderr.write("[WARN] " + str(e) + "\n")
+    return "--"
+
+def latexpcd(b, a, highlight=True):
+  try:
+    xx = pcd(b, a)
+    result = ("+" if xx >= 0.0 else "") + ("{}\\%".format(xx))
+    if highlight and (xx < 0):
+      return makeBold(result)
+    else:
+      return result
+  except Exception as e:
+    sys.stderr.write("[WARN] " + str(e) + "\n")
+    return "--"
+
+def fmt(xx):
+  if xx is None:
+    return "--"
+  elif type(xx) is str:
+    return xx
+  elif xx < 1.0:
+    return noLeadZero("{:.3f}".format(xx))
+  elif xx < 10.0:
+    return "{:.2f}".format(xx)
+  elif xx < 100.0:
+    return "{:.1f}".format(xx)
+  else:
+    return str(int(round(xx)))
+
+def geomean(iterable):
+  try:
+    a = np.array(iterable)
+    return a.prod()**(1.0/len(a))
+  except:
+    return None
+
+def average(iterable):
+  try:
+    a = np.array(iterable)
+    return a.sum() * (1.0/len(a))
+  except:
+    return None
+
+# =========================================================================
+
+delimWidth = 2
+
+def makeline(row, widths, align):
+  bits = []
+  i = 0
+  while i < len(row):
+    j = i+1
+    while j < len(row) and (row[j] is None):
+      j += 1
+    availableWidth = sum(widths[i:j]) + delimWidth*(j-i-1)
+    s = str(row[i])
+    w = " " * (availableWidth - len(row[i]))
+    aa = align(i)
+    if aa == "l":
+      ln = s + w
+    elif aa == "r":
+      ln = w + s
+    elif aa == "c":
+      ln = w[:len(w)/2] + s + w[len(w)/2:]
+    else:
+      raise ValueError("invalid formatter: {}".format(aa))
+    bits.append(ln)
+    i = j
+  return (" " * delimWidth).join(bits)
+
+def table(rows, align=None):
+  numCols = max(len(row) for row in rows if not isinstance(row, str))
+
+  widths = [0] * numCols
+  for row in rows:
+    # string rows are used for formatting
+    if isinstance(row, str):
+      continue
+
+    i = 0
+    while i < len(row):
+      j = i+1
+      while j < len(row) and (row[j] is None):
+        j += 1
+      # rw = len(stripANSI(str(row[i])))
+      # rw = len(str(row[i]))
+      rw = len(row[i])
+      for k in xrange(i, j):
+        w = (rw / (j-i)) + (1 if k < rw % (j-i) else 0)
+        widths[k] = max(widths[k], w)
+      i = j
+
+  totalWidth = sum(widths) + delimWidth*(numCols-1)
+
+  def aa(i):
+    try:
+      return align(i)
+    except:
+      return "l"
+
+  output = []
+  for row in rows:
+    if row == "-" or row == "=":
+      output.append(row * totalWidth)
+      continue
+    elif isinstance(row, str):
+      raise ValueError("bad row: {}".format(row))
+    output.append(makeline(row, widths, aa))
+
+  return "\n".join(output)
+
+# =========================================================================
+
+def mostRecentResultsFile(suffix=""):
+  files = os.listdir(os.path.join(ROOT, "results"))
+  pattern = r'\d{6}-\d{6}'
+  if suffix != "":
+    pattern = pattern + "-" + suffix + "$"
+  else:
+    pattern = pattern + "$"
+  # A bit of a hack. Filenames are ...YYMMDD-hhmmss, so lexicographic string
+  # comparison is correct for finding the most recent (i.e. maximum) file
+  mostRecent = max(p for p in files if re.match(pattern, p))
+  return mostRecent
+
+if args.input_file:
+  timingsFile = args.input_file
+else:
+  print("[INFO] no results file argument; finding most recent")
+  try:
+    mostRecent = mostRecentResultsFile()
+  except:
+    print("[ERR] could not find most recent results file\n " + \
+          "  check that these are formatted as 'YYMMSS-hhmmss'")
+    sys.exit(1)
+  timingsFile = os.path.join(ROOT, 'results', mostRecent)
+
+print("[INFO] reading {}\n".format(timingsFile))
+with open(timingsFile, 'r') as data:
+  resultsData = json_careful_readlines(data)
+D = [ parseStats(row) for row in resultsData ]
+P = sorted(list(foundProcs))
+maxp = max(p for p in foundProcs if p <= 72)
+orderedTags = sorted(list(foundTags), key=displayTag)
+
+foundProcs = set()
+foundTags = set()
+
+def keepTag(t):
+  return True
+
+orderedTags = [ t for t in orderedTags if keepTag(t) ]
+
+# ocamlTags = [
+#   "tokens",
+#   "msort",
+#   "primes",
+#   "raytracer",
+#   "lu-decomp",
+#   "msort-strings",
+#   "nbody",
+#   "game-of-life",
+#   "dedup-strings",
+#   "binarytrees5"
+# ]
+
+# sandmarkTags = [
+#   "binarytrees5",
+#   "game-of-life",
+#   "nbody",
+#   "lu-decomp"
+# ]
+
+# orderedTags = [ t for t in orderedTags if t not in sandmarkTags ]
+
+# ===========================================================================
+
+def filterSome(xs):
+  return [x for x in xs if x is not None]
+
+# def seqOverhead(tag):
+#   return sd(averageTime(D, 'mpl-em', tag, 1),averageTime(D, 'mpl', tag, 1))
+# def parOverhead(tag):
+#   return sd(averageTime(D, 'mpl-em', tag, maxp),averageTime(D, 'mpl', tag, maxp))
+# def seqSpaceOverhead(tag):
+#   return sd(averageSpace(D, 'mpl-em', tag, 1),averageSpace(D, 'mpl', tag, 1))
+# def parSpaceOverhead(tag):
+#   return sd(averageSpace(D, 'mpl-em', tag, maxp),averageSpace(D, 'mpl', tag, maxp))
+
+# print "geomean 1-core time overhead", geomean(filterSome([seqOverhead(t) for t in disentangledTags]))
+# print "geomean {}-core time overhead".format(maxp), geomean(filterSome([parOverhead(t) for t in disentangledTags]))
+# print "geomean 1-core space overhead", geomean(filterSome([seqSpaceOverhead(t) for t in disentangledTags]))
+# print "geomean {}-core space overhead".format(maxp), geomean(filterSome([parSpaceOverhead(t) for t in disentangledTags]))
+
+# ===========================================================================
+
+# percent difference (b-a)/|a|
+def color_pcd(b, a):
+  try:
+    xx = 100.0 * (b-a) / abs(a)
+    result = ("+" if xx >= 0.0 else "") + ("{:.1f}%".format(xx))
+    if xx >= 10.0:
+      return red(result)
+    elif xx >= 5.0:
+      return orange(result)
+    elif xx <= -10.0:
+      return green(result)
+    elif xx <= -5.0:
+      return lightgreen(result)
+    else:
+      return gray(result)
+  except:
+    return None
+
+# def sp(kb):
+#   if kb is None:
+#     return None
+#   num = kb
+#   for unit in ['K','M','G']:
+#     if num < 1000:
+#       return "%3.1f %s" % (num, unit)
+#     num = num / 1000
+#   return "%3.1f %s" % (num, 'T')
+
+def defaultAlign(i):
+  return "r" if i == 0 else "l"
+
+
+# ============================================================================
+
+sortShootout = [
+  ("MPL", "mpl", "msort"),
+  ("Java", "java", "sort-longs"),
+  ("OCaml", "ocaml", "msort-ints"),
+  ("Go", "go", "matthew-sort-int64")
+]
+
+sortShootoutBaseline = \
+  min(filterSome(
+    [tm(averageTime(D, config, tag, 1)) for name,config,tag in sortShootout]
+  ))
+
+headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R({})'.format(maxp)]
+tt = [headers1, "="]
+for name, config, tag in sortShootout:
+  t1 = tm(averageTime(D, config, tag, 1))
+  tp = tm(averageTime(D, config, tag, maxp))
+  rp = spg(averageSpace(D, config, tag, maxp, checkExpType=False))
+  thisRow = [
+    t1,
+    tp,
+    su(sd(t1,tp)),
+    su(sd(sortShootoutBaseline, tp)),
+    rp
+  ]
+  thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
+  tt.append(thisRow)
+
+print("SORT SHOOTOUT")
+print(table(tt, defaultAlign))
+print("")
+
+# ============================================================================
+
+tokensShootout = [
+  ("C++", "cpp", "tokens"),
+  ("MPL", "mpl", "tokens"),
+  ("Java", "java", "tokens"),
+  ("OCaml", "ocaml", "tokens"),
+  ("Go", "go", "tokens")
+]
+
+tokensShootoutBaseline = \
+  min(filterSome(
+    [tm(averageTime(D, config, tag, 1)) for name,config,tag in tokensShootout]
+  ))
+
+headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R({})'.format(maxp)]
+tt = [headers1, "="]
+for name, config, tag in tokensShootout:
+  t1 = tm(averageTime(D, config, tag, 1))
+  tp = tm(averageTime(D, config, tag, maxp))
+  rp = spg(averageSpace(D, config, tag, maxp, checkExpType=False))
+  thisRow = [
+    t1,
+    tp,
+    su(sd(t1,tp)),
+    su(sd(tokensShootoutBaseline, tp)),
+    rp
+  ]
+  thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
+  tt.append(thisRow)
+
+print("TOKENS SHOOTOUT")
+print(table(tt, defaultAlign))
+print("")
+
+# ============================================================================
+
+primesShootout = [
+  ("C++", "cpp", "primes"),
+  ("MPL", "mpl", "primes"),
+  ("Java", "java", "primes"),
+  ("OCaml", "ocaml", "primes"),
+  ("Go", "go", "primes")
+]
+
+primesShootoutBaseline = \
+  min(filterSome(
+    [tm(averageTime(D, config, tag, 1)) for name,config,tag in primesShootout]
+  ))
+
+headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R({})'.format(maxp)]
+tt = [headers1, "="]
+for name, config, tag in primesShootout:
+  t1 = tm(averageTime(D, config, tag, 1))
+  tp = tm(averageTime(D, config, tag, maxp))
+  rp = spg(averageSpace(D, config, tag, maxp, checkExpType=False))
+  thisRow = [
+    t1,
+    tp,
+    su(sd(t1,tp)),
+    su(sd(primesShootoutBaseline, tp)),
+    rp
+  ]
+  thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
+  tt.append(thisRow)
+
+print("PRIMES SHOOTOUT")
+print(table(tt, defaultAlign))
+print("")
+
+# ============================================================================
+
+print("[INFO] done reporting {}".format(timingsFile))

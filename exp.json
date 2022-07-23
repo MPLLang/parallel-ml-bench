@@ -3,11 +3,19 @@
     [
       {
         "match": { "config": "mpl", "exp": "time" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 10 -warmup 5"
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mpl", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
       },
       {
         "match": { "config": "mlton", "exp": "time", "procs": "1" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 10 -warmup 5"
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton", "exp": "space", "procs": "1" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
       }
     ],
 
@@ -15,7 +23,7 @@
     {
       "config": ["mlton", "mpl"],
       "cwd": ["mpl"],
-      "exp": ["time"],
+      "exp": ["time","space"],
       "trials": ["1"]
     },
 
@@ -56,7 +64,7 @@
       {
         "tag": ["msort"],
         "bench": ["msort"],
-        "args": ["-N 10000000"]
+        "args": ["-N 20000000"]
       },
       {
         "tag": ["nearest-nbrs"],
@@ -172,6 +180,26 @@
         "tag": ["mcss"],
         "bench": ["mcss-opt"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["game-of-life"],
+        "bench": ["ocaml-game-of-life"],
+        "args": ["-n_times 100 -board_size 1024"]
+      },
+      {
+        "tag": ["nbody"],
+        "bench": ["ocaml-nbody-imm"],
+        "args": ["-n 500 -num_bodies 1024"]
+      },
+      {
+        "tag": ["lu-decomp"],
+        "bench": ["ocaml-lu-decomp"],
+        "args": ["-mat_size 1024"]
+      },
+      {
+        "tag": ["binarytrees5"],
+        "bench": ["ocaml-binarytrees5"],
+        "args": ["-max_depth 19"]
       }
     ]
 }
