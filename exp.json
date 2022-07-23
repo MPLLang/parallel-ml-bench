@@ -152,6 +152,11 @@
         "args": ["-n 500000000"]
       },
       {
+        "tag": ["linearrec"],
+        "bench": ["linearrec"],
+        "args": ["-n 200000000"]
+      },
+      {
         "tag": ["bignum-add"],
         "bench": ["bignum-add-opt"],
         "args": ["-n 500000000"]
@@ -168,8 +173,8 @@
       },
       {
         "tag": ["wc"],
-        "bench": ["wc"],
-        "args": ["-n 500000000"]
+        "bench": ["wc-opt"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
       },
       {
         "tag": ["linearrec"],

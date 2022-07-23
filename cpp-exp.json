@@ -62,6 +62,11 @@
         "args": ["-n 500000000"]
       },
       {
+        "tag": ["linearrec"],
+        "bench": ["linearrec"],
+        "args": ["-n 200000000"]
+      },
+      {
         "tag": ["mcss"],
         "bench": ["mcss"],
         "args": ["-n 500000000"]
@@ -75,6 +80,11 @@
         "tag": ["tokens"],
         "bench": ["tokens"],
         "args": ["-infile ../inputs/words256.txt"]
+      },
+      {
+        "tag": ["wc"],
+        "bench": ["wc"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
       }
     ]
 }

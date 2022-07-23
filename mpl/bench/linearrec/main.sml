@@ -7,11 +7,11 @@ val n = CLA.parseInt "n" (1000 * 1000 * 100)
 
 val _ = print ("n " ^ Int.toString n ^ "\n")
 
-fun gen i =
-  Real.fromInt ((Util.hash i) mod 1000 - 500) / 500.0
+(* fun gen i =
+  Real.fromInt ((Util.hash i) mod 1000 - 500) / 500.0 *)
 
 val input =
-  Seq.tabulate (fn i => (gen (2*i), gen (2*i + 1))) n
+  Seq.tabulate (fn i => (1.0, 1.0)) n
 
 fun task () =
   L.linearRec input
