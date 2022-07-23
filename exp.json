@@ -177,11 +177,6 @@
         "args": ["-infile ../inputs/rmat-10M-symm"]
       },
       {
-        "tag": ["linearrec"],
-        "bench": ["linearrec"],
-        "args": ["-n 500000000"]
-      },
-      {
         "tag": ["mcss"],
         "bench": ["mcss-opt"],
         "args": ["-n 500000000"]

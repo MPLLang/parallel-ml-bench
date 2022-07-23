@@ -565,10 +565,11 @@ cppTags = sorted([
   "linefit",
   "grep",
   "delaunay",
-  "bingum-add",
+  "bignum-add",
   "nearest-nbrs",
   "mcss",
-  "bfs"
+  "bfs",
+  "integrate"
 ])
 
 # sandmarkTags = [
@@ -636,7 +637,7 @@ def defaultAlign(i):
 # ============================================================================
 
 sortShootout = [
-  ("MPL", "mpl", "msort"),
+  ("MPL", "mpl", "msort-ints"),
   ("Java", "java", "sort-longs"),
   ("OCaml", "ocaml", "msort-ints"),
   ("Go", "go", "matthew-sort-int64")
