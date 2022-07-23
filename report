@@ -115,6 +115,8 @@ def renameConfig(c):
   return c
 
 def renameTag(t):
+  if t == "msort":
+    return "msort-ints"
   return t
 
 def displayTag(t):
@@ -127,8 +129,6 @@ def displayTag(t):
     return "dense-matmul"
   if t == "mis":
     return "maximal-indep-set"
-  if t == "msort":
-    return "msort-ints"
   if t == "pfa-bst":
     return "persistent-arr"
   if t == "connectivity":
@@ -544,18 +544,31 @@ def keepTag(t):
 
 orderedTags = [ t for t in orderedTags if keepTag(t) ]
 
-# ocamlTags = [
-#   "tokens",
-#   "msort",
-#   "primes",
-#   "raytracer",
-#   "lu-decomp",
-#   "msort-strings",
-#   "nbody",
-#   "game-of-life",
-#   "dedup-strings",
-#   "binarytrees5"
-# ]
+ocamlTags = sorted([
+  "tokens",
+  "msort-ints",
+  "primes",
+  "raytracer",
+  "lu-decomp",
+  "msort-strings",
+  "nbody",
+  "game-of-life",
+  "binarytrees5"
+])
+
+cppTags = sorted([
+  "primes",
+  "sparse-mxv",
+  "tokens",
+  "wc",
+  "linearrec",
+  "linefit",
+  "grep",
+  "delaunay",
+  "bingum-add",
+  "nearest-nbrs",
+  "mcss"
+])
 
 # sandmarkTags = [
 #   "binarytrees5",
@@ -720,6 +733,80 @@ for name, config, tag in primesShootout:
   tt.append(thisRow)
 
 print("PRIMES SHOOTOUT")
+print(table(tt, defaultAlign))
+print("")
+
+# ============================================================================
+
+headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
+headers1 = ['Benchmark', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M']
+tt = [headers, "-", headers1, "="]
+for tag in ocamlTags:
+  mt1 = tm(averageTime(D, 'mpl', tag, 1))
+  mtp = tm(averageTime(D, 'mpl', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+
+  ot1 = tm(averageTime(D, 'ocaml', tag, 1))
+  otp = tm(averageTime(D, 'ocaml', tag, maxp))
+  or1 = spg(averageSpace(D, 'ocaml', tag, 1))
+  orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+
+  thisRow = [
+    ot1,
+    mt1,
+    ov(sd(ot1,mt1)),
+    otp,
+    mtp,
+    ov(sd(otp,mtp)),
+    or1,
+    mr1,
+    ov(sd(or1,mr1)),
+    orp,
+    mrp,
+    ov(sd(orp,mrp))
+  ]
+  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  tt.append(thisRow)
+
+print("OCAML COMPARISON")
+print(table(tt, defaultAlign))
+print("")
+
+# ============================================================================
+
+headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
+headers1 = ['Benchmark', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C']
+tt = [headers, "-", headers1, "="]
+for tag in cppTags:
+  mt1 = tm(averageTime(D, 'mpl', tag, 1))
+  mtp = tm(averageTime(D, 'mpl', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+
+  ct1 = tm(averageTime(D, 'cpp', tag, 1))
+  ctp = tm(averageTime(D, 'cpp', tag, maxp))
+  cr1 = spg(averageSpace(D, 'cpp', tag, 1))
+  crp = spg(averageSpace(D, 'cpp', tag, maxp))
+
+  thisRow = [
+    ct1,
+    mt1,
+    ov(sd(mt1,ct1)),
+    ctp,
+    mtp,
+    ov(sd(mtp,ctp)),
+    cr1,
+    mr1,
+    ov(sd(mr1,cr1)),
+    crp,
+    mrp,
+    ov(sd(mrp,crp))
+  ]
+  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  tt.append(thisRow)
+
+print("C++ COMPARISON")
 print(table(tt, defaultAlign))
 print("")
 
