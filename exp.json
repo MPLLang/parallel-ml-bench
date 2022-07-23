@@ -34,11 +34,6 @@
         "args": ["-N 1024"]
       },
       {
-        "tag": ["skyline"],
-        "bench": ["skyline"],
-        "args": ["-size 1000000"]
-      },
-      {
         "tag": ["raytracer"],
         "bench": ["ray"],
         "args": ["-n 1000 -m 1000"]
