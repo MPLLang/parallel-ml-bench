@@ -104,7 +104,7 @@
       {
         "tag": ["bfs"],
         "bench": ["bfs"],
-        "args": ["../inputs/rmat-10M-symm-bin"]
+        "args": ["../inputs/rmat-10M-symm-bin --no-dir-opt"]
       },
       {
         "tag": ["centrality"],

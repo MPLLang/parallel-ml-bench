@@ -2,6 +2,9 @@ structure CLA = CommandLineArgs
 structure BFS = NondetBFS
 structure G = BFS.G
 
+val dontDirOpt = CLA.parseFlag "no-dir-opt"
+val diropt = not dontDirOpt
+
 val source = CLA.parseInt "source" 0
 val doCheck = CLA.parseFlag "check"
 
@@ -24,14 +27,21 @@ val (graph, tm) = Util.getTime (fn _ => G.parseFile filename)
 val _ = print ("num vertices: " ^ Int.toString (G.numVertices graph) ^ "\n")
 val _ = print ("num edges: " ^ Int.toString (G.numEdges graph) ^ "\n")
 
-val (_, tm) = Util.getTime (fn _ =>
-  if G.parityCheck graph then ()
-  else TextIO.output (TextIO.stdErr,
-    "WARNING: parity check failed; graph might not be symmetric " ^
-    "or might have duplicate- or self-edges\n"))
-val _ = print ("parity check in " ^ Time.fmt 4 tm ^ "s\n")
+val _ =
+  if not diropt then () else
+  let
+    val (_, tm) = Util.getTime (fn _ =>
+      if G.parityCheck graph then ()
+      else TextIO.output (TextIO.stdErr,
+        "WARNING: parity check failed; graph might not be symmetric " ^
+        "or might have duplicate- or self-edges\n"))
+    val _ = print ("parity check in " ^ Time.fmt 4 tm ^ "s\n")
+  in
+    ()
+  end
 
-val P = Benchmark.run "running bfs" (fn _ => BFS.bfs graph source)
+val P = Benchmark.run "running bfs"
+  (fn _ => BFS.bfs {diropt = diropt} graph source)
 
 val numVisited =
   SeqBasis.reduce 10000 op+ 0 (0, Seq.length P)

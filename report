@@ -567,7 +567,8 @@ cppTags = sorted([
   "delaunay",
   "bingum-add",
   "nearest-nbrs",
-  "mcss"
+  "mcss",
+  "bfs"
 ])
 
 # sandmarkTags = [

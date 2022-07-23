@@ -85,6 +85,11 @@
         "tag": ["wc"],
         "bench": ["wc"],
         "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["bfs"],
+        "bench": ["bfs"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
       }
     ]
 }
