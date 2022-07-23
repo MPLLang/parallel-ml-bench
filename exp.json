@@ -150,12 +150,12 @@
       },
       {
         "tag": ["bignum-add"],
-        "bench": ["bignum-add"],
+        "bench": ["bignum-add-opt"],
         "args": ["-n 500000000"]
       },
       {
         "tag": ["integrate"],
-        "bench": ["integrate"],
+        "bench": ["integrate-opt"],
         "args": ["-n 500000000"]
       },
       {
@@ -175,7 +175,7 @@
       },
       {
         "tag": ["mcss"],
-        "bench": ["mcss"],
+        "bench": ["mcss-opt"],
         "args": ["-n 500000000"]
       }
     ]

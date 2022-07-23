@@ -37,6 +37,36 @@
         "tag": ["nearest-nbrs"],
         "bench": ["nearest-nbrs"],
         "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["grep"],
+        "bench": ["grep"],
+        "args": ["-infile ../inputs/words256-shuffled.txt -pattern EE"]
+      },
+      {
+        "tag": ["bignum-add"],
+        "bench": ["bignum-add"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linefit"],
+        "bench": ["linefit"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["mcss"],
+        "bench": ["mcss"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["sparse-mxv"],
+        "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["-infile ../inputs/words256.txt"]
       }
     ]
 }

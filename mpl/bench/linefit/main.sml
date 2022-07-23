@@ -2,7 +2,7 @@ structure CLA = CommandLineArgs
 structure Seq = ArraySequence
 
 (* chosen by subdirectory *)
-structure LF = MkLineFit(DelayedSeq)
+structure LF = MkLineFit(OldDelayedSeq)
 
 val n = CLA.parseInt "n" (1000 * 1000 * 100)
 val doCheck = CLA.parseFlag "check"

@@ -27,6 +27,8 @@ val _ = vprint ("read file in " ^ Time.fmt 4 tm ^ "s\n")
 val tokens =
   Benchmark.run "tokenizing" (fn _ => Tokenize.tokensSeq Char.isSpace contents)
 
+val _ = vprint ("number of tokens " ^ Int.toString (Seq.length tokens) ^ "\n")
+
 fun put c = TextIO.output1 (TextIO.stdOut, c)
 fun putToken token =
   Util.for (0, Seq.length token) (put o Seq.nth token)

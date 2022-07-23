@@ -1,7 +1,7 @@
 structure CLA = CommandLineArgs
 structure Seq = ArraySequence
 
-structure L = MkLinearRec(DelayedSeq)
+structure L = MkLinearRec(OldDelayedSeq)
 
 val n = CLA.parseInt "n" (1000 * 1000 * 100)
 
