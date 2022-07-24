@@ -85,6 +85,16 @@
         "tag": ["wc"],
         "bench": ["wc"],
         "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["msort"],
+        "bench": ["msort"],
+        "args": ["-n 20000000"]
+      },
+      {
+        "tag": ["quickhull"],
+        "bench": ["quickhull"],
+        "args": ["-infile ../inputs/uniform-circle-20M"]
       }
     ]
 }

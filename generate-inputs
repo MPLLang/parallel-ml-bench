@@ -35,6 +35,8 @@ TMP=$(mktemp -d)
   && make randPoints \
   && echo "[INFO] randPoints -s 1000000 $ROOT/inputs/uniform-circle-1M" \
   && ./randPoints -s 1000000 $ROOT/inputs/uniform-circle-1M \
+  && echo "[INFO] randPoints -s 1000000 $ROOT/inputs/uniform-circle-20M" \
+  && ./randPoints -s 20000000 $ROOT/inputs/uniform-circle-20M \
   && cd ../graphData \
   && make rMatGraph \
   && echo "[INFO] rMatGraph -s 15210 -o -j 10000000 $ROOT/inputs/rmat-10M-symm" \

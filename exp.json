@@ -74,7 +74,7 @@
       {
         "tag": ["quickhull"],
         "bench": ["quickhull"],
-        "args": ["-N 20000000"]
+        "args": ["-infile ../inputs/uniform-circle-20M"]
       },
       {
         "tag": ["reverb"],

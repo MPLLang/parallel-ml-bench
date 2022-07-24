@@ -1,4 +1,7 @@
 structure CLA = CommandLineArgs
+structure Seq = ArraySequence
+
+structure Quickhull = MkQuickhull(OldDelayedSeq)
 
 val resolution = 1000000
 fun randReal seed =
@@ -12,18 +15,20 @@ fun randPt seed =
     (1.0 + r * Math.cos(theta), 1.0 + r * Math.sin(theta))
   end
 
-(* val filename = CLA.parseString "infile" "" *)
+val filename = CLA.parseString "infile" ""
 val outfile = CLA.parseString "outfile" ""
-val n = CLA.parseInt "N" (1000 * 1000 * 100)
+val n = CLA.parseInt "n" (1000 * 1000 * 100)
+val doCheck = CLA.parseFlag "check"
 
-val _ = print ("input size " ^ Int.toString n ^ "\n")
+val inputPts =
+  case filename of
+    "" => Seq.tabulate randPt n
+  | _ => ParseFile.readSequencePoint2d filename
 
-val (inputPts, tm) = Util.getTime (fn _ => Seq.tabulate randPt n)
-val _ = print ("generated input in " ^ Time.fmt 4 tm ^ "s\n")
+val n = Seq.length inputPts
 
-val result = Benchmark.run "running quickhull" (fn _ => Quickhull.hull inputPts)
-
-val _ = print ("hull size " ^ Int.toString (Seq.length result) ^ "\n")
+fun task () =
+  Quickhull.hull inputPts
 
 fun rtos x =
   if x < 0.0 then "-" ^ rtos (~x)
@@ -31,29 +36,44 @@ fun rtos x =
 fun pttos (x,y) =
   String.concat ["(", rtos x, ",", rtos y, ")"]
 
-(* fun check result =
+(*
+fun check result =
+  if not doCheck then () else
   let
     val correct = Checkhull.check inputPts result
   in
     print ("correct? " ^
       Checkhull.report inputPts result (Checkhull.check inputPts result)
       ^ "\n")
-  end *)
+  end
+*)
+
+(* val _ =
+  (writeln "pbbs_sequencePoint2d"; dump inputPts 0; OS.Process.exit OS.Process.success) *)
+
+val result = Benchmark.run "quickhull" task
+val _ = print ("hull size " ^ Int.toString (Seq.length result) ^ "\n")
+(* val _ = check result *)
 
 val _ =
-  if outfile = "" then
-    print ("use -outfile XXX to see result\n")
-  else
-    let
-      val out = TextIO.openOut outfile
-      fun writeln str = TextIO.output (out, str ^ "\n")
-      fun dump i =
-        if i >= Seq.length result then ()
-        else (writeln (Int.toString (Seq.nth result i)); dump (i+1))
-    in
-      writeln "pbbs_sequenceInt";
-      dump 0;
-      TextIO.closeOut out
-    end
+  if outfile = "" then () else
+  let
+    val out = TextIO.openOut outfile
+    fun writeln str = TextIO.output (out, str ^ "\n")
+    fun dump i =
+      if i >= Seq.length result then ()
+      else (writeln (Int.toString (Seq.nth result i)); dump (i+1))
+  in
+    writeln "pbbs_sequenceInt";
+    dump 0;
+    TextIO.closeOut out
+  end
 
 val _ = GCStats.report ()
+
+(* fun dumpPt (x, y) = writeln (rtos x ^ " " ^ rtos y) *)
+(* fun dump pts i =
+  if i >= Seq.length pts then ()
+  else (dumpPt (Seq.nth pts i); dump pts (i+1)) *)
+(* val hullPts = Seq.map (Seq.nth inputPts) result *)
+(* dump hullPts 0 *)
