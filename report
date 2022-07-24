@@ -554,23 +554,24 @@ ocamlTags = sorted([
   "binarytrees5"
 ])
 
-cppTags = sorted([
-  "bfs",
-  "bignum-add",
-  "delaunay",
-  "grep",
-  "integrate",
-  "linearrec",
-  "linefit",
-  "mcss",
-  "msort",
-  "nearest-nbrs",
-  "primes",
-  "quickhull",
-  "sparse-mxv",
-  "tokens",
-  "wc"
-])
+# map each MPL tag to the correct C++ tag for comparison
+cppTags = {
+  "bfs": "bfs",
+  "bignum-add": "bignum-add",
+  "delaunay": "delaunay",
+  "grep": "grep",
+  "integrate": "integrate",
+  "linearrec": "linearrec",
+  "linefit": "linefit",
+  "mcss": "mcss",
+  "msort-ints": "msort",
+  "nearest-nbrs": "nearest-nbrs",
+  "primes": "primes",
+  "quickhull": "quickhull",
+  "sparse-mxv": "sparse-mxv",
+  "tokens": "tokens",
+  "wc": "wc"
+}
 
 # sandmarkTags = [
 #   "binarytrees5",
@@ -787,16 +788,16 @@ print("")
 headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
 headers1 = ['Benchmark', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C']
 tt = [headers, "-", headers1, "="]
-for tag in cppTags:
+for tag in sorted(cppTags.keys()):
   mt1 = tm(averageTime(D, 'mpl', tag, 1))
   mtp = tm(averageTime(D, 'mpl', tag, maxp))
   mr1 = spg(averageSpace(D, 'mpl', tag, 1))
   mrp = spg(averageSpace(D, 'mpl', tag, maxp))
 
-  ct1 = tm(averageTime(D, 'cpp', tag, 1))
-  ctp = tm(averageTime(D, 'cpp', tag, maxp))
-  cr1 = spg(averageSpace(D, 'cpp', tag, 1))
-  crp = spg(averageSpace(D, 'cpp', tag, maxp))
+  ct1 = tm(averageTime(D, 'cpp', cppTags[tag], 1))
+  ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
+  cr1 = spg(averageSpace(D, 'cpp', cppTags[tag], 1))
+  crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
 
   thisRow = [
     ct1,
