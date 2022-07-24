@@ -62,7 +62,7 @@
         "args": ["../inputs/words64.txt"]
       },
       {
-        "tag": ["msort"],
+        "tag": ["msort-ints"],
         "bench": ["msort"],
         "args": ["-N 20000000"]
       },

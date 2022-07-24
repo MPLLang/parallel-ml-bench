@@ -115,8 +115,6 @@ def renameConfig(c):
   return c
 
 def renameTag(t):
-  if t == "msort":
-    return "msort-ints"
   return t
 
 def displayTag(t):
@@ -557,19 +555,21 @@ ocamlTags = sorted([
 ])
 
 cppTags = sorted([
-  "primes",
-  "sparse-mxv",
-  "tokens",
-  "wc",
+  "bfs",
+  "bignum-add",
+  "delaunay",
+  "grep",
+  "integrate",
   "linearrec",
   "linefit",
-  "grep",
-  "delaunay",
-  "bignum-add",
-  "nearest-nbrs",
   "mcss",
-  "bfs",
-  "integrate"
+  "msort",
+  "nearest-nbrs",
+  "primes",
+  "quickhull",
+  "sparse-mxv",
+  "tokens",
+  "wc"
 ])
 
 # sandmarkTags = [
@@ -637,6 +637,7 @@ def defaultAlign(i):
 # ============================================================================
 
 sortShootout = [
+  ("C++", "cpp", "msort"),
   ("MPL", "mpl", "msort-ints"),
   ("Java", "java", "sort-longs"),
   ("OCaml", "ocaml", "msort-ints"),
@@ -648,17 +649,19 @@ sortShootoutBaseline = \
     [tm(averageTime(D, config, tag, 1)) for name,config,tag in sortShootout]
   ))
 
-headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R({})'.format(maxp)]
+headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
 tt = [headers1, "="]
 for name, config, tag in sortShootout:
   t1 = tm(averageTime(D, config, tag, 1))
   tp = tm(averageTime(D, config, tag, maxp))
-  rp = spg(averageSpace(D, config, tag, maxp, checkExpType=False))
+  r1 = spg(averageSpace(D, config, tag, 1))
+  rp = spg(averageSpace(D, config, tag, maxp))
   thisRow = [
     t1,
     tp,
     su(sd(t1,tp)),
     su(sd(sortShootoutBaseline, tp)),
+    r1,
     rp
   ]
   thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
@@ -683,17 +686,19 @@ tokensShootoutBaseline = \
     [tm(averageTime(D, config, tag, 1)) for name,config,tag in tokensShootout]
   ))
 
-headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R({})'.format(maxp)]
+headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
 tt = [headers1, "="]
 for name, config, tag in tokensShootout:
   t1 = tm(averageTime(D, config, tag, 1))
   tp = tm(averageTime(D, config, tag, maxp))
-  rp = spg(averageSpace(D, config, tag, maxp, checkExpType=False))
+  r1 = spg(averageSpace(D, config, tag, 1))
+  rp = spg(averageSpace(D, config, tag, maxp))
   thisRow = [
     t1,
     tp,
     su(sd(t1,tp)),
     su(sd(tokensShootoutBaseline, tp)),
+    r1,
     rp
   ]
   thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
@@ -718,17 +723,19 @@ primesShootoutBaseline = \
     [tm(averageTime(D, config, tag, 1)) for name,config,tag in primesShootout]
   ))
 
-headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R({})'.format(maxp)]
+headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
 tt = [headers1, "="]
 for name, config, tag in primesShootout:
   t1 = tm(averageTime(D, config, tag, 1))
   tp = tm(averageTime(D, config, tag, maxp))
-  rp = spg(averageSpace(D, config, tag, maxp, checkExpType=False))
+  r1 = spg(averageSpace(D, config, tag, 1))
+  rp = spg(averageSpace(D, config, tag, maxp))
   thisRow = [
     t1,
     tp,
     su(sd(t1,tp)),
     su(sd(primesShootoutBaseline, tp)),
+    r1,
     rp
   ]
   thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
