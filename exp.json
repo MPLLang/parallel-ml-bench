@@ -27,7 +27,7 @@
       "trials": ["1"]
     },
 
-  "jqselect": "(true)",
+  "jqselect": "(  (.exp == \"time\")  or  (.exp == \"space\" and (.procs == \"1\" or .procs == $max_procs))  )",
 
   "specs":
     [
