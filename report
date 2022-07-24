@@ -1015,8 +1015,10 @@ import matplotlib.pyplot as plt
 
 plt.figure(figsize=(7,7))
 # markers = ['o','v','^','<','>','s','*','d','D','+','x','|','','','','','']
-colors = ['blue', 'green', 'red', 'darkturquoise', 'black', 'darkviolet', 'goldenrod', 'dimgrey','brown']
-markers = ['o','v','^','<','>','s','d','D','*','+','x']
+colors = ['blue', 'darkturquoise', 'darkgreen', 'darkviolet', 'red', 'goldenrod','dimgrey', 'brown']
+# 'black',
+markers = ['o','v','^','<','>','s','d']
+# ,'D','*','P','X'
 linestyles = ['solid', 'dashed','dashdot']
 
 # markers = ['.'] * len(speedupTags)
@@ -1036,7 +1038,8 @@ def getspeedup(tag, p):
 
 sortedBySpeedups = sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
 
-used = dict()
+usedFull = dict()
+usedNoc = dict()
 
 plt.plot([0,maxp+1], [0,maxp+1], marker="", color="grey", linewidth=0.8)
 lines = []
@@ -1050,16 +1053,23 @@ for tag in speedupTags:
     mi = i % len(markers)
     si = i % len(linestyles)
 
-    if tuple((ci, mi, si)) in used:
-      otherTag = used[tuple(ci, mi, si)]
+    if tuple((ci, mi, si)) in usedFull:
+      otherTag = usedFull[tuple((ci, mi, si))]
       sys.stderr.write('[WARN] uh oh: {} and {} have same style\n'.format(tag, otherTag))
     else:
-      used[tuple((ci, mi, si))] = tag
+      usedFull[tuple((ci, mi, si))] = tag
+
+    if tuple((mi, si)) in usedNoc:
+      otherTag = usedNoc[tuple((mi, si))]
+      if tuple((ci, mi, si)) not in usedFull:
+        sys.stderr.write('[WARN] uh oh: {} and {} only differ by color\n'.format(tag, otherTag))
+    else:
+      usedNoc[tuple((mi, si))] = tag
 
     color = colors[ci]
     marker = markers[mi]
     linestyle = linestyles[si]
-    lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, linewidth=1.3, color=color))
+    lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
   except Exception as e:
     sys.stderr.write('[WARN] error while plotting speedup for {}: {}\n'.format(tag, e))
 
