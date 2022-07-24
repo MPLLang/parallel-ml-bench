@@ -58,17 +58,26 @@ many commands are left to run. For example, `[5/100]` means that this is the
 5th benchmark out of 100 total benchmarks to run.
 
 Results are written to a timestamped file in the `results/` directory. The
-timestamp format is `YYMMDD-HHMMSS`. Each line of the results file is a
+timestamp format is `YYMMDD-HHMMSS`. Each line of a results file is a
 JSON object with the parameters and results from that run.
 
 You may terminate the `run` script early with `Ctrl-C`. All results obtained
 so far will still be available in the results file.
 
+## Generate report
+
+After using the `run` script as described above, you can run the following
+script to generate tables, speedup plots, etc. This will print out info at
+the command line, and also generate data in the `figures/` directory.
+```
+$ ./report
+```
+
 ## TODO
 
 Infrastructure and benchmarks
   * [x] update inputs (need words256, input graphs, etc.)
-  * [ ] report script (speedup plots, summary table, etc.)
+  * [x] report script (speedup plots, summary table, etc.)
   * [ ] benchmarks documentation
   * [x] MPL: infrastructure
   * [x] MPL: benchmarks

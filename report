@@ -9,6 +9,10 @@ import argparse
 import subprocess
 import numpy as np
 
+def ensureFigDir():
+  if not os.path.isdir("figures"):
+    os.mkdir("figures")
+
 def getGitRoot():
   return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
     stdout=subprocess.PIPE).communicate()[0].rstrip()
@@ -552,7 +556,7 @@ ocamlTags = sorted([
   "nbody",
   "game-of-life",
   "binarytrees5"
-])
+], key=displayTag)
 
 # map each MPL tag to the correct C++ tag for comparison
 cppTags = {
@@ -573,12 +577,12 @@ cppTags = {
   "wc": "wc"
 }
 
-# sandmarkTags = [
-#   "binarytrees5",
-#   "game-of-life",
-#   "nbody",
-#   "lu-decomp"
-# ]
+sandmarkTags = [
+  "binarytrees5",
+  "game-of-life",
+  "nbody",
+  "lu-decomp"
+]
 
 # orderedTags = [ t for t in orderedTags if t not in sandmarkTags ]
 
@@ -821,5 +825,290 @@ print(table(tt, defaultAlign))
 print("")
 
 # ============================================================================
+# LaTeX figure: OCaml comparison
+# ============================================================================
 
+proc1TimeRats = []
+proc72TimeRats = []
+proc1SpaceRats = []
+proc72SpaceRats = []
+
+ensureFigDir()
+ocamlComparisonTable = "figures/ocaml-space-time-comparison.tex"
+with open(ocamlComparisonTable, 'w') as output:
+  for tag in ocamlTags:
+    or1 = spg(averageSpace(D, 'ocaml', tag, 1))
+    orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+
+    ot1 = tm(averageTime(D, 'ocaml', tag, 1))
+    otp = tm(averageTime(D, 'ocaml', tag, maxp))
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+
+    proc1TimeRats.append(ovv(sd(ot1, mt1)))
+    proc72TimeRats.append(ovv(sd(otp, mtp)))
+    proc1SpaceRats.append(ovv(sd(or1, mr1)))
+    proc72SpaceRats.append(ovv(sd(orp, mrp)))
+
+    row = \
+      [ fmt(ot1)
+      , fmt(mt1)
+      , makeBold(fmt(ov(sd(ot1, mt1))))
+      , fmt(otp)
+      , fmt(mtp)
+      , makeBold(fmt(ov(sd(otp, mtp))))
+      , sfmt(or1)
+      , sfmt(mr1)
+      , makeBold(fmt(ov(sd(or1, mr1))))
+      , sfmt(orp)
+      , sfmt(mrp)
+      , makeBold(fmt(ov(sd(orp, mrp))))
+      ]
+
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  output.write("\\midrule\n")
+  row = [
+    "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
+  ]
+  output.write(" & ".join(["geomean"] + row))
+  output.write("  \\\\\n")
+print("[INFO] wrote to {}".format(ocamlComparisonTable))
+
+# ============================================================================
+# LaTeX figure: C++ comparison
+# ============================================================================
+
+proc1TimeRats = []
+proc72TimeRats = []
+proc1SpaceRats = []
+proc72SpaceRats = []
+# multiTimeRats = []
+
+ensureFigDir()
+cppComparisonTable = "figures/cpp-space-time-comparison.tex"
+with open(cppComparisonTable, 'w') as output:
+  for tag in sorted(cppTags.keys()):
+    cr1 = spg(averageSpace(D, 'cpp', cppTags[tag], 1))
+    crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
+    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+
+    ct1 = tm(averageTime(D, 'cpp', cppTags[tag], 1))
+    ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+
+    proc1TimeRats.append(ovv(sd(mt1, ct1)))
+    proc72TimeRats.append(ovv(sd(mtp, ctp)))
+    proc1SpaceRats.append(ovv(sd(mr1, cr1)))
+    proc72SpaceRats.append(ovv(sd(mrp, crp)))
+
+    row = \
+      [ fmt(ct1)
+      , fmt(mt1)
+      , makeBold(fmt(ov(sd(mt1, ct1))))
+      , fmt(ctp)
+      , fmt(mtp)
+      , makeBold(fmt(ov(sd(mtp, ctp))))
+      , sfmt(cr1)
+      , sfmt(mr1)
+      , makeBold(fmt(ov(sd(mr1, cr1))))
+      , sfmt(crp)
+      , sfmt(mrp)
+      , makeBold(fmt(ov(sd(mrp, crp))))
+      ]
+
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  output.write("\\midrule\n")
+  row = [
+    "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
+  ]
+  output.write(" & ".join(["geomean"] + row))
+  output.write("  \\\\\n")
+print("[INFO] wrote to {}".format(cppComparisonTable))
+
+# ============================================================================
+# LaTeX figure: MLton comparison
+# ============================================================================
+
+ovRats = []
+suRats = []
+bu1Rats = []
+bupRats = []
+
+mltonCmpTags = sorted([
+  tag for tag in orderedTags
+  if (averageTime(D, 'mpl', tag, maxp) is not None)
+  and tag not in sandmarkTags
+], key=displayTag)
+
+ensureFigDir()
+mltonCmpTable = "figures/mlton-comparison.tex"
+with open(mltonCmpTable, 'w') as output:
+  for tag in mltonCmpTags:
+    mltont = tm(averageTime(D, 'mlton', tag, 1))
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    mtp = tm(averageTime (D, 'mpl', tag, maxp))
+
+    mltonr = spg(averageSpace(D, 'mlton', tag, 1))
+    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+    mrp = spg(averageSpace (D, 'mpl', tag, maxp))
+
+    ovRats.append(ovv(sd(mt1, mltont)))
+    suRats.append(ovv(sd(mltont, mtp)))
+    bu1Rats.append(ovv(sd(mr1, mltonr)))
+    bupRats.append(ovv(sd(mrp, mltonr)))
+
+    row = [
+      mltont,
+      mt1,
+      makeBold(fmt(ov(sd(mt1, mltont)))),
+      mtp,
+      makeBold(fmt(su(sd(mltont, mtp)))),
+      sfmt(mltonr),
+      sfmt(mr1),
+      makeBold(fmt(bu(sd(mr1, mltonr)))),
+      sfmt(mrp),
+      makeBold(fmt(bu(sd(mrp, mltonr))))
+    ]
+
+    row = [ fmt(x) for x in row ]
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  output.write("\\midrule\n")
+  row = [
+    "", "", makeBold(fmt(ov(geomean(ovRats)))),
+    "",     makeBold(fmt(su(geomean(suRats)))),
+    "", "", makeBold(fmt(ov(geomean(bu1Rats)))),
+    "",     makeBold(fmt(ov(geomean(bupRats))))
+  ]
+  output.write(" & ".join(["geomean", ""] + row))
+  output.write("  \\\\\n")
+print("[INFO] wrote to {}".format(mltonCmpTable))
+
+# ============================================================================
+# PDF: Speedup plot
+# ============================================================================
+
+speedupTags = sorted([
+  tag for tag in orderedTags
+  if (averageTime(D, 'mpl', tag, maxp) is not None)
+  and tag not in sandmarkTags
+], key=displayTag)
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(7,7))
+# markers = ['o','v','^','<','>','s','*','d','D','+','x','|','','','','','']
+colors = ['blue', 'green', 'red', 'darkturquoise', 'black', 'darkviolet', 'goldenrod', 'dimgrey','brown']
+markers = ['o','v','^','<','>','s','d','D','*','+','x']
+linestyles = ['solid', 'dashed','dashdot']
+
+# markers = ['.'] * len(speedupTags)
+procs = P
+
+fontSize = 14
+legendFontSize = 12
+markerSize = 8
+
+def getspeedup(tag, p):
+  baseline = averageTime(D, 'mlton', tag, 1)
+  try:
+    return baseline / averageTime(D, 'mpl', tag, p)
+  except Exception as e:
+    sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
+    return None
+
+sortedBySpeedups = sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
+
+used = dict()
+
+plt.plot([0,maxp+1], [0,maxp+1], marker="", color="grey", linewidth=0.8)
+lines = []
+for tag in speedupTags:
+  try:
+    baseline = averageTime(D, 'mlton', tag, 1)
+    speedups = map((lambda p: getspeedup(tag, p)), procs)
+
+    i = sortedBySpeedups.index(tag)
+    ci = i % len(colors)
+    mi = i % len(markers)
+    si = i % len(linestyles)
+
+    if tuple((ci, mi, si)) in used:
+      otherTag = used[tuple(ci, mi, si)]
+      sys.stderr.write('[WARN] uh oh: {} and {} have same style\n'.format(tag, otherTag))
+    else:
+      used[tuple((ci, mi, si))] = tag
+
+    color = colors[ci]
+    marker = markers[mi]
+    linestyle = linestyles[si]
+    lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, linewidth=1.3, color=color))
+  except Exception as e:
+    sys.stderr.write('[WARN] error while plotting speedup for {}: {}\n'.format(tag, e))
+
+# this sets the legend.
+font = {
+  'size': legendFontSize,
+  #'family' : 'normal',
+  #'weight' : 'bold',
+}
+matplotlib.rc('font', **font)
+
+# make sure to use truetype fonts
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
+
+# set legend position
+matplotlib.rcParams['legend.loc'] = 'upper left'
+
+ticks = [1] + range(10, maxp+1, 10)
+
+plt.xlabel('Processors', fontsize=fontSize)
+plt.ylabel('Speedup', fontsize=fontSize)
+plt.yticks(ticks, fontsize=fontSize)
+plt.xticks(ticks, fontsize=fontSize)
+plt.xlim(0, 74)
+plt.ylim(0, 74)
+plt.gca().grid(axis='both', linestyle='dotted')
+plt.gca().set_axisbelow(True)
+# plt.margins(y=10)
+
+if True:
+  plt.legend(
+    [b[0] for b in lines],
+    map(displayTag, speedupTags),
+    # bbox_to_anchor=(-0.16,1.05),
+    # loc='upper right',
+    bbox_to_anchor=(-0.1,1.01),
+    loc='lower left',
+    ncol=3
+  )
+
+ensureFigDir()
+outputName = 'figures/mpl-speedups.pdf'
+plt.savefig(outputName, bbox_inches='tight')
+sys.stdout.write("[INFO] output written to {}\n".format(outputName))
+plt.close()
+
+
+# ============================================================================
+# ============================================================================
+# ============================================================================
 print("[INFO] done reporting {}".format(timingsFile))
