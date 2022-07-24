@@ -4,7 +4,8 @@
 #include "pbbsbench/common/geometry.h"
 #include "pbbsbench/common/geometryIO.h"
 #include "pbbsbench/common/parse_command_line.h"
-#include "pbbsbench/benchmarks/nearestNeighbors/octTree/neighbors.h"
+// #include "pbbsbench/benchmarks/nearestNeighbors/octTree/neighbors.h"
+#include "neighbors.h"
 
 using coord = double;
 using point = point2d<coord>;

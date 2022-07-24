@@ -3,8 +3,8 @@ structure CLA = CommandLineArgs
 
 val n = CLA.parseInt "N" 1000000
 val inputFile = CLA.parseString "input" ""
-val leafSize = CLA.parseInt "leafSize" 16
-val grain = CLA.parseInt "grain" 100
+val leafSize = CLA.parseInt "leafSize" 50
+val grain = CLA.parseInt "grain" 1000
 val seed = CLA.parseInt "seed" 15210
 
 fun genReal i =
@@ -16,6 +16,14 @@ fun genReal i =
   end
 
 fun genPoint i = (genReal (2*i), genReal (2*i + 1))
+
+(* This silly thing helps ensure good placement, by
+ * forcing points to be reallocated more adjacent.
+ * It's a no-op, but gives us as much as 2x time
+ * improvement (!)
+ *)
+fun swap pts = Seq.map (fn (x, y) => (y, x)) pts
+fun compactify pts = swap (swap pts)
 
 val input =
   case inputFile of
@@ -30,7 +38,7 @@ val input =
   | filename =>
       let
         val (points, tm) = Util.getTime (fn _ =>
-          ParseFile.readSequencePoint2d filename)
+          compactify (ParseFile.readSequencePoint2d filename))
       in
         print ("parsed input points in " ^ Time.fmt 4 tm ^ "s\n");
         points

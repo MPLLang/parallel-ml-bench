@@ -20,10 +20,18 @@ val outfile = CLA.parseString "outfile" ""
 val n = CLA.parseInt "n" (1000 * 1000 * 100)
 val doCheck = CLA.parseFlag "check"
 
+(* This silly thing helps ensure good placement, by
+ * forcing points to be reallocated more adjacent.
+ * It's a no-op, but gives us as much as 2x time
+ * improvement (!)
+ *)
+fun swap pts = Seq.map (fn (x, y) => (y, x)) pts
+fun compactify pts = swap (swap pts)
+
 val inputPts =
   case filename of
     "" => Seq.tabulate randPt n
-  | _ => ParseFile.readSequencePoint2d filename
+  | _ => compactify (ParseFile.readSequencePoint2d filename)
 
 val n = Seq.length inputPts
 

@@ -24,10 +24,18 @@ fun generateInputPoints () =
     points
   end
 
+(* This silly thing helps ensure good placement, by
+ * forcing points to be reallocated more adjacent.
+ * It's a no-op, but gives us as much as 2x time
+ * improvement (!)
+ *)
+fun swap pts = Seq.map (fn (x, y) => (y, x)) pts
+fun compactify pts = swap (swap pts)
+
 fun parseInputFile () =
   let
     val (points, tm) = Util.getTime (fn _ =>
-      ParseFile.readSequencePoint2d filename)
+      compactify (ParseFile.readSequencePoint2d filename))
   in
     print ("parsed input points in " ^ Time.fmt 4 tm ^ "s\n");
     points
