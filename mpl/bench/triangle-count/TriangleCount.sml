@@ -7,22 +7,25 @@ struct
   structure AS = ArraySlice
 
   type vertex = G.vertex
+  exception Assert
+
+  (* assumes l <= r and all elements accessible in [l, r) *)
+  (* ensures that all elements left of the returned index are lesser *)
+  fun bin_search k s (l, r) =
+    if l = r then (l, false)
+    else if (r - l) = 1 then (l, (Seq.nth s l) = k)
+    else
+      let
+        val mid = l + Int.div (r - l - 1, 2)
+      in
+        case Int.compare (k, Seq.nth s mid) of
+          EQUAL => (mid, true)
+        | LESS => bin_search k s (l, mid)
+        | GREATER => bin_search k s (mid + 1, r)
+      end
 
   fun intersection_count s s' gran =
     let
-      fun bin_search k s (l, r) =
-        if l = r then (l, false)
-        else if (r - l) = 1 then (l, (Seq.nth s l) = k)
-        else
-          let
-            val mid = l + Int.div (r - l - 1, 2)
-          in
-            case Int.compare (k, Seq.nth s mid) of
-              EQUAL => (mid, true)
-            | LESS => bin_search k s (l, mid)
-            | GREATER => bin_search k s (mid + 1, r)
-          end
-
       fun countseq1 s1 s2 =
         let
           val (n1, n2) = (Seq.length s1, Seq.length s2)
@@ -81,26 +84,42 @@ struct
       r
     end
 
+  (* get common vertices greater than min_elt *)
+  fun intersection_count_thresh s s' gran min_elt =
+    let
+      val (n1, n2) = (Seq.length s, Seq.length s')
+      val (k1, _) = bin_search min_elt s (0, n1)
+      val (k2, _) = bin_search min_elt s' (0, n2)
+      fun subs s i j = Seq.subseq s (i, j - i)
+    in
+      if (k1 = n1) orelse (k2 = n2) then 0
+      else intersection_count (subs s k1 n1) (subs s' k2 n2) gran
+    end
+
   fun triangle_count g =
     let
-      val n = G.numVertices g
-      val vertices = Seq.tabulate (fn i => i) n
-      val edges = Seq.flatten (Seq.map (fn u => Seq.map (fn v => (u, v)) (G.neighbors g u)) vertices)
-      val directed_edges = Seq.filter (fn (u, v) => u < v) edges
-      (* why is this better than edge map *)
-      (* val directed_edges = AdjInt.edge_map g vertices (fn (u, v) => if u < v then SOME(u, v) else NONE) (fn _ => true) *)
-      val g' = G.fromSortedEdges directed_edges
       fun count u =
         let
-          val ngbrs = G.neighbors g' u
+          val ngbrs = G.neighbors g u
           val num_ngbrs = Seq.length ngbrs
-          fun helpi i = intersection_count ngbrs (G.neighbors g' (Seq.nth ngbrs i)) 10000
-          val r = SeqBasis.reduce 10000 Int.+ 0 (0, num_ngbrs) helpi
+          val (idx, _) = bin_search u ngbrs (0, num_ngbrs)
+          val ngbrs = Seq.subseq ngbrs (idx, num_ngbrs - idx)
+          val num_ngbrs = Seq.length ngbrs
+          fun helpi i =
+          let
+            val v = Seq.nth ngbrs i
+          in
+            if u < v then
+              intersection_count_thresh ngbrs (G.neighbors g v) 10000 v
+            else
+              0
+          end
+          val r = SeqBasis.reduce 100 Int.+ 0 (0, num_ngbrs) helpi
         in
           r
         end
-      val tr_counts = Seq.tabulate count (G.numVertices g')
+      (* val tr_counts = Seq.tabulate count (G.numVertices g) *)
     in
-      Seq.reduce Int.+ 0 tr_counts
+      SeqBasis.reduce 100 op+ 0 (0, G.numVertices g) count
     end
 end
