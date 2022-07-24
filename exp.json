@@ -38,12 +38,12 @@
       },
       {
         "tag": ["dense-matmul"],
-        "bench": ["dmm"],
+        "bench": ["dense-matmul"],
         "args": ["-N 1024"]
       },
       {
         "tag": ["raytracer"],
-        "bench": ["ray"],
+        "bench": ["raytracer"],
         "args": ["-n 1000 -m 1000"]
       },
       {
@@ -68,7 +68,7 @@
       },
       {
         "tag": ["nearest-nbrs"],
-        "bench": ["nn"],
+        "bench": ["nearest-nbrs"],
         "args": ["-input ../inputs/uniform-circle-1M"]
       },
       {
@@ -112,6 +112,16 @@
         "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
+        "tag": ["low-d-decomp"],
+        "bench": ["low-d-decomp"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["max-indep-set"],
+        "bench": ["max-indep-set"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
         "tag": ["palindrome"],
         "bench": ["palindrome"],
         "args": ["-N 1000000"]
@@ -125,11 +135,6 @@
         "tag": ["nqueens"],
         "bench": ["nqueens"],
         "args": ["-N 13"]
-      },
-      {
-        "tag": ["low-d-decomp"],
-        "bench": ["ldd"],
-        "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
         "tag": ["triangle-count"],
