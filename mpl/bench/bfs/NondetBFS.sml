@@ -28,7 +28,7 @@ struct
     in if start = 0 then s' else raise Fail "strip base <> 0"
     end
 
-  fun bfs (g : G.graph) (s : vertex) =
+  fun bfs {diropt: bool} (g : G.graph) (s : vertex) =
     let
       val n = G.numVertices g
       val parent = strip (Seq.tabulate (fn _ => ~1) n)
@@ -50,6 +50,7 @@ struct
         (* DS.reduce op+ 0 (DS.map degree (DS.fromArraySeq frontier)) *)
 
       fun shouldProcessDense frontier =
+        diropt andalso
         let
           val n = Seq.length frontier
           val m = sumOfOutDegrees frontier

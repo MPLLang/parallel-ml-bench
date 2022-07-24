@@ -95,6 +95,16 @@
         "tag": ["quickhull"],
         "bench": ["quickhull"],
         "args": ["-infile ../inputs/uniform-circle-20M"]
+      },
+      {
+        "tag": ["bfs"],
+        "bench": ["bfs"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["integrate"],
+        "bench": ["integrate"],
+        "args": ["-n 500000000"]
       }
     ]
 }

@@ -104,7 +104,7 @@
       {
         "tag": ["bfs"],
         "bench": ["bfs"],
-        "args": ["../inputs/rmat-10M-symm-bin"]
+        "args": ["../inputs/rmat-10M-symm-bin --no-dir-opt"]
       },
       {
         "tag": ["centrality"],
@@ -175,11 +175,6 @@
         "tag": ["wc"],
         "bench": ["wc-opt"],
         "args": ["-infile ../inputs/rmat-10M-symm"]
-      },
-      {
-        "tag": ["linearrec"],
-        "bench": ["linearrec"],
-        "args": ["-n 500000000"]
       },
       {
         "tag": ["mcss"],
