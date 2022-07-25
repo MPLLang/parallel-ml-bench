@@ -183,7 +183,7 @@ fun next (g, new_g) =
      * static partitioning based on num_domains, but this is unnecessary.
      * Just choose a static granularity that is reasonable, and then it will
      * work decently for any number of processors. *)
-    val target_granularity = 5000
+    val target_granularity = 10000
     val chunk_size = Int.max (1, target_granularity div board_size)
   in
     ForkJoin.parfor chunk_size (0, board_size) (fn x =>
