@@ -5,7 +5,7 @@ import (
   "fmt"
   // "time"
 	// "runtime"
-	"github.com/intel/forGoParallel/parallel"
+	// "github.com/intel/forGoParallel/parallel"
 )
 
 type ParamStruct struct {
@@ -60,7 +60,7 @@ func main() {
   fmt.Printf("n %d\n", n)
 
 	xs := make([]int64, n)
-	parallel.Range(0, n, func(low, high int) {
+	parallelRange(5000, 0, n, func(low, high int) {
 		for i := low; i < high; i++ {
 			xs[i] = int64(hash64(uint64(i)) % uint64(n))
 		}

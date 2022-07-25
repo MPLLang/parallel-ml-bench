@@ -3,7 +3,7 @@ package main
 import (
   "fmt"
 	"math"
-	"github.com/intel/forGoParallel/parallel"
+	// "github.com/intel/forGoParallel/parallel"
 )
 
 
@@ -16,18 +16,18 @@ func primesUpto(n int) []int64 {
   // fmt.Printf("primesUpto(%d): len(sqrtPrimes) = %d\n", n, len(sqrtPrimes))
 
 	flags := make([]bool, n+1)
-	parallel.Range(0, n+1, func(low, high int) {
+	parallelRange(5000, 0, n+1, func(low, high int) {
 		for i := low; i < high; i++ {
 	  	flags[i] = true
 		}
 	})
 
-	parallel.Range(0, len(sqrtPrimes), func(iLo, iHi int) {
+	parallelRange(1, 0, len(sqrtPrimes), func(iLo, iHi int) {
 		for i := iLo; i < iHi; i++ {
 			p := int(sqrtPrimes[i])
 			numMultiples := n / p - 1
 			// fmt.Printf("num multiples of %d: %d\n", p, numMultiples)
-			parallel.Range(0, numMultiples, func(jLo, jHi int) {
+			parallelRange(5000, 0, numMultiples, func(jLo, jHi int) {
 				for j := jLo; j < jHi; j++ {
 					// fmt.Printf("multiple of %d: %d\n", p, (j+2)*p)
 					flags[(j+2)*p] = false

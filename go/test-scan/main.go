@@ -3,7 +3,7 @@ package main
 import (
   "fmt"
 	// "math"
-	"github.com/intel/forGoParallel/parallel"
+	// "github.com/intel/forGoParallel/parallel"
 )
 
 func add64(a, b int64) int64 {
@@ -19,7 +19,7 @@ func main() {
   fmt.Printf("n %d\n", n)
 
 	input := make([]int64, n)
-	parallel.Range(0, n, func(low, high int) {
+	parallelRange(5000, 0, n, func(low, high int) {
 		for i := low; i < high; i++ {
 			input[i] = 1
 		}

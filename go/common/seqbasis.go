@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/intel/forGoParallel/parallel"
+	// "github.com/intel/forGoParallel/parallel"
 )
 
 func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
@@ -21,7 +21,7 @@ func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
   blockSize := grain
 	numBlocks := 1 + (n-1) / blockSize
 	blockSums := make([]T, numBlocks)
-	parallel.Range(0, numBlocks, func(bLo, bHi int) {
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
 			stop := min(n, (b+1)*blockSize)
@@ -35,7 +35,7 @@ func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
 
 	partials := scan[T](grain, f, z, blockSums)
 	result := make([]T, n+1)
-	parallel.Range(0, numBlocks, func(bLo, bHi int) {
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
 			stop := min(n, (b+1)*blockSize)
@@ -57,7 +57,7 @@ func filter[T any](grain int, p func(int) bool, n int, f func(int) T) []T {
 	blockSize := grain
 	numBlocks := 1 + (n-1) / blockSize
 	blockCounts := make([]int, numBlocks)
-	parallel.Range(0, numBlocks, func(bLo, bHi int) {
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
 			stop := min(n, (b+1)*blockSize)
@@ -75,7 +75,7 @@ func filter[T any](grain int, p func(int) bool, n int, f func(int) T) []T {
 	total := offsets[numBlocks]
 
 	result := make([]T, total)
-	parallel.Range(0, numBlocks, func(bLo, bHi int) {
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
 			stop := min(n, (b+1)*blockSize)
