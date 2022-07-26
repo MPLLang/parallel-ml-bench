@@ -98,3 +98,27 @@ func filterRange[T any](grain int, p func(int) bool, lo int, hi int, f func(int)
 		hi-lo,
 		func (i int) T { return f(lo+i) })
 }
+
+
+func reduce[T any](grain int, g func(T, T) T, z T, lo, hi int, f func(int) T) T {
+	if hi-lo <= grain {
+		acc := z
+		for i := lo; i < hi; i++ {
+			acc = g(acc, f(i))
+		}
+		return acc
+	}
+
+	mid := lo + ((hi-lo)/2)
+  done := make(chan bool)
+	var right T
+	go func () {
+		right = reduce(grain, g, z, mid, hi, f)
+		done <- true
+	} ()
+
+	left := reduce(grain, g, z, lo, mid, f)
+	<-done
+
+	return g(left, right)
+}
