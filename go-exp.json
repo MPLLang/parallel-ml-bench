@@ -3,7 +3,7 @@
     [
       {
         "match": { "exp": "time", "config": "go", "procs": "(?!1$)" },
-        "template": "/usr/bin/time -v numactl -i all -- bin/<bench>.<config>.bin -procs <procs> <args?{}> <args1?{}> -repeat 20 -warmup 5"
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin -procs <procs> <args?{}> <args1?{}> -repeat 20 -warmup 5"
       },
       {
         "match": { "exp": "time", "config": "go" },
@@ -11,7 +11,7 @@
       },
       {
         "match": { "exp": "space", "config": "go", "procs": "(?!1$)" },
-        "template": "/usr/bin/time -v numactl -i all -- bin/<bench>.<config>.bin -procs <procs> <args?{}> <args1?{}> -repeat 20 -warmup 0"
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin -procs <procs> <args?{}> <args1?{}> -repeat 20 -warmup 0"
       },
       {
         "match": { "exp": "space", "config": "go" },

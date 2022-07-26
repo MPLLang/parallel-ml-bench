@@ -581,7 +581,8 @@ javaTags = {
   "primes": "primes",
   "msort-ints": "sort-longs",
   "tokens": "tokens",
-  "mcss": "mcss"
+  "mcss": "mcss",
+  "linefit": "linefit"
 }
 
 goTags = {

@@ -3,7 +3,7 @@
     [
       {
         "match": { "exp": "time", "config": "java", "procs": "(?!1$)" },
-        "template": "/usr/bin/time -v numactl -i all -- java -XX:+UseG1GC -XX:ParallelGCThreads=<procs> -Djava.util.concurrent.ForkJoinPool.common.parallelism=<procs> <bench> <args?{}> <args1?{}> -repeat 20 -warmup 5"
+        "template": "/usr/bin/time -v java -XX:+UseG1GC -XX:ParallelGCThreads=<procs> -Djava.util.concurrent.ForkJoinPool.common.parallelism=<procs> <bench> <args?{}> <args1?{}> -repeat 20 -warmup 5"
       },
       {
         "match": { "exp": "time", "config": "java" },
@@ -11,7 +11,7 @@
       },
       {
         "match": { "exp": "space", "config": "java", "procs": "(?!1$)" },
-        "template": "/usr/bin/time -v numactl -i all -- java -XX:+UseG1GC -XX:ParallelGCThreads=<procs> -Djava.util.concurrent.ForkJoinPool.common.parallelism=<procs> <bench> <args?{}> <args1?{}> -repeat 20 -warmup 0"
+        "template": "/usr/bin/time -v java -XX:+UseG1GC -XX:ParallelGCThreads=<procs> -Djava.util.concurrent.ForkJoinPool.common.parallelism=<procs> <bench> <args?{}> <args1?{}> -repeat 20 -warmup 0"
       },
       {
         "match": { "exp": "space", "config": "java" },
@@ -49,6 +49,11 @@
       {
         "tag": ["mcss"],
         "bench": ["MCSS"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linefit"],
+        "bench": ["Linefit"],
         "args": ["-n 500000000"]
       }
     ]

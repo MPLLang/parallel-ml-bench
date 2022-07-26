@@ -21,7 +21,7 @@ func linefit (input []P) P {
 
 	z := P { x: 0.0, y: 0.0 }
 
-	sum := func (f func (p P) P) P {
+	sum := func (f func (P) P) P {
 		return reduce(5000, sumPair, z, 0, len(input), func (i int) P {
 			return f(input[i])
 		})
