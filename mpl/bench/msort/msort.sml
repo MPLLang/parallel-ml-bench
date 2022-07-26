@@ -12,6 +12,7 @@ val input = ArraySlice.full (SeqBasis.tabulate 10000 (0, n) elem)
 val result =
   Benchmark.run "running mergesort" (fn _ => Mergesort.sort Int.compare input)
 
+val _ = print ("input " ^ Util.summarizeArraySlice 8 Int.toString input ^ "\n")
 val _ = print ("result " ^ Util.summarizeArraySlice 8 Int.toString result ^ "\n")
 
 val _ = GCStats.report ()

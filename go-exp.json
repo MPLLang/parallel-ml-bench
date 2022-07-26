@@ -42,6 +42,11 @@
         "args": ["-n 20000000"]
       },
       {
+        "tag": ["msort"],
+        "bench": ["msort"],
+        "args": ["-n 20000000"]
+      },
+      {
         "tag": ["primes"],
         "bench": ["primes"],
         "args": ["-n 100000000"]
@@ -54,6 +59,11 @@
       {
         "tag": ["mcss"],
         "bench": ["mcss"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linefit"],
+        "bench": ["linefit"],
         "args": ["-n 500000000"]
       }
     ]

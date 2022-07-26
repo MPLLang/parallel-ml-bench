@@ -2,6 +2,7 @@ package main
 
 import (
 	// "github.com/intel/forGoParallel/parallel"
+	"golang.org/x/exp/constraints"
 )
 
 func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
@@ -121,4 +122,113 @@ func reduce[T any](grain int, g func(T, T) T, z T, lo, hi int, f func(int) T) T 
 	<-done
 
 	return g(left, right)
+}
+
+
+// ===========================================================================
+
+/*
+let search cmp s x =
+  let rec loop lo hi =
+    match hi - lo with
+    | 0 -> lo
+    | n ->
+      let mid = lo + n / 2 in
+      let pivot = Seq.get s mid in
+      let c = cmp x pivot in
+      if c < 0 then
+        (* less *)
+        loop lo mid
+      else if c = 0 then
+        (* equal *)
+        mid
+      else
+        (* greater *)
+        loop (mid+1) hi
+  in
+  loop 0 (Seq.length s)
+*/
+
+func binarySearch[T constraints.Ordered](s []T, x T) int {
+	lo := 0
+	hi := len(s)
+
+	for ; lo < hi; {
+		n := hi-lo
+		mid := lo + n/2
+		pivot := s[mid]
+		if x < pivot {
+			hi = mid
+		} else if x == pivot {
+			return mid
+		} else {
+			lo = mid+1
+		}
+	}
+
+	return lo
+}
+
+func writeMergeSerial[T constraints.Ordered](s1, s2, t []T) {
+	n1 := len(s1)
+	n2 := len(s2)
+	i1 := 0
+	i2 := 0
+	j := 0
+
+	for ; i1 < n1 && i2 < n2; j++ {
+		x1 := s1[i1]
+		x2 := s2[i2]
+		if x1 < x2 {
+			t[j] = x1
+			i1++
+		} else {
+			t[j] = x2
+			i2++
+		}
+	}
+
+	for ; i1 < n1; j++ {
+		t[j] = s1[i1]
+		i1++
+	}
+
+	for ; i2 < n2; j++ {
+		t[j] = s2[i2]
+		i2++
+	}
+}
+
+func writeMerge[T constraints.Ordered](s1, s2, t []T) {
+	n1 := len(s1)
+	n2 := len(s2)
+
+	if n1+n2 <= 5000 {
+		writeMergeSerial(s1, s2, t)
+		return
+	}
+
+	if n1 == 0 {
+		parallelRange(5000, 0, n2, func (lo, hi int) {
+			for i := lo; i < hi; i++ {
+				t[i] = s2[i]
+			}
+		})
+		return
+	}
+
+	mid1 := n1 / 2
+	pivot := s1[mid1]
+	mid2 := binarySearch(s2, pivot)
+
+	l1 := s1[:mid1]
+	r1 := s1[(mid1+1):]
+	l2 := s2[:mid2]
+	r2 := s2[mid2:]
+
+	t[mid1+mid2] = pivot
+	tl := t[:(mid1+mid2)]
+	tr := t[(mid1+mid2+1):]
+	pardo(func(){ writeMerge(l1, l2, tl) },
+	      func(){ writeMerge(r1, r2, tr) })
 }

@@ -583,6 +583,14 @@ javaTags = {
   "tokens": "tokens"
 }
 
+goTags = {
+  "primes": "primes",
+  "msort-ints": "msort",
+  "tokens": "tokens",
+  "mcss": "mcss",
+  "linefit": "linefit"
+}
+
 sandmarkTags = [
   "binarytrees5",
   "game-of-life",
@@ -652,7 +660,7 @@ sortShootout = [
   ("MPL", "mpl", "msort-ints"),
   ("Java", "java", "sort-longs"),
   ("OCaml", "ocaml", "msort-ints"),
-  ("Go", "go", "matthew-sort-int64")
+  ("Go", "go", "msort")
 ]
 
 sortShootoutBaseline = \
@@ -868,6 +876,43 @@ print(table(tt, defaultAlign))
 print("")
 
 # ============================================================================
+
+headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
+headers1 = ['Benchmark', 'G', 'M', 'G/M', 'G', 'M', 'G/M', 'G', 'M', 'G/M', 'G', 'M', 'G/M']
+tt = [headers, "-", headers1, "="]
+for tag in sorted(goTags.keys()):
+  mt1 = tm(averageTime(D, 'mpl', tag, 1))
+  mtp = tm(averageTime(D, 'mpl', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+
+  jt1 = tm(averageTime(D, 'go', goTags[tag], 1))
+  jtp = tm(averageTime(D, 'go', goTags[tag], maxp))
+  jr1 = spg(averageSpace(D, 'go', goTags[tag], 1))
+  jrp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+
+  thisRow = [
+    jt1,
+    mt1,
+    ov(sd(jt1, mt1)),
+    jtp,
+    mtp,
+    ov(sd(jtp, mtp)),
+    jr1,
+    mr1,
+    ov(sd(jr1, mr1)),
+    jrp,
+    mrp,
+    ov(sd(jrp, mrp))
+  ]
+  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  tt.append(thisRow)
+
+print("GO COMPARISON")
+print(table(tt, defaultAlign))
+print("")
+
+# ============================================================================
 # LaTeX figure: OCaml comparison
 # ============================================================================
 
@@ -980,6 +1025,63 @@ with open(javaComparisonTable, 'w') as output:
   output.write(" & ".join(["geomean"] + row))
   output.write("  \\\\\n")
 print("[INFO] wrote to {}".format(javaComparisonTable))
+
+# ============================================================================
+# LaTeX figure: Go comparison
+# ============================================================================
+
+proc1TimeRats = []
+proc72TimeRats = []
+proc1SpaceRats = []
+proc72SpaceRats = []
+
+ensureFigDir()
+goComparisonTable = "figures/go-space-time-comparison.tex"
+with open(goComparisonTable, 'w') as output:
+  for tag in sorted(goTags.keys()):
+    or1 = spg(averageSpace(D, 'go', goTags[tag], 1))
+    orp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+
+    ot1 = tm(averageTime(D, 'go', goTags[tag], 1))
+    otp = tm(averageTime(D, 'go', goTags[tag], maxp))
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+
+    proc1TimeRats.append(ovv(sd(ot1, mt1)))
+    proc72TimeRats.append(ovv(sd(otp, mtp)))
+    proc1SpaceRats.append(ovv(sd(or1, mr1)))
+    proc72SpaceRats.append(ovv(sd(orp, mrp)))
+
+    row = \
+      [ fmt(ot1)
+      , fmt(mt1)
+      , makeBold(fmt(ov(sd(ot1, mt1))))
+      , fmt(otp)
+      , fmt(mtp)
+      , makeBold(fmt(ov(sd(otp, mtp))))
+      , sfmt(or1)
+      , sfmt(mr1)
+      , makeBold(fmt(ov(sd(or1, mr1))))
+      , sfmt(orp)
+      , sfmt(mrp)
+      , makeBold(fmt(ov(sd(orp, mrp))))
+      ]
+
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  output.write("\\midrule\n")
+  row = [
+    "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
+    "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
+  ]
+  output.write(" & ".join(["geomean"] + row))
+  output.write("  \\\\\n")
+print("[INFO] wrote to {}".format(goComparisonTable))
 
 # ============================================================================
 # LaTeX figure: C++ comparison

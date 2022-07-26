@@ -53,6 +53,22 @@ func hash64(u uint64) uint64 {
   return v
 }
 
+// func unsignedMod(d, m int64) int64 {
+// 	r := d % m
+// 	if (r < 0 && m > 0) || (r > 0 && m < 0) {
+// 		return r + m
+// 	}
+// 	return r
+// }
+
+func unsignedMod(a, b int64) int64 {
+	r := a % b
+	if r < 0 {
+		return r + b
+	}
+	return r
+}
+
 
 func readFileContents(path string) []byte {
 	file, err := os.Open(path)
