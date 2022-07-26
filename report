@@ -580,7 +580,8 @@ cppTags = {
 javaTags = {
   "primes": "primes",
   "msort-ints": "sort-longs",
-  "tokens": "tokens"
+  "tokens": "tokens",
+  "mcss": "mcss"
 }
 
 goTags = {

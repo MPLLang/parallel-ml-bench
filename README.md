@@ -88,7 +88,7 @@ Infrastructure and benchmarks
   * [x] OCaml: infrastructure
   * [x] OCaml: **more benchmarks**
   * [x] Go: infrastructure
-  * [ ] Go: **more benchmarks**
+  * [x] Go: **more benchmarks**
 
 Performance optimization
   * [ ] Try z-sort for nearest neighbors.

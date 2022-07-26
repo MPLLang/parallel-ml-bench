@@ -45,6 +45,11 @@
         "tag": ["tokens"],
         "bench": ["Tokens"],
         "args": ["-input ../inputs/words256.txt"]
+      },
+      {
+        "tag": ["mcss"],
+        "bench": ["MCSS"],
+        "args": ["-n 500000000"]
       }
     ]
 }
