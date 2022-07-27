@@ -8,8 +8,25 @@ nested (fork-join) parallelism. MPL generates executables with
 excellent multicore performance, utilizing a novel approach to
 memory management based on the theory of disentanglement
 [[1](#rmab16),[2](#gwraf18),[3](#wyfa20),[4](#awa21)].
-
 MPL is research software and is being actively developed.
+
+This suite consists of sophisticated parallel benchmarks from various
+problem domains, including graphs, text processing, digital audio processing,
+image analysis and manipulation, numerical algorithms, computational
+geometry, and others. These are ported to MPL from existing state-of-the-art
+parallel C/C++ benchmark suites and libraries including
+[PBBS](https://github.com/cmuparlay/pbbsbench),
+[ParlayLib](https://github.com/cmuparlay/parlaylib),
+[Ligra](https://github.com/jshun/ligra), and
+[PAM](https://github.com/cmuparlay/PAM).
+Even though these benchmarks were originally written in C/C++, all of them
+are naturally disentangled.
+
+All benchmarks are "problem-based", i.e., the input and output are
+well-specified, allowing us to do cross-language comparisons.
+This repo includes comparisons with Java, Go, Multicore OCaml, and C++.
+We also compare against MLton (on which MPL is based) to determine overall
+overheads and scalability.
 
 ## Sample of results
 
