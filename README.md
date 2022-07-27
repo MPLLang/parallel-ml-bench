@@ -2,6 +2,12 @@
 Parallel ML benchmark suite for the [`mpl`](https://github.com/MPLLang/mpl)
 compiler.
 
+Some current results: speedup of MPL over MLton on up to 72 processors
+across 30 benchmarks. This is on a 72-core server (4x 2.4GHz Intel E7-8867 v4
+Xeons) with 1TB of memory.
+
+![Speedups of MPL over MLton on up to 72 processors](img/speedups.png)
+
 ## Requirements
 
 Machine: Linux x86_64 multicore

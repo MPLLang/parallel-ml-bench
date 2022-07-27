@@ -125,16 +125,8 @@ def displayTag(t):
   sandmarkTags = ["binarytrees5","lu-decomp","game-of-life","nbody"]
   if t in sandmarkTags:
     return "SM:" + t
-  if t == "dedup-strings":
-    return "hash-dedup"
-  if t == "dmm":
-    return "dense-matmul"
-  if t == "mis":
-    return "maximal-indep-set"
-  if t == "pfa-bst":
-    return "persistent-arr"
-  if t == "connectivity":
-    return "reachability"
+  if t == "msort-ints":
+    return "msort-int64"
   return t
 
 
@@ -796,7 +788,7 @@ for tag in ocamlTags:
     mrp,
     ov(sd(orp,mrp))
   ]
-  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
   tt.append(thisRow)
 
 print("OCAML COMPARISON")
@@ -833,7 +825,7 @@ for tag in sorted(cppTags.keys()):
     mrp,
     ov(sd(mrp,crp))
   ]
-  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
   tt.append(thisRow)
 
 print("C++ COMPARISON")
@@ -870,7 +862,7 @@ for tag in sorted(javaTags.keys()):
     mrp,
     ov(sd(jrp, mrp))
   ]
-  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
   tt.append(thisRow)
 
 print("JAVA COMPARISON")
@@ -907,7 +899,7 @@ for tag in sorted(goTags.keys()):
     mrp,
     ov(sd(jrp, mrp))
   ]
-  thisRow = [tag] + [str(x) if x is not None else "--" for x in thisRow]
+  thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
   tt.append(thisRow)
 
 print("GO COMPARISON")
