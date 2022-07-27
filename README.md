@@ -28,6 +28,10 @@ This repo includes comparisons with Java, Go, Multicore OCaml, and C++.
 We also compare against MLton (on which MPL is based) to determine overall
 overheads and scalability.
 
+Please see also [`mpllib`](https://github.com/MPLLang/mpllib), which
+is a library of key data structures and algorithms used throughout the MPL
+benchmarks.
+
 ## Sample of results
 
 ### Speedups
