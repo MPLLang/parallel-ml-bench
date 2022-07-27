@@ -2,11 +2,28 @@
 Parallel ML benchmark suite for the [`mpl`](https://github.com/MPLLang/mpl)
 compiler.
 
-Some current results: speedup of MPL over MLton on up to 72 processors
+## Sample of results
+
+### Speedups
+Speedup of MPL over MLton on up to 72 processors
 across 30 benchmarks. This is on a 72-core server (4x 2.4GHz Intel E7-8867 v4
 Xeons) with 1TB of memory.
 
 ![Speedups of MPL over MLton on up to 72 processors](img/speedups.png)
+
+### Java comparison
+Comparison with Java on a few benchmarks, with runtimes $T_p$ and space
+usage (maximum residency) $R_p$ on $p$ processors. Column $J/M$ is the
+overhead of Java relative to MPL; higher ratios are better for MPL.
+
+![Comparison between Java and MPL](img/java-cmp.png)
+
+### Go comparison
+Comparison with Go on a few benchmarks, with runtimes $T_p$ and space
+usage $R_p$ on $p$ processors. Column $G/M$ is the overhead of Go relative
+to MPL; higher ratios are better for MPL.
+
+![Comparison between Go and MPL](img/go-cmp.png)
 
 ## Requirements
 
