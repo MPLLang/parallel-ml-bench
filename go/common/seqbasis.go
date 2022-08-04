@@ -5,6 +5,16 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+func tabulate[T any](grain int, n int, f func(int) T) []T {
+	result := make([]T, n)
+	parallelRange(grain, 0, n, func(lo, hi int) {
+		for i := lo; i < hi; i++ {
+			result[i] = f(i)
+		}
+	})
+	return result
+}
+
 func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
 	n := len(input)
 

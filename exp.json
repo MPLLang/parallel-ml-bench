@@ -173,7 +173,7 @@
       },
       {
         "tag": ["sparse-mxv"],
-        "bench": ["sparse-mxv"],
+        "bench": ["sparse-mxv-opt"],
         "args": ["-n 200000000"]
       },
       {
