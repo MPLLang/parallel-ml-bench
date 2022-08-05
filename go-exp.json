@@ -47,6 +47,11 @@
         "args": ["-n 20000000"]
       },
       {
+        "tag": ["msort-strings"],
+        "bench": ["msort-strings"],
+        "args": ["-infile ../inputs/words64.txt"]
+      },
+      {
         "tag": ["primes"],
         "bench": ["primes"],
         "args": ["-n 100000000"]

@@ -60,6 +60,11 @@
         "tag": ["sparse-mxv"],
         "bench": ["SparseMxV"],
         "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["msort-strings"],
+        "bench": ["SortStrings"],
+        "args": ["-input ../inputs/words64.txt"]
       }
     ]
 }
