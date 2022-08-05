@@ -55,6 +55,11 @@
         "tag": ["linefit"],
         "bench": ["Linefit"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["SparseMxV"],
+        "args": ["-n 200000000"]
       }
     ]
 }
