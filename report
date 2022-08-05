@@ -574,7 +574,8 @@ javaTags = {
   "msort-ints": "sort-longs",
   "tokens": "tokens",
   "mcss": "mcss",
-  "linefit": "linefit"
+  "linefit": "linefit",
+  "sparse-mxv": "sparse-mxv"
 }
 
 goTags = {
@@ -582,7 +583,8 @@ goTags = {
   "msort-ints": "msort",
   "tokens": "tokens",
   "mcss": "mcss",
-  "linefit": "linefit"
+  "linefit": "linefit",
+  "sparse-mxv": "sparse-mxv"
 }
 
 sandmarkTags = [
