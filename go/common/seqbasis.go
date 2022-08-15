@@ -3,6 +3,7 @@ package main
 import (
 	// "github.com/intel/forGoParallel/parallel"
 	"golang.org/x/exp/constraints"
+	"time"
 )
 
 func tabulate[T any](grain int, n int, f func(int) T) []T {
@@ -31,7 +32,8 @@ func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
 
   blockSize := grain
 	numBlocks := 1 + (n-1) / blockSize
-	blockSums := make([]T, numBlocks)
+	// blockSums := make([]T, numBlocks)
+	blockSums := arrayAlloc[T](numBlocks)
 	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
@@ -45,7 +47,7 @@ func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
 	})
 
 	partials := scan[T](grain, f, z, blockSums)
-	result := make([]T, n+1)
+	result := arrayAlloc[T](n+1)
 	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
@@ -65,9 +67,13 @@ func scan[T any](grain int, f func(T,T) T, z T, input []T) []T {
 
 
 func filter[T any](grain int, p func(int) bool, n int, f func(int) T) []T {
+	tm := time.Now()
+
 	blockSize := grain
 	numBlocks := 1 + (n-1) / blockSize
-	blockCounts := make([]int, numBlocks)
+	// blockCounts := make([]int, numBlocks)
+	blockCounts := arrayAlloc[int](numBlocks)
+	tm = tickSince(tm, "filter:alloc")
 	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
@@ -82,10 +88,14 @@ func filter[T any](grain int, p func(int) bool, n int, f func(int) T) []T {
 		}
 	})
 
+	tm = tickSince(tm, "filter:block-counts")
+
 	offsets := scan(grain, func(a, b int) int { return a+b }, 0, blockCounts)
 	total := offsets[numBlocks]
+	tm = tickSince(tm, "filter:scan-offsets")
 
-	result := make([]T, total)
+	result := arrayAlloc[T](total)
+	tm = tickSince(tm, "filter:alloc-output")
 	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
 		for b := bLo; b < bHi; b++ {
 			start := b*blockSize
@@ -99,9 +109,60 @@ func filter[T any](grain int, p func(int) bool, n int, f func(int) T) []T {
 			}
 		}
 	})
+	tm = tickSince(tm, "filter:fill-output")
 
 	return result
 }
+
+
+func intFilter(grain int, p func(int) bool, n int, f func(int) int) []int {
+	tm := time.Now()
+
+	blockSize := grain
+	numBlocks := 1 + (n-1) / blockSize
+	// blockCounts := make([]int, numBlocks)
+	blockCounts := arrayAlloc[int](numBlocks)
+	tm = tickSince(tm, "intFilter:alloc")
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
+		for b := bLo; b < bHi; b++ {
+			start := b*blockSize
+			stop := min(n, (b+1)*blockSize)
+			count := 0
+			for i := start; i < stop; i++ {
+				if p(i) {
+					count++
+				}
+			}
+			blockCounts[b] = count
+		}
+	})
+
+	tm = tickSince(tm, "intFilter:block-counts")
+
+	offsets := scan(grain, func(a, b int) int { return a+b }, 0, blockCounts)
+	total := offsets[numBlocks]
+	tm = tickSince(tm, "intFilter:scan-offsets")
+
+	result := arrayAlloc[int](total)
+	tm = tickSince(tm, "intFilter:alloc-output")
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
+		for b := bLo; b < bHi; b++ {
+			start := b*blockSize
+			stop := min(n, (b+1)*blockSize)
+			j := offsets[b]
+			for i := start; i < stop; i++ {
+				if p(i) {
+					result[j] = f(i)
+					j++
+				}
+			}
+		}
+	})
+	tm = tickSince(tm, "intFilter:fill-output")
+
+	return result
+}
+
 
 func filterRange[T any](grain int, p func(int) bool, lo int, hi int, f func(int) T) []T {
 	return filter(grain,

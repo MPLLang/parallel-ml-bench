@@ -6,6 +6,7 @@ import (
   "fmt"
   "strconv"
   "golang.org/x/exp/constraints"
+	"time"
 )
 
 func min[T constraints.Ordered](x,y T) T {
@@ -167,4 +168,31 @@ func isSpace(b byte) bool {
 	       (b == 10) ||  // newline
 				 (b == 13) ||  // carriage return
 				 (b == 9)      // tab
+}
+
+
+// ==========================================================================
+
+// func arrayAlloc[T any](n int) []T {
+// 	if (n < 100000) {
+// 		return make([]T, n)
+// 	}
+
+// 	var result []T
+// 	tm := getTime(func() { result = make([]T, n) })
+// 	fmt.Printf("make([]%T,%d): %.3fs\n", *new(T), n, tm)
+// 	return result
+// }
+
+
+func arrayAlloc[T any](n int) []T {
+	return make([]T, n)
+}
+
+
+func tickSince(t time.Time, msg string) time.Time {
+	newt := time.Now()
+	diff := newt.Sub(t).Seconds()
+	fmt.Printf("tick:%s %.3fs\n", msg, diff)
+	return newt
 }
