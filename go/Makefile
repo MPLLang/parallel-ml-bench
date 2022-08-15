@@ -3,7 +3,7 @@ bindir: phony
 
 %.go.bin: bindir
 	(cd $* && go build)
-	mv $*/main bin/$*.go.bin
+	mv $*/mymain bin/$*.go.bin
 
 .PHONY: phony
 phony:
