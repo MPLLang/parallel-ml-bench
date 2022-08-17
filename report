@@ -1203,30 +1203,112 @@ print("[INFO] wrote to {}".format(mltonCmpTable))
 # PDF: Speedup plot
 # ============================================================================
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
+  plt.figure(figsize=(7,7))
+  # markers = ['o','v','^','<','>','s','*','d','D','+','x','|','','','','','']
+  colors = ['blue', 'darkturquoise', 'darkgreen', 'darkviolet', 'red', 'goldenrod','dimgrey', 'brown']
+  # 'black',
+  markers = ['o','v','^','<','>','s','d']
+  # ,'D','*','P','X'
+  linestyles = ['solid', 'dashed','dashdot']
+
+  # markers = ['.'] * len(speedupTags)
+  procs = P
+
+  fontSize = 14
+  legendFontSize = 12
+  markerSize = 8
+
+  usedFull = dict()
+  usedNoc = dict()
+
+  plt.plot([0,maxp+1], [0,maxp+1], marker="", color="grey", linewidth=0.8)
+  lines = []
+  for tag in tagsSortedByName:
+    try:
+      baseline = averageTime(D, 'mlton', tag, 1)
+      speedups = map((lambda p: getspeedup(tag, p)), procs)
+
+      i = tagsSortedBySpeedups.index(tag)
+      ci = i % len(colors)
+      mi = i % len(markers)
+      si = i % len(linestyles)
+
+      if tuple((ci, mi, si)) in usedFull:
+        otherTag = usedFull[tuple((ci, mi, si))]
+        sys.stderr.write('[WARN] uh oh: {} and {} have same style\n'.format(tag, otherTag))
+      else:
+        usedFull[tuple((ci, mi, si))] = tag
+
+      if tuple((mi, si)) in usedNoc:
+        otherTag = usedNoc[tuple((mi, si))]
+        if tuple((ci, mi, si)) not in usedFull:
+          sys.stderr.write('[WARN] uh oh: {} and {} only differ by color\n'.format(tag, otherTag))
+      else:
+        usedNoc[tuple((mi, si))] = tag
+
+      color = colors[ci]
+      marker = markers[mi]
+      linestyle = linestyles[si]
+      lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
+    except Exception as e:
+      sys.stderr.write('[WARN] error while plotting speedup for {}: {}\n'.format(tag, e))
+
+  # this sets the legend.
+  font = {
+    'size': legendFontSize,
+    #'family' : 'normal',
+    #'weight' : 'bold',
+  }
+  matplotlib.rc('font', **font)
+
+  # make sure to use truetype fonts
+  matplotlib.rcParams['pdf.fonttype'] = 42
+  matplotlib.rcParams['ps.fonttype'] = 42
+
+  # set legend position
+  matplotlib.rcParams['legend.loc'] = 'upper left'
+
+  ticks = [1] + range(10, maxp+1, 10)
+
+  plt.xlabel('Processors', fontsize=fontSize)
+  plt.ylabel('Speedup', fontsize=fontSize)
+  plt.yticks(ticks, fontsize=fontSize)
+  plt.xticks(ticks, fontsize=fontSize)
+  plt.xlim(0, 74)
+  plt.ylim(0, 74)
+  plt.gca().grid(axis='both', linestyle='dotted')
+  plt.gca().set_axisbelow(True)
+  # plt.margins(y=10)
+
+  if True:
+    plt.legend(
+      [b[0] for b in lines],
+      map(displayTag, tagsSortedByName),
+      # bbox_to_anchor=(-0.16,1.05),
+      # loc='upper right',
+      bbox_to_anchor=(-0.1,1.01),
+      loc='lower left',
+      ncol=3
+    )
+
+  ensureFigDir()
+  # outputName = 'figures/mpl-speedups.pdf'
+  plt.savefig(outputName, bbox_inches='tight')
+  sys.stdout.write("[INFO] output written to {}\n".format(outputName))
+  plt.close()
+
+
+
 speedupTags = sorted([
   tag for tag in orderedTags
   if (averageTime(D, 'mpl', tag, maxp) is not None)
   and tag not in sandmarkTags
 ], key=displayTag)
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(7,7))
-# markers = ['o','v','^','<','>','s','*','d','D','+','x','|','','','','','']
-colors = ['blue', 'darkturquoise', 'darkgreen', 'darkviolet', 'red', 'goldenrod','dimgrey', 'brown']
-# 'black',
-markers = ['o','v','^','<','>','s','d']
-# ,'D','*','P','X'
-linestyles = ['solid', 'dashed','dashdot']
-
-# markers = ['.'] * len(speedupTags)
-procs = P
-
-fontSize = 14
-legendFontSize = 12
-markerSize = 8
 
 def getspeedup(tag, p):
   baseline = averageTime(D, 'mlton', tag, 1)
@@ -1238,85 +1320,15 @@ def getspeedup(tag, p):
 
 sortedBySpeedups = sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
 
-usedFull = dict()
-usedNoc = dict()
+groupA = sortedBySpeedups[::2]
+groupB = sortedBySpeedups[1::2]
 
-plt.plot([0,maxp+1], [0,maxp+1], marker="", color="grey", linewidth=0.8)
-lines = []
-for tag in speedupTags:
-  try:
-    baseline = averageTime(D, 'mlton', tag, 1)
-    speedups = map((lambda p: getspeedup(tag, p)), procs)
+groupATags = [t for t in speedupTags if t in groupA]
+groupBTags = [t for t in speedupTags if t in groupB]
 
-    i = sortedBySpeedups.index(tag)
-    ci = i % len(colors)
-    mi = i % len(markers)
-    si = i % len(linestyles)
-
-    if tuple((ci, mi, si)) in usedFull:
-      otherTag = usedFull[tuple((ci, mi, si))]
-      sys.stderr.write('[WARN] uh oh: {} and {} have same style\n'.format(tag, otherTag))
-    else:
-      usedFull[tuple((ci, mi, si))] = tag
-
-    if tuple((mi, si)) in usedNoc:
-      otherTag = usedNoc[tuple((mi, si))]
-      if tuple((ci, mi, si)) not in usedFull:
-        sys.stderr.write('[WARN] uh oh: {} and {} only differ by color\n'.format(tag, otherTag))
-    else:
-      usedNoc[tuple((mi, si))] = tag
-
-    color = colors[ci]
-    marker = markers[mi]
-    linestyle = linestyles[si]
-    lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
-  except Exception as e:
-    sys.stderr.write('[WARN] error while plotting speedup for {}: {}\n'.format(tag, e))
-
-# this sets the legend.
-font = {
-  'size': legendFontSize,
-  #'family' : 'normal',
-  #'weight' : 'bold',
-}
-matplotlib.rc('font', **font)
-
-# make sure to use truetype fonts
-matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['ps.fonttype'] = 42
-
-# set legend position
-matplotlib.rcParams['legend.loc'] = 'upper left'
-
-ticks = [1] + range(10, maxp+1, 10)
-
-plt.xlabel('Processors', fontsize=fontSize)
-plt.ylabel('Speedup', fontsize=fontSize)
-plt.yticks(ticks, fontsize=fontSize)
-plt.xticks(ticks, fontsize=fontSize)
-plt.xlim(0, 74)
-plt.ylim(0, 74)
-plt.gca().grid(axis='both', linestyle='dotted')
-plt.gca().set_axisbelow(True)
-# plt.margins(y=10)
-
-if True:
-  plt.legend(
-    [b[0] for b in lines],
-    map(displayTag, speedupTags),
-    # bbox_to_anchor=(-0.16,1.05),
-    # loc='upper right',
-    bbox_to_anchor=(-0.1,1.01),
-    loc='lower left',
-    ncol=3
-  )
-
-ensureFigDir()
-outputName = 'figures/mpl-speedups.pdf'
-plt.savefig(outputName, bbox_inches='tight')
-sys.stdout.write("[INFO] output written to {}\n".format(outputName))
-plt.close()
-
+speedupPlot("figures/mpl-speedups.pdf", sortedBySpeedups, speedupTags)
+speedupPlot("figures/mpl-speedups-1.pdf", groupA, groupATags)
+speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags)
 
 # ============================================================================
 # ============================================================================
