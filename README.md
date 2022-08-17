@@ -34,13 +34,6 @@ benchmarks.
 
 ## Sample of results
 
-### Speedups
-Speedup of MPL over MLton on up to 72 processors
-across 30 benchmarks. This is on a 72-core server (4x 2.4GHz Intel E7-8867 v4
-Xeons) with 1TB of memory.
-
-![Speedups of MPL over MLton on up to 72 processors](img/speedups.png)
-
 ### Java comparison
 Comparison with Java on a few benchmarks, with runtimes $T_p$ (in seconds) and
 space usage (maximum residency, in GB) $R_p$ on $p$ processors. Column $J/M$ is
@@ -54,6 +47,13 @@ space usage $R_p$ (in GB) on $p$ processors. Column $G/M$ is the overhead of
 Go relative to MPL; higher ratios are better for MPL.
 
 ![Comparison between Go and MPL](img/go-cmp.png)
+
+### Speedups
+Speedup of MPL over MLton on up to 72 processors
+across 30 benchmarks. This is on a 72-core server (4x 2.4GHz Intel E7-8867 v4
+Xeons) with 1TB of memory.
+
+![Speedups of MPL over MLton on up to 72 processors](img/speedups.png)
 
 ## Requirements
 
