@@ -24,10 +24,8 @@ linematcher = re.compile(pattern)
 def parseLine(line):
   m = linematcher.match(line)
   if m:
-    print(m.groupdict())
-  else:
-    print("no match")
-  return m.groupdict()
+    return m.groupdict()
+  return None
 
 if len(sys.argv) < 2:
   sys.stderr.write("[ERROR] missing filename argument")
@@ -45,5 +43,6 @@ stw2 = [float(x['clock_phase3']) for x in data]
 def avg(xs):
   return sum(xs) / len(xs)
 
-print(min(stw1), avg(stw1), max(stw1))
-print(min(stw2), avg(stw2), max(stw2))
+template = '  min {}\n  avg {}\n  max {}\n  tot {}\n'
+print('stw1\n' + template.format(min(stw1), avg(stw1), max(stw1), sum(stw1)))
+print('stw2\n' + template.format(min(stw2), avg(stw2), max(stw2), sum(stw2)))
