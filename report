@@ -102,6 +102,7 @@ statsPatterns = \
     ("space", parseKiB, reCompile(r"^\s*Maximum resident set size \(kbytes\): (\d+).*$"))
   , ("approx-race-factor", parseB, reCompile(r"^entangled bytes: (\d+).*$"))
   , ("kbytes-pinned-entangled", parseB, reCompile(r"^bytes pinned entangled: (\d+).*$"))
+  , ("computed-average", float, reCompile(r"^average\s+(\d+.\d+).*$"))
   # , ("num-local", int, reCompile(r"^num local: (\d+)$"))
   # , ("local-reclaimed", parseB, reCompile(r"^local reclaimed: (\d+)$"))
   # , ("local-time", int, reCompile(r"^local gc time: (\d+)$"))
@@ -154,15 +155,15 @@ def parseStats(row):
   except:
     newRow['avgtime'] = None
 
-  # try:
-  #   newRow['space'] = float(newRow['space'])
-  # except KeyError:
-  #   pass
-
-  # try:
-  #   newRow['time'] = float(newRow['elapsed'])
-  # except KeyError:
-  #   pass
+  if newRow['avgtime'] is None:
+    try:
+      newRow['avgtime'] = newRow['computed-average']
+    except:
+      pass
+  elif abs(newRow['computed-average'] - newRow['avgtime']) > 0.001:
+    # sanity check: might as well check that the average reported by the
+    # benchmark respects the average we compute here
+    sys.stderr.write("[WARN] (tag={} config={} procs={}) computed-average ({}) and avgtime ({}) differ a bit.".format(newRow['tag'], newRow['config'], newRow['procs'], newRow['computed-average'], newRow['avgtime']))
 
   foundTags.add(newRow['tag'])
   foundProcs.add(newRow['procs'])
@@ -193,8 +194,8 @@ def averageSpace(data, config, tag, procs, checkExpType=True):
   sp = [ r['space'] for r in trials if 'space' in r ]
 
   try:
-    # sp = sp[-10:] if procs > 1 else sp[-1:]
-    sp = sp[-1:]
+    sp = sp[-10:] if procs > 1 else sp[-1:]
+    # sp = sp[-1:]
     return sum(sp) / len(sp)
   except:
     return None
@@ -655,16 +656,19 @@ def defaultAlign(i):
 
 sortShootout = [
   ("C++", "cpp", "msort"),
-  ("MPL", "mpl", "msort-ints"),
+  ("MPL", "mpl-em", "msort-ints"),
   ("Java", "java", "sort-longs"),
   ("OCaml", "ocaml", "msort-ints"),
   ("Go", "go", "msort")
 ]
 
-sortShootoutBaseline = \
-  min(filterSome(
-    [tm(averageTime(D, config, tag, 1)) for name,config,tag in sortShootout]
-  ))
+try:
+  sortShootoutBaseline = \
+    min(filterSome(
+      [tm(averageTime(D, config, tag, 1)) for name,config,tag in sortShootout]
+    ))
+except:
+  sortShootoutBaseline = None
 
 headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
 tt = [headers1, "="]
@@ -692,16 +696,19 @@ print("")
 
 tokensShootout = [
   ("C++", "cpp", "tokens"),
-  ("MPL", "mpl", "tokens"),
+  ("MPL", "mpl-em", "tokens"),
   ("Java", "java", "tokens"),
   ("OCaml", "ocaml", "tokens"),
   ("Go", "go", "tokens")
 ]
 
-tokensShootoutBaseline = \
-  min(filterSome(
-    [tm(averageTime(D, config, tag, 1)) for name,config,tag in tokensShootout]
-  ))
+try:
+  tokensShootoutBaseline = \
+    min(filterSome(
+      [tm(averageTime(D, config, tag, 1)) for name,config,tag in tokensShootout]
+    ))
+except:
+  tokensShootoutBaseline = None
 
 headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
 tt = [headers1, "="]
@@ -729,16 +736,19 @@ print("")
 
 primesShootout = [
   ("C++", "cpp", "primes"),
-  ("MPL", "mpl", "primes"),
+  ("MPL", "mpl-em", "primes"),
   ("Java", "java", "primes"),
   ("OCaml", "ocaml", "primes"),
   ("Go", "go", "primes")
 ]
 
-primesShootoutBaseline = \
-  min(filterSome(
-    [tm(averageTime(D, config, tag, 1)) for name,config,tag in primesShootout]
-  ))
+try:
+  primesShootoutBaseline = \
+    min(filterSome(
+      [tm(averageTime(D, config, tag, 1)) for name,config,tag in primesShootout]
+    ))
+except:
+  primesShootoutBaseline = None
 
 headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
 tt = [headers1, "="]
@@ -768,10 +778,10 @@ headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', Non
 headers1 = ['Benchmark', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M']
 tt = [headers, "-", headers1, "="]
 for tag in ocamlTags:
-  mt1 = tm(averageTime(D, 'mpl', tag, 1))
-  mtp = tm(averageTime(D, 'mpl', tag, maxp))
-  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+  mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+  mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
   ot1 = tm(averageTime(D, 'ocaml', tag, 1))
   otp = tm(averageTime(D, 'ocaml', tag, maxp))
@@ -805,10 +815,10 @@ headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', Non
 headers1 = ['Benchmark', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C']
 tt = [headers, "-", headers1, "="]
 for tag in sorted(cppTags.keys()):
-  mt1 = tm(averageTime(D, 'mpl', tag, 1))
-  mtp = tm(averageTime(D, 'mpl', tag, maxp))
-  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+  mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+  mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
   ct1 = tm(averageTime(D, 'cpp', cppTags[tag], 1))
   ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
@@ -842,10 +852,10 @@ headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', Non
 headers1 = ['Benchmark', 'J', 'M', 'J/M', 'J', 'M', 'J/M', 'J', 'M', 'J/M', 'J', 'M', 'J/M']
 tt = [headers, "-", headers1, "="]
 for tag in sorted(javaTags.keys()):
-  mt1 = tm(averageTime(D, 'mpl', tag, 1))
-  mtp = tm(averageTime(D, 'mpl', tag, maxp))
-  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+  mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+  mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
   jt1 = tm(averageTime(D, 'java', javaTags[tag], 1))
   jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
@@ -879,10 +889,10 @@ headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', Non
 headers1 = ['Benchmark', 'G', 'M', 'G/M', 'G', 'M', 'G/M', 'G', 'M', 'G/M', 'G', 'M', 'G/M']
 tt = [headers, "-", headers1, "="]
 for tag in sorted(goTags.keys()):
-  mt1 = tm(averageTime(D, 'mpl', tag, 1))
-  mtp = tm(averageTime(D, 'mpl', tag, maxp))
-  mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-  mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+  mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+  mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+  mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+  mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
   jt1 = tm(averageTime(D, 'go', goTags[tag], 1))
   jtp = tm(averageTime(D, 'go', goTags[tag], maxp))
@@ -925,13 +935,13 @@ with open(ocamlComparisonTable, 'w') as output:
   for tag in ocamlTags:
     or1 = spg(averageSpace(D, 'ocaml', tag, 1))
     orp = spg(averageSpace(D, 'ocaml', tag, maxp))
-    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
     ot1 = tm(averageTime(D, 'ocaml', tag, 1))
     otp = tm(averageTime(D, 'ocaml', tag, maxp))
-    mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
 
     proc1TimeRats.append(ovv(sd(ot1, mt1)))
     proc72TimeRats.append(ovv(sd(otp, mtp)))
@@ -982,13 +992,13 @@ with open(javaComparisonTable, 'w') as output:
   for tag in sorted(javaTags.keys()):
     or1 = spg(averageSpace(D, 'java', javaTags[tag], 1))
     orp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
-    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
     ot1 = tm(averageTime(D, 'java', javaTags[tag], 1))
     otp = tm(averageTime(D, 'java', javaTags[tag], maxp))
-    mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
 
     proc1TimeRats.append(ovv(sd(ot1, mt1)))
     proc72TimeRats.append(ovv(sd(otp, mtp)))
@@ -1039,13 +1049,13 @@ with open(goComparisonTable, 'w') as output:
   for tag in sorted(goTags.keys()):
     or1 = spg(averageSpace(D, 'go', goTags[tag], 1))
     orp = spg(averageSpace(D, 'go', goTags[tag], maxp))
-    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
     ot1 = tm(averageTime(D, 'go', goTags[tag], 1))
     otp = tm(averageTime(D, 'go', goTags[tag], maxp))
-    mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
 
     proc1TimeRats.append(ovv(sd(ot1, mt1)))
     proc72TimeRats.append(ovv(sd(otp, mtp)))
@@ -1097,13 +1107,13 @@ with open(cppComparisonTable, 'w') as output:
   for tag in sorted(cppTags.keys()):
     cr1 = spg(averageSpace(D, 'cpp', cppTags[tag], 1))
     crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
-    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
     ct1 = tm(averageTime(D, 'cpp', cppTags[tag], 1))
     ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
-    mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
 
     proc1TimeRats.append(ovv(sd(mt1, ct1)))
     proc72TimeRats.append(ovv(sd(mtp, ctp)))
@@ -1150,7 +1160,7 @@ bupRats = []
 
 mltonCmpTags = sorted([
   tag for tag in orderedTags
-  if (averageTime(D, 'mpl', tag, maxp) is not None)
+  if (averageTime(D, 'mpl-em', tag, maxp) is not None)
   and tag not in sandmarkTags
 ], key=displayTag)
 
@@ -1159,12 +1169,12 @@ mltonCmpTable = "figures/mlton-comparison.tex"
 with open(mltonCmpTable, 'w') as output:
   for tag in mltonCmpTags:
     mltont = tm(averageTime(D, 'mlton', tag, 1))
-    mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    mtp = tm(averageTime (D, 'mpl', tag, maxp))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime (D, 'mpl-em', tag, maxp))
 
     mltonr = spg(averageSpace(D, 'mlton', tag, 1))
-    mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    mrp = spg(averageSpace (D, 'mpl', tag, maxp))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace (D, 'mpl-em', tag, maxp))
 
     ovRats.append(ovv(sd(mt1, mltont)))
     suRats.append(ovv(sd(mltont, mtp)))
@@ -1306,14 +1316,14 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
 
 speedupTags = sorted([
   tag for tag in orderedTags
-  if (averageTime(D, 'mpl', tag, maxp) is not None)
+  if (averageTime(D, 'mpl-em', tag, maxp) is not None)
   and tag not in sandmarkTags
 ], key=displayTag)
 
 def getspeedup(tag, p):
   baseline = averageTime(D, 'mlton', tag, 1)
   try:
-    return baseline / averageTime(D, 'mpl', tag, p)
+    return baseline / averageTime(D, 'mpl-em', tag, p)
   except Exception as e:
     sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
     return None
