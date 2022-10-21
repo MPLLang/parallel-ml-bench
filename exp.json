@@ -10,11 +10,11 @@
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
       },
       {
-        "match": { "config": "mlton", "exp": "time", "procs": "1" },
+        "match": { "config": "mlton", "exp": "time", "procs": "1$" },
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
       },
       {
-        "match": { "config": "mlton", "exp": "space", "procs": "1" },
+        "match": { "config": "mlton", "exp": "space", "procs": "1$" },
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
       }
     ],
