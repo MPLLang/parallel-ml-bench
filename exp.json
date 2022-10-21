@@ -21,13 +21,14 @@
 
   "globals":
     {
-      "config": ["mlton", "mpl"],
+      "config": ["mlton", "mpl-em"],
       "cwd": ["mpl"],
       "exp": ["time","space"],
-      "trials": ["1"]
+      "trials": ["1","10"]
     },
 
-  "jqselect": "(  (.exp == \"time\")  or  (.exp == \"space\" and (.procs == \"1\" or .procs == $max_procs))  )",
+  "jqselect":
+    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
 
   "specs":
     [
@@ -50,11 +51,6 @@
         "tag": ["tinykaboom"],
         "bench": ["tinykaboom"],
         "args": ["-width 100 -height 100 -frames 10 -fps 1"]
-      },
-      {
-        "tag": ["game-of-life"],
-        "bench": ["ocaml-game-of-life"],
-        "args": ["-n_times 100 -board_size 1024"]
       },
       {
         "tag": ["msort-strings"],
@@ -90,6 +86,11 @@
         "tag": ["dedup"],
         "bench": ["dedup"],
         "args": ["../inputs/words256-shuffled.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup-strings-entangled"],
+        "args": ["-f ../inputs/words256-shuffled.txt"]
       },
       {
         "tag": ["suffix-array"],
@@ -152,6 +153,11 @@
         "args": ["-input ../inputs/uniform-circle-1M"]
       },
       {
+        "tag": ["delaunay-entangled"],
+        "bench": ["delaunay-entangled"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
         "tag": ["linefit"],
         "bench": ["linefit-opt"],
         "args": ["-n 500000000"]
@@ -205,6 +211,46 @@
         "tag": ["binarytrees5"],
         "bench": ["ocaml-binarytrees5"],
         "args": ["-max_depth 19"]
+      },
+      {
+        "tag": ["connectivity"],
+        "bench": ["connectivity-entangled"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["spanner"],
+        "bench": ["spanner-entangled"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["ms-queue"],
+        "bench": ["ms-queue"],
+        "args": ["-nq 100 -bs 1000000 -work 1000"]
+      },
+      {
+        "tag": ["harris-linked-list"],
+        "bench": ["harris-linked-list"],
+        "args": ["-nq 100 -bs 100000 -work 17"]
+      },
+      {
+        "tag": ["linden-pq"],
+        "bench": ["linden-pq"],
+        "args": ["-nq 100 -bs 100000 -work 17"]
+      },
+      {
+        "tag": ["pfa-bst"],
+        "bench": ["pfa-bst"],
+        "args": ["-n 10000 -nq 10000000 -nu 50"]
+      },
+      {
+        "tag": ["sk-net"],
+        "bench": ["sk-net"],
+        "args": ["-pmax 9"]
+      },
+      {
+        "tag": ["interval-tree"],
+        "bench": ["interval-tree"],
+        "args": ["-n 1000000 -q 100"]
       }
     ]
 }

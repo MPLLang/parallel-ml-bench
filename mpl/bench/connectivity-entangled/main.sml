@@ -33,18 +33,11 @@ val _ = print ("parity check in " ^ Time.fmt 4 tm ^ "s\n")
 
 val b = (CommandLineArgs.parseReal "b" 0.3)
 
-val (cluster, parent) =
-  Benchmark.run "running ldd: " (fn _ => LDD.ldd graph b)
+val P = Benchmark.run "running connectivity: " (fn _ => Connectivity.connectivity graph b)
 
 val _ = GCStats.report ()
-
-(* val numClusters =
-  SeqBasis.reduce 10000 op+ 0 (0, Seq.length cluster) (fn i =>
-    if Seq.nth cluster i = i then 1 else 0) *)
-(* val _ = print ("num clusters " ^ Int.toString numClusters ^ "\n") *)
-
 (* val _ = print ("num-triangles = " ^ (Int.toString P) ^ "\n") *)
-(* val _ = LDD.check_ldd graph cluster parent *)
+(* val _ = LDD.check_ldd graph (#1 P) (#2 P) *)
 (* val _ = Benchmark.run "running connectivity" (fn _ => LDD.connectivity graph b) *)
 (*
 val numVisited =
@@ -79,4 +72,4 @@ fun check () =
 
 val _ = if doCheck then check () else ()
 
-val _ = GCStats.report () *)
+ *)

@@ -13,6 +13,12 @@
  (modes native))
 
 (executable
+ (name dedup_strings)
+ (libraries util cla seq benchmark hashset readfile tokenize)
+ (modules dedup_strings)
+ (modes native))
+
+(executable
  (name primes)
  (libraries cla seqbasis benchmark)
  (modules primes)

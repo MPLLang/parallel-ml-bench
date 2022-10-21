@@ -36,10 +36,13 @@ val b = (CommandLineArgs.parseReal "b" 0.3)
 val ind_set =
   Benchmark.run "running independent set: " (fn _ => MIS.mis graph)
 
-val c = Seq.reduce op+ 0 (Seq.map (fn i => if i then 1 else 0) ind_set)
-val _ = print ("num elements = " ^ (Int.toString c) ^ "\n")
-
 val _ = MIS.verify_mis graph ind_set
+val _ = GCStats.report()
+
+
+(* val c = Seq.reduce op+ 0 (Seq.map (fn i => if i then 1 else 0) ind_set) *)
+(* val _ = print ("num elements = " ^ (Int.toString c) ^ "\n") *)
+
 
 
 (* val numClusters =

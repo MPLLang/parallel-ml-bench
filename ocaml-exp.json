@@ -16,10 +16,11 @@
       "config": ["ocaml"],
       "cwd": ["ocaml"],
       "exp": ["time","space"],
-      "trials": ["1"]
+      "trials": ["1","10"]
     },
 
-  "jqselect": "(  (.exp == \"time\")  or  (.exp == \"space\" and (.procs == \"1\" or .procs == $max_procs))  )",
+  "jqselect":
+    "(  (.exp == \"time\" and .trials == \"1\" and (.procs == \"1\" or .procs == $max_procs))  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
 
   "specs":
     [
@@ -67,6 +68,11 @@
         "tag": ["binarytrees5"],
         "bench": ["binarytrees5"],
         "args": ["-max_depth 19"]
+      },
+      {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup_strings"],
+        "args": ["-f ../inputs/words256-shuffled.txt"]
       }
     ]
 }
