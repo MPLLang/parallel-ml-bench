@@ -546,6 +546,7 @@ ocamlTags = [
   "raytracer",
   "lu-decomp",
   "msort-strings",
+  "dedup-strings",
   "nbody",
   "game-of-life",
   "binarytrees5"
@@ -919,6 +920,79 @@ for tag in sorted(goTags.keys()):
 print("GO COMPARISON")
 print(table(tt, defaultAlign))
 print("")
+
+
+# ============================================================================
+# LaTeX figure: Language shootout
+# ============================================================================
+
+allShootoutTags = sorted([
+  "primes",
+  "msort-ints",
+  "tokens",
+  "mcss",
+  "linefit",
+  "sparse-mxv"
+], key=displayTag)
+
+# proc1TimeRats = dict()
+maxPTimeRat = dict()
+# proc1SpaceRats = dict()
+# proc72SpaceRats = dict()
+
+def putMaxPTimeRat(config, xx):
+  if config not in maxPTimeRat:
+    maxPTimeRat[config] = []
+  maxPTimeRat[config].append(xx)
+
+ensureFigDir()
+fullShootoutTable = "figures/full-shootout.tex"
+with open(fullShootoutTable, 'w') as output:
+  for tag in allShootoutTags:
+    # orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+    # mrp = spg(averageSpace(D, 'mpl', tag, maxp))
+    # crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
+    # jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
+    # grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+
+    otp = tm(averageTime(D, 'ocaml', tag, maxp))
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
+    jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
+    gtp = tm(averageTime(D, 'go', goTags[tag], maxp))
+
+    putMaxPTimeRat('ocaml', ovv(sd(otp, mtp)))
+    putMaxPTimeRat('cpp', ovv(sd(ctp, mtp)))
+    putMaxPTimeRat('java', ovv(sd(jtp, mtp)))
+    putMaxPTimeRat('go', ovv(sd(gtp, mtp)))
+
+    row = \
+      [ fmt(ctp)
+      , makeBold(fmt(ov(sd(ctp, mtp))))
+      , fmt(mtp)
+      , makeBold(fmt(ov(sd(mtp, mtp))))
+      , fmt(gtp)
+      , makeBold(fmt(ov(sd(gtp, mtp))))
+      , fmt(jtp)
+      , makeBold(fmt(ov(sd(jtp, mtp))))
+      , fmt(otp)
+      , makeBold(fmt(ov(sd(otp, mtp))))
+      ]
+
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  output.write("\\midrule\n")
+  row = [
+    "", makeBold(fmt(ov(geomean(maxPTimeRat['cpp'])))),
+    "", makeBold(fmt(ov(1.0))),
+    "", makeBold(fmt(ov(geomean(maxPTimeRat['go'])))),
+    "", makeBold(fmt(ov(geomean(maxPTimeRat['java'])))),
+    "", makeBold(fmt(ov(geomean(maxPTimeRat['ocaml']))))
+  ]
+  output.write(" & ".join(["geomean"] + row))
+  output.write("  \\\\\n")
+print("[INFO] wrote to {}".format(fullShootoutTable))
 
 # ============================================================================
 # LaTeX figure: OCaml comparison
