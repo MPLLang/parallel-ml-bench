@@ -57,7 +57,7 @@ struct
         in #1 x = #2 x end
       val intra_edges = AS.full (SeqBasis.filter 10000 (0, n) (fn i => (i, Seq.nth parents i)) (not o is_self_loop))
       val inter_edges = inter_cluster_edges (g, center, num_clusters)
-      val _ = print "deduplicated edges"
+      val _ = print "deduplicated edges\n"
     in
       Seq.append (intra_edges, inter_edges)
     end
