@@ -79,7 +79,7 @@
       },
       {
         "tag": ["tokens"],
-        "bench": ["tokens"],
+        "bench": ["new-tokens"],
         "args": ["-infile ../inputs/words256.txt"]
       },
       {

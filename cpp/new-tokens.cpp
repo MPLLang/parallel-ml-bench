@@ -1,0 +1,23 @@
+#include "cmdline.hpp"
+#include "benchmark.hpp"
+#include "tokens.h"
+
+int main(int argc, char** argv) {
+  auto infile = deepsea::cmdline::parse_or_default_string("infile", "tokens.txt");
+  auto input = parlay::chars_from_file(infile.c_str(), true);
+
+  auto is_space = [] (char c) {
+    switch (c)  {
+    case '\r': case '\t': case '\n': case ' ' : return true;
+    default : return false;
+    }
+  };
+  using ipair = std::pair<long,long>;
+  size_t s;
+  pbbsBench::launch([&] {
+    auto xd = parlay::to_sequence(tokens_filter_delayed(input, is_space));
+    s = xd.size();
+  });
+  std::cout << "result " << s << std::endl;
+  return 0;
+}
