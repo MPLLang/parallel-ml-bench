@@ -70,6 +70,12 @@ func unsignedMod(a, b int64) int64 {
 	return r
 }
 
+func intMod(a, b int) int {
+	r := a % b
+	if r >= 0 { return r }
+	if b < 0 { return r - b }
+	return r + b
+}
 
 func readFileContents(path string) []byte {
 	file, err := os.Open(path)
@@ -125,6 +131,35 @@ func parallelRange(grain, start, stop int, f func(int, int)) {
 
 
 // ==========================================================================
+
+
+func tokenGenerator(s []byte, isSpace func(byte) bool) (int, func(int)string) {
+	n := len(s)
+	check := func(i int) bool {
+		if i == n {
+			return !(isSpace(s[n-1]))
+		} else if i == 0 {
+			return !(isSpace(s[0]))
+		}
+
+		i1 := isSpace(s[i])
+		i2 := isSpace(s[i-1])
+
+		return (i1 && !i2) || (i2 && !i1)
+	}
+
+	ids := filter(5000, check, n+1, func (i int) int { return i })
+	count := len(ids) / 2
+
+	makeString := func(i int) string {
+		start := ids[2*i]
+		stop := ids[2*i+1]
+    return string(s[start:stop])
+	}
+
+	return count, makeString
+}
+
 
 func tokens(s []byte, isSpace func(byte) bool) []string {
 	n := len(s)

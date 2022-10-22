@@ -43,6 +43,11 @@
         "args": ["-infile ../inputs/words64.txt"]
       },
       {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup-strings"],
+        "args": ["-infile ../inputs/words256-shuffled.txt"]
+      },
+      {
         "tag": ["primes"],
         "bench": ["primes"],
         "args": ["-n 100000000"]

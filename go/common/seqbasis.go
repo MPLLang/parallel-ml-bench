@@ -172,6 +172,14 @@ func filterRange[T any](grain int, p func(int) bool, lo int, hi int, f func(int)
 }
 
 
+func filterArray[T any](grain int, p func(T) bool, data []T) []T {
+	return filter(grain,
+	  func (i int) bool { return p(data[i]) },
+		len(data),
+		func (i int) T { return data[i] })
+}
+
+
 func reduce[T any](grain int, g func(T, T) T, z T, lo, hi int, f func(int) T) T {
 	if hi-lo <= grain {
 		acc := z
