@@ -10,18 +10,26 @@
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
       },
       {
-        "match": { "config": "mlton", "exp": "time", "procs": "1$" },
+        "match": { "config": "mlton$", "exp": "time", "procs": "1$" },
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
       },
       {
-        "match": { "config": "mlton", "exp": "space", "procs": "1$" },
+        "match": { "config": "mlton$", "exp": "space", "procs": "1$" },
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
       }
     ],
 
   "globals":
     {
-      "config": ["mlton", "mpl-em"],
+      "config": ["mlton", "mlton-tight", "mpl-em"],
       "cwd": ["mpl"],
       "exp": ["time","space"],
       "trials": ["1","10"]
@@ -81,11 +89,6 @@
         "tag": ["seam-carve"],
         "bench": ["seam-carve"],
         "args": ["../inputs/pano.ppm -num-seams 100"]
-      },
-      {
-        "tag": ["dedup"],
-        "bench": ["dedup"],
-        "args": ["../inputs/words256-shuffled.txt --verbose --no-output"]
       },
       {
         "tag": ["dedup-strings"],

@@ -33,16 +33,6 @@
   "specs":
     [
       {
-        "tag": ["forgo-sort-int64"],
-        "bench": ["forgo-sort"],
-        "args": ["-n 20000000"]
-      },
-      {
-        "tag": ["matthew-sort-int64"],
-        "bench": ["matthew-sort"],
-        "args": ["-n 20000000"]
-      },
-      {
         "tag": ["msort"],
         "bench": ["msort"],
         "args": ["-n 20000000"]
