@@ -569,7 +569,8 @@ cppTags = {
   "quickhull": "quickhull",
   "sparse-mxv": "sparse-mxv",
   "tokens": "tokens",
-  "wc": "wc"
+  "wc": "wc",
+  "dedup-strings": "dedup-strings"
 }
 
 javaTags = {
@@ -579,7 +580,8 @@ javaTags = {
   "mcss": "mcss",
   "linefit": "linefit",
   "sparse-mxv": "sparse-mxv",
-  "msort-strings": "msort-strings"
+  "msort-strings": "msort-strings",
+  "dedup-strings": "dedup-strings"
 }
 
 goTags = {
@@ -589,7 +591,8 @@ goTags = {
   "mcss": "mcss",
   "linefit": "linefit",
   "sparse-mxv": "sparse-mxv",
-  "msort-strings": "msort-strings"
+  "msort-strings": "msort-strings",
+  "dedup-strings": "dedup-strings"
 }
 
 sandmarkTags = [
@@ -933,7 +936,8 @@ allShootoutTags = sorted([
   "tokens",
   "mcss",
   "linefit",
-  "sparse-mxv"
+  "sparse-mxv",
+  "dedup-strings"
 ], key=displayTag)
 
 def doFullShootout():
@@ -943,6 +947,8 @@ def doFullShootout():
   # proc72SpaceRats = dict()
 
   def putMaxPTimeRat(config, xx):
+    if xx is None:
+      return
     if config not in maxPTimeRat:
       maxPTimeRat[config] = []
     maxPTimeRat[config].append(xx)
