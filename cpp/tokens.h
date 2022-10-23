@@ -75,7 +75,7 @@ auto tokens_delayed(const parlay::sequence<char>& seq, F is_space) {
 
 
 template <typename F>
-auto tokens_filter_delayed(const parlay::sequence<char>& seq, F is_space) {
+auto token_boundaries(const parlay::sequence<char>& seq, F is_space) {
   size_t n = seq.size();
   auto A = seq.begin();  // Take a pointer to the buffer to avoid the overhead of SSO
 
@@ -91,10 +91,12 @@ auto tokens_filter_delayed(const parlay::sequence<char>& seq, F is_space) {
   };
 
   auto ids = parlay::filter(parlay::iota(n+1), check);
-  size_t count = ids.size() / 2;
+  // size_t count = ids.size() / 2;
+  return ids;
 
-  return parlay::delayed_tabulate(count, [&] (size_t i) {
-    auto slice = seq.cut(2*i, 2*i+1);
-    return std::string(slice.begin(), slice.end());
-  });
+  // return parlay::tabulate(count, [&] (size_t i) {
+  //   auto slice = seq.cut(ids[2*i], ids[2*i+1]);
+  //   auto str = std::string(slice.begin(), slice.end());
+  //   return str;
+  // });
 }

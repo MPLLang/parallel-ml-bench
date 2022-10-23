@@ -4,6 +4,8 @@ val maxload = CLA.parseReal "maxload" 0.75
 val initialCapacity = CLA.parseInt "init-cap" 1000
 val filename = CLA.parseString "f" ""
 
+val _ = print ("tolerance " ^ Int.toString (2 * Real.ceil (1.0 / (1.0 - maxload))) ^ "\n")
+
 val _ = print ("Int.precision " ^ Int.toString (valOf Int.precision) ^ "\n")
 
 (* choosing this to line up with OCaml's 63-bit integers *)
@@ -74,6 +76,7 @@ fun dedup() =
 
     fun loop ht bucketsTodo =
       let
+        val _ = print ("num buckets todo: " ^ Int.toString (Seq.length bucketsTodo) ^ "\n")
         val _ =
           ForkJoin.parfor 1 (0, Seq.length bucketsTodo) (fn i =>
             let

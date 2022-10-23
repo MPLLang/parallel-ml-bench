@@ -53,6 +53,11 @@
         "args": ["-infile ../inputs/words256-shuffled.txt -pattern EE"]
       },
       {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup-strings"],
+        "args": ["-infile ../inputs/words256-shuffled.txt"]
+      },
+      {
         "tag": ["bignum-add"],
         "bench": ["bignum-add"],
         "args": ["-n 500000000"]
