@@ -6,7 +6,7 @@
 #include "tokens.h"
 
 
-size_t hashElem(std::string const &s) {
+size_t hashElem(const std::string &s) {
   // choosing this to line up with OCaml's 63-bit integers
   uint64_t maxInt63 = 4611686018427387903;
   size_t n = std::min((size_t)32, s.size());
@@ -29,6 +29,11 @@ struct Hashset {
     maxload = 0.75;
   }
 
+  Hashset(const Hashset& other) {
+    std::cout << "Hashset copy constructor not allowed" << std::endl;
+    std::abort();
+  }
+
   Hashset(Hashset&& other) {
     // std::cout << "Hashset move constructor" << std::endl;
     data = other.data;
@@ -39,10 +44,15 @@ struct Hashset {
     other.capacity = 0;
   }
 
+  Hashset& operator=(const Hashset& other) {
+    std::cout << "Hashset copy assignment not allowed" << std::endl;
+    std::abort();
+  }
+
   Hashset& operator=(Hashset&& other) {
     // std::cout << "Hashset move assignment" << std::endl;
     if (this != &other) {
-      if (data != nullptr) free(data);
+      clear();
       data = other.data;
       capacity = other.capacity;
       maxload = other.maxload;
@@ -53,20 +63,36 @@ struct Hashset {
     return *this;
   }
 
+  void clear() {
+    if (data != nullptr) {
+      parlay::parallel_for(0, capacity, [&] (size_t i) {
+        void* x = data[i].load();
+        if (x != nullptr) {
+          data[i] = std::atomic(nullptr);
+          std::string* s = reinterpret_cast<std::string*>(x);
+          delete s;
+        }
+      });
+      free(data);
+      data = nullptr;
+    }
+  }
+
   ~Hashset() {
-    if (data != nullptr) free(data);
+    clear();
   }
 };
 
 
 bool insert(
   Hashset &ht,
-  std::string &s)
+  std::string *s,
+  bool makeNewCopy = true)
 {
   size_t n = ht.capacity;
   size_t probes = 0;
   size_t tolerance = 2 * std::ceil(1.0 / (1.0 - ht.maxload));
-  size_t i = hashElem(s) % n;
+  size_t i = hashElem(*s) % n;
   while (true) {
     if (probes >= tolerance) { return false; }
     if (i >= n) i = 0;
@@ -74,14 +100,14 @@ bool insert(
     // std::cout << "try insert " << s << " at " << i << std::endl;
     if (curr != nullptr) {
       std::string* currStrp = reinterpret_cast<std::string*>(curr);
-      if (s.compare(*currStrp) == 0) {
+      if (s->compare(*currStrp) == 0) {
         // std::cout << "already found " << s << " at " << i << std::endl;
         return true;
       }
       // std::cout << "slot is full at " << i << std::endl;
     } else {
       // slot is empty
-      std::string* xx = new std::string(s);
+      std::string* xx = (makeNewCopy ? new std::string(*s) : s);
       void* desired = reinterpret_cast<void*>(xx);
       if (ht.data[i].compare_exchange_strong(curr, desired)) {
         // std::cout << "success insert " << s << " at " << i << std::endl;
@@ -89,7 +115,7 @@ bool insert(
       }
       else {
         // contention! try again
-        delete xx;
+        if (makeNewCopy) delete xx;
         continue;
       }
     }
@@ -107,7 +133,7 @@ void resize(Hashset &ht)
   std::atomic<void*> * newData =
     static_cast<std::atomic<void*> *>(malloc(newCap * sizeof(std::atomic<void*>)));
   parlay::parallel_for(0, newCap, [&] (size_t i) {
-    newData[i] = nullptr;
+    newData[i] = std::atomic(nullptr);
   });
   ht.data = newData;
   ht.capacity = newCap;
@@ -117,9 +143,10 @@ void resize(Hashset &ht)
   // });
   parlay::parallel_for(0, cap, [&] (size_t i) {
     void* curr = oldData[i].load();
+    oldData[i] = std::atomic(nullptr);
     if (curr != nullptr) {
       std::string* currStrp = reinterpret_cast<std::string*>(curr);
-      insert(ht, *currStrp);
+      insert(ht, currStrp, false);
     }
   });
   free(oldData);
@@ -136,7 +163,7 @@ size_t count(const Hashset &ht) {
 }
 
 
-Hashset dedup(const parlay::sequence<char>& input, parlay::sequence<size_t> ids) {
+Hashset dedup(const parlay::sequence<char>& input, const parlay::sequence<size_t>& ids) {
   size_t n = ids.size() / 2;
   double maxload = 0.75;
   size_t initialCap = 1000;
@@ -158,7 +185,7 @@ Hashset dedup(const parlay::sequence<char>& input, parlay::sequence<size_t> ids)
   h.capacity = initialCap;
   h.data = static_cast<std::atomic<void*> *>(malloc(initialCap * sizeof(std::atomic<void*>)));
   parlay::parallel_for(0, initialCap, [&] (size_t i) {
-    h.data[i] = nullptr;
+    h.data[i] = std::atomic(nullptr);
   });
 
   while (true) {
@@ -173,7 +200,7 @@ Hashset dedup(const parlay::sequence<char>& input, parlay::sequence<size_t> ids)
         std::string v = makeElem(j);
         // std::cout << "wheee " << i << " " << j << std::endl;
         // std::cout << v << std::endl;
-        bool isOkay = insert(h, v);
+        bool isOkay = insert(h, &v, true);
         if (!isOkay) break;
         j++;
       }
