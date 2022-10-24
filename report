@@ -550,7 +550,8 @@ ocamlTags = [
   "dedup-strings",
   "nbody",
   "game-of-life",
-  "binarytrees5"
+  "binarytrees5",
+  "sparse-mxv"
 ]
 
 # map each MPL tag to the correct C++ tag for comparison
