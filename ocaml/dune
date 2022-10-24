@@ -25,6 +25,12 @@
  (modes native))
 
 (executable
+ (name sparse_mxv)
+ (libraries cla seqbasis seq benchmark util)
+ (modules sparse_mxv)
+ (modes native))
+
+(executable
  (name tokens)
  (libraries util cla benchmark readfile bytes tokenize)
  (modules tokens)

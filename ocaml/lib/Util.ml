@@ -12,3 +12,11 @@ let hash64 u =
 
 
 let ceilDiv n k = 1 + (n-1) / k
+
+
+let mod64 x y =
+  let r = Int64.rem x y in
+  if Int64.compare y 0L < 0 || Int64.compare r 0L >= 0 then
+    r
+  else
+    Int64.add r y

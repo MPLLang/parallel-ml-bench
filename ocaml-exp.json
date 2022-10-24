@@ -73,6 +73,11 @@
         "tag": ["dedup-strings"],
         "bench": ["dedup_strings"],
         "args": ["-f ../inputs/words256-shuffled.txt"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["sparse_mxv"],
+        "args": ["-n 200000000"]
       }
     ]
 }
