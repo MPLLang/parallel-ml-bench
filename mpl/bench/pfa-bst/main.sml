@@ -102,4 +102,4 @@ val (orig, updated, queries) = Benchmark.run "pfa-bst" bench
 val _ = print (Array.sub (queries, 0) ^ "\n")
 (* val _ = print (Util.summarizeArray 2 (fn s => s) queries ^ "\n") *)
 
-val _ = GCStats.report ()
+

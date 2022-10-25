@@ -55,4 +55,4 @@ val _ =
       TextIO.closeOut file
     end
 
-val _ = GCStats.report ()
+

@@ -33,4 +33,4 @@ val result =
 
 val _ = print ("result " ^ PureSeq.summarize 10 Int.toString result ^ "\n")
 
-val _ = GCStats.report ()
+

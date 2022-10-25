@@ -31,4 +31,4 @@ val result = Benchmark.run "tabulating" (fn _ => tabulate (n, gen seed'))
 fun str x = Word64.fmt StringCvt.HEX x
 val _ = print ("result " ^ Util.summarizeArray 3 str result ^ "\n")
 
-val _ = GCStats.report ()
+

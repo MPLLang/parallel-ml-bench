@@ -36,7 +36,7 @@ val b = (CommandLineArgs.parseReal "b" 0.3)
 val (cluster, parent) =
   Benchmark.run "running ldd: " (fn _ => LDD.ldd graph b)
 
-val _ = GCStats.report ()
+
 
 (* val numClusters =
   SeqBasis.reduce 10000 op+ 0 (0, Seq.length cluster) (fn i =>
@@ -79,4 +79,4 @@ fun check () =
 
 val _ = if doCheck then check () else ()
 
-val _ = GCStats.report () *)
+val _ = () *)

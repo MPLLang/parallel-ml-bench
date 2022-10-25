@@ -35,7 +35,7 @@ val b = (CommandLineArgs.parseReal "b" 0.3)
 
 val P = Benchmark.run "running connectivity: " (fn _ => Connectivity.connectivity graph b)
 
-val _ = GCStats.report ()
+
 (* val _ = print ("num-triangles = " ^ (Int.toString P) ^ "\n") *)
 (* val _ = LDD.check_ldd graph (#1 P) (#2 P) *)
 (* val _ = Benchmark.run "running connectivity" (fn _ => LDD.connectivity graph b) *)

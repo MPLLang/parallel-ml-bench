@@ -88,4 +88,4 @@ val result = Benchmark.run "running binary trees" (fn _ =>
 val _ = print ("result " ^ Int.toString result ^ "\n")
 val _ = print ("values " ^ Util.summarizeArray 10 Int.toString values ^ "\n")
 
-val _ = GCStats.report ()
+

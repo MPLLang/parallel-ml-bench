@@ -34,7 +34,7 @@ val _ = print ("parity check in " ^ Time.fmt 4 tm ^ "s\n")
 val k = (CommandLineArgs.parseInt "k" 3)
 
 val P = Benchmark.run "running spanner: " (fn _ => Spanner.spanner graph k)
-val _ = GCStats.report ()
+
 (* val _ = print ("num-triangles = " ^ (Int.toString P) ^ "\n") *)
 (* val _ = LDD.check_ldd graph (#1 P) (#2 P) *)
 (* val _ = Benchmark.run "running connectivity" (fn _ => LDD.connectivity graph b) *)
@@ -71,4 +71,4 @@ fun check () =
 
 val _ = if doCheck then check () else ()
 
-val _ = GCStats.report () *)
+val _ = () *)

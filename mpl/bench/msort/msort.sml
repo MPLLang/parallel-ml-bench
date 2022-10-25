@@ -15,4 +15,4 @@ val result =
 val _ = print ("input " ^ Util.summarizeArraySlice 8 Int.toString input ^ "\n")
 val _ = print ("result " ^ Util.summarizeArraySlice 8 Int.toString result ^ "\n")
 
-val _ = GCStats.report ()
+

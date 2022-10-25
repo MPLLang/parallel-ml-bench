@@ -139,5 +139,5 @@ val _ =
 
 val _ =
   if not beVerbose then ()
-  else GCStats.report ()
+  else ()
 

@@ -1,1 +1,3 @@
-lib/github.com/mpllang/mpllib/sources.$(COMPAT).mlb
+lib.$(COMPAT).mlb
+lib-local/stats.$(COMPAT).mlb
+lib-local/Benchmark.sml

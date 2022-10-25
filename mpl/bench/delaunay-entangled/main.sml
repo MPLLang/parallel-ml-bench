@@ -46,8 +46,6 @@ val _ = print ("num rounds " ^ Int.toString numRounds ^ "\n")
 (* val _ =
   print ("\n" ^ T.toString mesh ^ "\n") *)
 
-val _ = GCStats.report()
-
 (* ==========================================================================
  * output result image
  * only works if all input points are in range [0,1)

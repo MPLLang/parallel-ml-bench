@@ -164,7 +164,7 @@ struct
   val tile_width = 0.3 (* eps_0 = 0.14, how does this correspond to tile_width *)
   val max_length = CLA.parseInt "pmax" 6 (* l_0 = 16, see pg6 of dawson *)
   val (sk_net) = Benchmark.run "generate_net" (fn _ => SU2_Net.generate_net (cliffordt_gates, tile_width) max_length)
-  val _ = GCStats.report ()
+  val _ = ()
   (* val _ = print ("net generated " ^ Time.fmt 4 tm ^ "s\n") *)
 
   (* val sk_net = Benchmark.run "generate_net_from_perms"  (fn _ => SU2_Net.create_net_from_perms (cliffordt_gates, tile_width, allrep)) *)

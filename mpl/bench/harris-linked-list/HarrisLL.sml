@@ -46,7 +46,6 @@ val P = Concurrency.numberOfProcessors
 val _ = print ("num procs = " ^(Int.toString P) ^ "\n")
 val _ = Benchmark.run "running random_eval on harris-linked-list: "
           (fn _ =>  eval_random P (CLA.parseInt "bs" 10000))
-val _ = GCStats.report()
 
 (*
 

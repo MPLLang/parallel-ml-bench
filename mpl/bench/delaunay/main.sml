@@ -51,7 +51,7 @@ val input =
 val (numRounds, mesh) = Benchmark.run "delaunay" (fn _ => DT.triangulate input)
 val _ = print ("num rounds " ^ Int.toString numRounds ^ "\n")
 
-val _ = GCStats.report ()
+
 
 (* val _ =
   print ("\n" ^ T.toString mesh ^ "\n") *)

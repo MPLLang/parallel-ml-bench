@@ -88,4 +88,4 @@ val qs = Benchmark.run "linden queue" bench
 val data = SeqBasis.tabulate 1000 (0, Seq.length qs) (fn qi =>
   #1 (Option.getOpt (LindenQueue.delMin (Seq.nth qs qi), (~1,~1))))
 val _ = print (Util.summarizeArray 10 Int.toString data ^ "\n")
-val _ = GCStats.report ()
+

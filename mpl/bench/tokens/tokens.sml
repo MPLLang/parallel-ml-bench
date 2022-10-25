@@ -44,5 +44,5 @@ val _ =
     end
 
 val _ =
-  if beVerbose then GCStats.report ()
+  if beVerbose then ()
   else ()

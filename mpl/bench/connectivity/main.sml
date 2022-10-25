@@ -70,4 +70,4 @@ fun check () =
 
 val _ = if doCheck then check () else ()
 
-val _ = GCStats.report () *)
+val _ = () *)

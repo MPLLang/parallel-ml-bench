@@ -115,4 +115,4 @@ fun dedup() =
 val result = Benchmark.run "dedup-strings-entangled" dedup
 val num_unique = List.length (Hashset.to_list result)
 val _ = print ("unique " ^ Int.toString num_unique ^ "\n")
-val _ = GCStats.report ()
+

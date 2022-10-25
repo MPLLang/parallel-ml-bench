@@ -41,4 +41,4 @@ val correct = Seq.equal op= (elems, result)
 val _ = print ("correct? " ^ (if correct then "yes" else "no") ^ "\n")
 val _ = print ("result " ^ Util.summarizeArraySlice 10 Int.toString result ^ "\n")
 
-val _ = GCStats.report ()
+

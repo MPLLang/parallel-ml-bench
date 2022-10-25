@@ -37,7 +37,6 @@ val ind_set =
   Benchmark.run "running independent set: " (fn _ => MIS.mis graph)
 
 val _ = MIS.verify_mis graph ind_set
-val _ = GCStats.report()
 
 
 (* val c = Seq.reduce op+ 0 (Seq.map (fn i => if i then 1 else 0) ind_set) *)
@@ -86,4 +85,4 @@ fun check () =
 
 val _ = if doCheck then check () else ()
 
-val _ = GCStats.report () *)
+val _ = () *)

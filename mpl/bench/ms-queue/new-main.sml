@@ -56,7 +56,7 @@ fun bench () =
 
 val data = Benchmark.run "msqueue list" bench
 val _ = print (Util.summarizeArray 10 Int.toString data ^ "\n")
-val _ = GCStats.report ()
+
 
 
 (*
@@ -109,6 +109,6 @@ val P = Concurrency.numberOfProcessors
 val _ = print ("num procs = " ^(Int.toString P) ^ "s\n")
 val _ = Benchmark.run "running random_eval on ms-queue: "
           (fn _ =>  random_eval P (CLA.parseInt "bs" 10000))
-val _ = GCStats.report ()
+
 
 *)

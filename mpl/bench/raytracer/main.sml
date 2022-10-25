@@ -427,4 +427,4 @@ val _ = if f <> "" then
             end
         else print ("-f not passed, so not writing image to file.\n")
 
-val _ = GCStats.report ()
+

@@ -330,7 +330,7 @@ val _ =
   if filename <> "" then ()
   else ( print ("to see output, use -output and -resolution arguments\n" ^
                 "for example: nn -N 10000 -output result.ppm -resolution 1000\n")
-       ; GCStats.report ()
+       ; ()
        ; OS.Process.exit OS.Process.success
        )
 
@@ -418,4 +418,4 @@ val _ = print ("generated image in " ^ Time.fmt 4 (Time.- (t1, t0)) ^ "s\n")
 val (_, tm) = Util.getTime (fn _ => PPM.write filename image)
 val _ = print ("wrote to " ^ filename ^ " in " ^ Time.fmt 4 tm ^ "s\n")
 
-val _ = GCStats.report ()
+

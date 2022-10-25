@@ -80,4 +80,4 @@ val qs = Benchmark.run "harris list" bench
 val data = SeqBasis.tabulate 1000 (0, Seq.length qs) (fn qi =>
   if HarrisList.find (Seq.nth qs qi) (0,0) then 1 else 0)
 val _ = print (Util.summarizeArray 10 Int.toString data ^ "\n")
-val _ = GCStats.report ()
+
