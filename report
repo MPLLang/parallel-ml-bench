@@ -96,16 +96,40 @@ def parseTimes(stdout):
   pat = reCompile(r"^time\s+(\d+.\d+).*$")
   return [float(x) for x in pat.findall(stdout)]
 
+def parseMilliseconds(ms):
+  return float(int(ms)) / 1000.0
+
+# sus marks: 1260000
+# de checks: 0
+# bytes pinned entangled: 0
+
+# lgc count: 0
+# lgc bytes reclaimed: 0
+# lgc trace time(ms): 0
+# lgc promo time(ms): 0
+# lgc total time(ms): 0
+
+# cgc count: 4999
+# cgc bytes reclaimed: 44329304
+# cgc time(ms): 841
+
+# work time(ms): 128304
+# idle time(ms): 170102
+
 statsPatterns = \
   [ #("time", float, reCompile(r"^end-to-end\s+(\d+.\d+)s$"))
   #,
     ("space", parseKiB, reCompile(r"^\s*Maximum resident set size \(kbytes\): (\d+).*$"))
-  , ("approx-race-factor", parseB, reCompile(r"^entangled bytes: (\d+).*$"))
-  , ("kbytes-pinned-entangled", parseB, reCompile(r"^bytes pinned entangled: (\d+).*$"))
   , ("computed-average", float, reCompile(r"^average\s+(\d+.\d+).*$"))
-  # , ("num-local", int, reCompile(r"^num local: (\d+)$"))
-  # , ("local-reclaimed", parseB, reCompile(r"^local reclaimed: (\d+)$"))
-  # , ("local-time", int, reCompile(r"^local gc time: (\d+)$"))
+  , ("pinned-entangled", parseB, reCompile(r"^bytes pinned entangled: (\d+).*$"))
+  , ("lgc-count", int, reCompile(r"^lgc count: (\d+)$"))
+  , ("lgc-reclaimed", parseB, reCompile(r"^lgc bytes reclaimed: (\d+)$"))
+  , ("lgc-time", parseMilliseconds, reCompile(r"^lgc total time\(ms\): (\d+)$"))
+  , ("cgc-count", int, reCompile(r"^cgc count: (\d+)$"))
+  , ("cgc-reclaimed", parseB, reCompile(r"^cgc bytes reclaimed: (\d+)$"))
+  , ("cgc-time", parseMilliseconds, reCompile(r"^cgc time\(ms\): (\d+)$"))
+  , ("work-time", parseMilliseconds, reCompile(r"^work time\(ms\): (\d+)$"))
+  , ("idle-time", parseMilliseconds, reCompile(r"^idle time\(ms\): (\d+)$"))
   # , ("promo-time", int, reCompile(r"^promo time: (\d+)$"))
   # , ("root-reclaimed", parseB, reCompile(r"^root cc reclaimed: (\d+)$"))
   # , ("internal-reclaimed", parseB, reCompile(r"^internal cc reclaimed: (\d+)$"))
@@ -201,11 +225,59 @@ def averageSpace(data, config, tag, procs, checkExpType=True):
   except:
     return None
 
-def approxRaceFactor(data, config, tag, procs):
-  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'stats' ]
-  ee = [ r['approx-race-factor'] for r in trials if 'approx-race-factor' in r ]
+def pinnedEntangled(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['pinned-entangled'] for r in trials if 'pinned-entangled' in r ]
   try:
-    return ee[-1]
+    return ee[-1] / 20.0
+  except:
+    return None
+
+def lgcCount(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['lgc-count'] for r in trials if 'lgc-count' in r ]
+  try:
+    return ee[-1] / 20.0
+  except:
+    return None
+
+def lgcReclaimed(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['lgc-reclaimed'] for r in trials if 'lgc-reclaimed' in r ]
+  try:
+    return ee[-1] / 20.0
+  except:
+    return None
+
+def lgcTime(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['lgc-time'] for r in trials if 'lgc-time' in r ]
+  try:
+    return ee[-1] / 20.0
+  except:
+    return None
+
+def cgcCount(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['cgc-count'] for r in trials if 'cgc-count' in r ]
+  try:
+    return ee[-1] / 20.0
+  except:
+    return None
+
+def cgcReclaimed(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['cgc-reclaimed'] for r in trials if 'cgc-reclaimed' in r ]
+  try:
+    return ee[-1] / 20.0
+  except:
+    return None
+
+def cgcTime(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'space']
+  ee = [ r['cgc-time'] for r in trials if 'cgc-time' in r ]
+  try:
+    return ee[-1] / 20.0
   except:
     return None
 
@@ -537,6 +609,23 @@ foundTags = set()
 
 def keepTag(t):
   return True
+
+nondetTags = [
+  'bfs',
+  'centrality',
+  'connectivity',
+  'dedup-strings',
+  'delaunay',
+  'delaunay-entangled',
+  'harris-linked-list',
+  'linden-pq',
+  'low-d-decomp',
+  'max-indep-set',
+  'ms-queue',
+  'pfa-bst',
+  'sk-net',
+  'spanner'
+]
 
 orderedTags = [ t for t in orderedTags if keepTag(t) ]
 
@@ -1256,45 +1345,59 @@ mltonCmpTags = sorted([
   and tag not in sandmarkTags
 ], key=displayTag)
 
+
 def doMLtonComparison(mltonConfigName):
   ovRats = []
   suRats = []
   bu1Rats = []
   bupRats = []
 
+
+  def doTag(tag, output):
+    mltont = tm(averageTime(D, mltonConfigName, tag, 1))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime (D, 'mpl-em', tag, maxp))
+
+    mltonr = spg(averageSpace(D, mltonConfigName, tag, 1))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace (D, 'mpl-em', tag, maxp))
+
+    pin = pinnedEntangled(D, 'mpl-em', tag, maxp)
+
+    ovRats.append(ovv(sd(mt1, mltont)))
+    suRats.append(ovv(sd(mltont, mtp)))
+    bu1Rats.append(ovv(sd(mr1, mltonr)))
+    bupRats.append(ovv(sd(mrp, mltonr)))
+
+    row = [
+      mltont,
+      mt1,
+      makeBold(fmt(ov(sd(mt1, mltont)))),
+      mtp,
+      makeBold(fmt(su(sd(mltont, mtp)))),
+      sfmt(mltonr),
+      sfmt(mr1),
+      makeBold(fmt(bu(sd(mr1, mltonr)))),
+      sfmt(mrp),
+      makeBold(fmt(bu(sd(mrp, mltonr)))),
+      sp(pin)
+    ]
+
+    row = [ fmt(x) for x in row ]
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+
   ensureFigDir()
   mltonCmpTable = "figures/{}-comparison.tex".format(mltonConfigName)
   with open(mltonCmpTable, 'w') as output:
-    for tag in mltonCmpTags:
-      mltont = tm(averageTime(D, mltonConfigName, tag, 1))
-      mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      mtp = tm(averageTime (D, 'mpl-em', tag, maxp))
+    for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
+      doTag(tag, output)
 
-      mltonr = spg(averageSpace(D, mltonConfigName, tag, 1))
-      mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      mrp = spg(averageSpace (D, 'mpl-em', tag, maxp))
-
-      ovRats.append(ovv(sd(mt1, mltont)))
-      suRats.append(ovv(sd(mltont, mtp)))
-      bu1Rats.append(ovv(sd(mr1, mltonr)))
-      bupRats.append(ovv(sd(mrp, mltonr)))
-
-      row = [
-        mltont,
-        mt1,
-        makeBold(fmt(ov(sd(mt1, mltont)))),
-        mtp,
-        makeBold(fmt(su(sd(mltont, mtp)))),
-        sfmt(mltonr),
-        sfmt(mr1),
-        makeBold(fmt(bu(sd(mr1, mltonr)))),
-        sfmt(mrp),
-        makeBold(fmt(bu(sd(mrp, mltonr))))
-      ]
-
-      row = [ fmt(x) for x in row ]
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
+    output.write("\\midrule\n")
+    
+    for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+      doTag(tag, output)
 
     output.write("\\midrule\n")
     row = [
@@ -1309,6 +1412,81 @@ def doMLtonComparison(mltonConfigName):
 
 doMLtonComparison('mlton')
 doMLtonComparison('mlton-tight')
+
+# ============================================================================
+# LaTeX figure: GC and Runtime Stats
+# ============================================================================
+
+def runtimeStats():
+  # ovRats = []
+  # suRats = []
+  # bu1Rats = []
+  # bupRats = []
+
+  def doTag(tag, output):
+    r1 = averageSpace(D, 'mpl-em', tag, 1)
+    lc1 = lgcCount(D, 'mpl-em', tag, 1)
+    cc1 = cgcCount(D, 'mpl-em', tag, 1)
+    lt1 = tm(lgcTime(D, 'mpl-em', tag, 1))
+    ct1 = tm(cgcTime(D, 'mpl-em', tag, 1))
+    lr1 = lgcReclaimed(D, 'mpl-em', tag, 1)
+    cr1 = cgcReclaimed(D, 'mpl-em', tag, 1)
+
+    rp = averageSpace(D, 'mpl-em', tag, maxp)
+    lcp = lgcCount(D, 'mpl-em', tag, maxp)
+    ccp = cgcCount(D, 'mpl-em', tag, maxp)
+    ltp = tm(lgcTime(D, 'mpl-em', tag, maxp))
+    ctp = tm(cgcTime(D, 'mpl-em', tag, maxp))
+    lrp = lgcReclaimed(D, 'mpl-em', tag, maxp)
+    crp = cgcReclaimed(D, 'mpl-em', tag, maxp)
+
+    # ovRats.append(ovv(sd(mt1, mltont)))
+    # suRats.append(ovv(sd(mltont, mtp)))
+    # bu1Rats.append(ovv(sd(mr1, mltonr)))
+    # bupRats.append(ovv(sd(mrp, mltonr)))
+
+    row = [
+      sp(r1),
+      lc1,
+      lt1,
+      sp(lr1),
+      cc1,
+      ct1,
+      sp(cr1),
+      sp(rp),
+      lcp,
+      ltp,
+      sp(lrp),
+      ccp,
+      ctp,
+      sp(crp),
+    ]
+
+    row = [ fmt(x) for x in row ]
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  ensureFigDir()
+  runtimeStatsTable = "figures/runtime-stats.tex"
+  with open(runtimeStatsTable, 'w') as output:
+    for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
+      doTag(tag, output)
+    output.write("\\midrule\n")
+    for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+      doTag(tag, output)
+
+    # output.write("\\midrule\n")
+    # row = [
+    #   "", "", makeBold(fmt(ov(geomean(ovRats)))),
+    #   "",     makeBold(fmt(su(geomean(suRats)))),
+    #   "", "", makeBold(fmt(ov(geomean(bu1Rats)))),
+    #   "",     makeBold(fmt(ov(geomean(bupRats))))
+    # ]
+    # output.write(" & ".join(["geomean"] + row))
+    # output.write("  \\\\\n")
+  print("[INFO] wrote to {}".format(runtimeStatsTable))
+
+runtimeStats()
 
 # ============================================================================
 # PDF: Speedup plot
