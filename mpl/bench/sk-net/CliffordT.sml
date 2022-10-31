@@ -161,26 +161,41 @@ struct
   end
 
 
+
+  fun RZ thet =
+    let
+      val t = thet/2.0
+      val (c, s) = (Math.cos t, Math.sin t)
+    in
+      MatrixComplex2x2.fromList [[(c, ~1.0 * s), (0.0, 0.0)], [(0.0, 0.0), (c, s)]]
+    end
+
+  val PZR = RZ  (Math.pi/64.0)
+
   val tile_width = 0.3 (* eps_0 = 0.14, how does this correspond to tile_width *)
   val max_length = CLA.parseInt "pmax" 6 (* l_0 = 16, see pg6 of dawson *)
-  val (sk_net) = Benchmark.run "generate_net" (fn _ => SU2_Net.generate_net (cliffordt_gates, tile_width) max_length)
-  val _ = ()
+  val depth = CLA.parseInt "depth" 2
+  val _ = Benchmark.run "gen_circuit"
+    (fn _ => let val sk_net = SU2_Net.generate_net (cliffordt_gates, tile_width) max_length in SU2_Net.sk sk_net (PZR, depth) end)
+
+
+  (* val sk_net = Benchmark.run "generate_net" (fn _ => SU2_Net.generate_net (cliffordt_gates, tile_width) max_length) *)
   (* val _ = print ("net generated " ^ Time.fmt 4 tm ^ "s\n") *)
 
   (* val sk_net = Benchmark.run "generate_net_from_perms"  (fn _ => SU2_Net.create_net_from_perms (cliffordt_gates, tile_width, allrep)) *)
 
-
+(*
   fun synthesize (U, depth) = SU2_Net.sk sk_net (U, depth)
 
   fun report (U, KU) =
     (
-    print ("perm = " ^ (SU2_Net.knot_to_string cliffordt_gates KU) ^ "\n");
+    (* print ("perm = " ^ (SU2_Net.knot_to_string cliffordt_gates KU) ^ "\n");
     print ("length = " ^ (Int.toString(Seq.length (#perm KU))) ^ "\n");
     (print ("goal mat = " ^ (SU2.str (U)) ^ "\n"));
-    (print ("mat = " ^ (SU2.str (#M KU)) ^ "\n"));
+    (print ("mat = " ^ (SU2.str (#M KU)) ^ "\n")); *)
      print ("accuracy = " ^ (Real.toString(SU2.proj_trace_dist (#M KU, U))) ^ "\n")
     )
 
-  fun syn_and_report (U, depth) = report (U, synthesize (U, depth))
+  fun syn_and_report (U, depth) = report (U, synthesize (U, depth)) *)
 
 end

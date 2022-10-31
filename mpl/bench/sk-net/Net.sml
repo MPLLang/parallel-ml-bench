@@ -78,7 +78,8 @@ struct
           end
 
         val num_slices = (end_sz - start_sz + 1) * (Seq.length p)
-        val _ = print ("checking " ^ (Int.toString (Seq.length p) ^ " slices\n"))
+        val num_slices = 0
+        (* val _ = print ("checking " ^ (Int.toString (Seq.length p) ^ " slices\n")) *)
         val new_reps = tabulate (fn i => check_slice (i mod (Seq.length p)) (start_sz + i div (Seq.length p))) num_slices
         val best_sub = Seq.reduce
         (fn (a, b) =>

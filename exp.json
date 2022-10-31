@@ -246,9 +246,9 @@
         "args": ["-n 10000 -nq 10000000 -nu 50"]
       },
       {
-        "tag": ["sk-net"],
+        "tag": ["quant-synth"],
         "bench": ["sk-net"],
-        "args": ["-pmax 9"]
+        "args": ["-pmax 9 -depth 5"]
       },
       {
         "tag": ["interval-tree"],
