@@ -1446,12 +1446,12 @@ mltonCmpTags = sorted([
 ], key=displayTag)
 
 
-def spacePctStr(a, b):
+def toPctStr(a, b):
   try:
     eep = float(a)
     rrp = float(b)
     epPct = 100.0 * (eep / rrp)
-    if eep < 0.001:
+    if eep < 0.00001:
       return ""
     elif epPct < 1:
       return "<1\\%"
@@ -1478,8 +1478,8 @@ def doMLtonComparison(mltonConfigName):
 
     pin = pinnedEntangled(D, 'mpl-em', tag, maxp)
     # pinW = pinnedEntangledWatermark(D, 'mpl-em', tag, maxp)
-    epPctStr = spacePctStr(pin, averageSpace(D, 'mpl-em', tag, maxp))
-    # epwPctStr = spacePctStr(pinW, averageSpace(D, 'mpl-em', tag, maxp))
+    epPctStr = toPctStr(pin, averageSpace(D, 'mpl-em', tag, maxp))
+    # epwPctStr = toPctStr(pinW, averageSpace(D, 'mpl-em', tag, maxp))
 
     ovRats.append(ovv(sd(mt1, mltont)))
     suRats.append(ovv(sd(mltont, mtp)))
@@ -1591,6 +1591,79 @@ def runtimeStats(procs):
 
 runtimeStats(1)
 runtimeStats(maxp)
+
+# ============================================================================
+# LaTeX figure: GC and Runtime Stats, Summary
+# ============================================================================
+
+def runtimeStatsSummary():
+  # ovRats = []
+  # suRats = []
+  # bu1Rats = []
+  # bupRats = []
+
+  def doTag(tag, output):
+    # r = averageSpace(D, 'mpl-em', tag, maxp)
+    lc = lgcCount(D, 'mpl-em', tag, maxp)
+    cc = cgcCount(D, 'mpl-em', tag, maxp)
+    # lt = tm(lgcTime(D, 'mpl-em', tag, maxp))
+    # ct = tm(cgcTime(D, 'mpl-em', tag, maxp))
+    lr = lgcReclaimed(D, 'mpl-em', tag, maxp)
+    cr = cgcReclaimed(D, 'mpl-em', tag, maxp)
+    # ls = lgcScope(D, 'mpl-em', tag, maxp)
+    # cs = cgcScope(D, 'mpl-em', tag, maxp)
+
+    try:
+      totGC1 = lgcTime(D, 'mpl-em', tag, 1) + cgcTime(D, 'mpl-em', tag, 1)
+      approxWork = tm(averageTime(D, 'mpl-em', tag, 1) - totGC1)
+    except:
+      approxWork = None
+
+    try:
+      totGCp = lgcTime(D, 'mpl-em', tag, maxp) + cgcTime(D, 'mpl-em', tag, maxp)
+      pctGCWork = toPctStr(totGCp, approxWork)
+    except:
+      pctGCWork = None
+
+    avgLGCtimeMilli = 1000.0 * lgcTime(D, 'mpl-em', tag, maxp) / lc
+    avgCGCtimeMilli = 1000.0 * cgcTime(D, 'mpl-em', tag, maxp) / cc
+
+    row = [
+      approxWork,
+      pctGCWork,
+      avgLGCtimeMilli,
+      avgCGCtimeMilli,
+      lc,
+      cc,
+      sp(lr),
+      sp(cr)
+    ]
+
+    row = [ fmt(x) for x in row ]
+    output.write(" & ".join([displayTag(tag)] + row))
+    output.write("  \\\\\n")
+
+  ensureFigDir()
+  runtimeStatsTable = "figures/runtime-stats-summary.tex"
+  with open(runtimeStatsTable, 'w') as output:
+    for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
+      doTag(tag, output)
+    output.write("\\midrule\n")
+    for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+      doTag(tag, output)
+
+    # output.write("\\midrule\n")
+    # row = [
+    #   "", "", makeBold(fmt(ov(geomean(ovRats)))),
+    #   "",     makeBold(fmt(su(geomean(suRats)))),
+    #   "", "", makeBold(fmt(ov(geomean(bu1Rats)))),
+    #   "",     makeBold(fmt(ov(geomean(bupRats))))
+    # ]
+    # output.write(" & ".join(["geomean"] + row))
+    # output.write("  \\\\\n")
+  print("[INFO] wrote to {}".format(runtimeStatsTable))
+
+runtimeStatsSummary()
 
 # ============================================================================
 # PDF: Speedup plot
