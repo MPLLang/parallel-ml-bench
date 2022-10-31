@@ -1453,6 +1453,10 @@ def toPctStr(a, b):
     epPct = 100.0 * (eep / rrp)
     if eep < 0.00001:
       return ""
+    elif epPct > 99.999:
+      return "100\\%"
+    elif epPct > 99:
+      return ">99\\%"
     elif epPct < 1:
       return "<1\\%"
     else:
@@ -1613,6 +1617,10 @@ def runtimeStatsSummary():
     # ls = lgcScope(D, 'mpl-em', tag, maxp)
     # cs = cgcScope(D, 'mpl-em', tag, maxp)
 
+    totCount = lc + cc
+    lgcCountPct = toPctStr(lc, totCount)
+    cgcCountPct = toPctStr(cc, totCount)
+
     try:
       totGC1 = lgcTime(D, 'mpl-em', tag, 1) + cgcTime(D, 'mpl-em', tag, 1)
       approxWork = tm(averageTime(D, 'mpl-em', tag, 1) - totGC1)
@@ -1628,15 +1636,23 @@ def runtimeStatsSummary():
     avgLGCtimeMilli = 1000.0 * lgcTime(D, 'mpl-em', tag, maxp) / lc
     avgCGCtimeMilli = 1000.0 * cgcTime(D, 'mpl-em', tag, maxp) / cc
 
+    # throughput = gb/sec
+    lgcRecThrough = sd(sd(lr, lgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
+    cgcRecThrough = sd(sd(cr, cgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
+
     row = [
       approxWork,
       pctGCWork,
       avgLGCtimeMilli,
       avgCGCtimeMilli,
-      lc,
-      cc,
-      sp(lr),
-      sp(cr)
+      totCount,
+      lgcCountPct,
+      cgcCountPct,
+      sd(lr+cr, 1000.0),
+      toPctStr(lr, lr+cr),
+      toPctStr(cr, lr+cr),
+      lgcRecThrough,
+      cgcRecThrough
     ]
 
     row = [ fmt(x) for x in row ]
