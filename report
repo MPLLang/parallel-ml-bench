@@ -1052,7 +1052,7 @@ print("")
 
 
 # ============================================================================
-# LaTeX figure: Language shootout
+# LaTeX figure: Language shootout (time comparison)
 # ============================================================================
 
 allShootoutTags = sorted([
@@ -1065,7 +1065,7 @@ allShootoutTags = sorted([
   "dedup-strings"
 ], key=displayTag)
 
-def doFullShootout():
+def doFullShootoutTime():
   # proc1TimeRats = dict()
   maxPTimeRat = dict()
   # proc1SpaceRats = dict()
@@ -1127,7 +1127,72 @@ def doFullShootout():
     output.write("  \\\\\n")
   print("[INFO] wrote to {}".format(fullShootoutTable))
 
-doFullShootout()
+doFullShootoutTime()
+
+# ============================================================================
+# LaTeX figure: Language shootout (space comparison)
+# ============================================================================
+
+def doFullShootoutSpace():
+  maxPSpaceRat = dict()
+
+  def putMaxPSpaceRat(config, xx):
+    if xx is None:
+      return
+    if config not in maxPSpaceRat:
+      maxPSpaceRat[config] = []
+    maxPSpaceRat[config].append(xx)
+
+  ensureFigDir()
+  fullShootoutTable = "figures/full-shootout-space.tex"
+  with open(fullShootoutTable, 'w') as output:
+    for tag in allShootoutTags:
+      orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+      mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
+      crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
+      jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
+      grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+
+      # otp = tm(averageTime(D, 'ocaml', tag, maxp))
+      # mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+      # ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
+      # jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
+      # gtp = tm(averageTime(D, 'go', goTags[tag], maxp))
+
+      putMaxPSpaceRat('ocaml', ovv(sd(orp, mrp)))
+      putMaxPSpaceRat('cpp', ovv(sd(crp, mrp)))
+      putMaxPSpaceRat('java', ovv(sd(jrp, mrp)))
+      putMaxPSpaceRat('go', ovv(sd(grp, mrp)))
+
+      row = \
+        [ fmt(crp)
+        , makeBold(fmt(ov(sd(crp, mrp))))
+        , fmt(mrp)
+        , makeBold(fmt(ov(sd(mrp, mrp))))
+        , fmt(grp)
+        , makeBold(fmt(ov(sd(grp, mrp))))
+        , fmt(jrp)
+        , makeBold(fmt(ov(sd(jrp, mrp))))
+        , fmt(orp)
+        , makeBold(fmt(ov(sd(orp, mrp))))
+        ]
+
+      output.write(" & ".join([displayTag(tag)] + row))
+      output.write("  \\\\\n")
+
+    output.write("\\midrule\n")
+    row = [
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat['cpp'])))),
+      "", makeBold(fmt(ov(1.0))),
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat['go'])))),
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat['java'])))),
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat['ocaml']))))
+    ]
+    output.write(" & ".join(["geomean"] + row))
+    output.write("  \\\\\n")
+  print("[INFO] wrote to {}".format(fullShootoutTable))
+
+doFullShootoutSpace()
 
 # ============================================================================
 # LaTeX figure: OCaml comparison
@@ -1412,9 +1477,9 @@ def doMLtonComparison(mltonConfigName):
     mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
     pin = pinnedEntangled(D, 'mpl-em', tag, maxp)
-    pinW = pinnedEntangledWatermark(D, 'mpl-em', tag, maxp)
-    # epPctStr = spacePctStr(pin, averageSpace(D, 'mpl-em', tag, maxp))
-    epwPctStr = spacePctStr(pinW, averageSpace(D, 'mpl-em', tag, maxp))
+    # pinW = pinnedEntangledWatermark(D, 'mpl-em', tag, maxp)
+    epPctStr = spacePctStr(pin, averageSpace(D, 'mpl-em', tag, maxp))
+    # epwPctStr = spacePctStr(pinW, averageSpace(D, 'mpl-em', tag, maxp))
 
     ovRats.append(ovv(sd(mt1, mltont)))
     suRats.append(ovv(sd(mltont, mtp)))
@@ -1433,8 +1498,8 @@ def doMLtonComparison(mltonConfigName):
       sfmt(mrp),
       makeBold(fmt(bu(sd(mrp, mltonr)))),
       sp(pin),
-      sp(pinW),
-      epwPctStr
+      # sp(pinW),
+      epPctStr
     ]
 
     row = [ fmt(x) for x in row ]
