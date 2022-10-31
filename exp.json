@@ -248,7 +248,7 @@
       {
         "tag": ["quant-synth"],
         "bench": ["sk-net"],
-        "args": ["-pmax 9 -depth 5"]
+        "args": ["-pmax 10 -depth 5"]
       },
       {
         "tag": ["interval-tree"],
