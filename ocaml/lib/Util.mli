@@ -1,3 +1,4 @@
 val hash64: int64 -> int64
 val ceilDiv: int -> int -> int
 val mod64: int64 -> int64 -> int64
+val modint: int -> int -> int

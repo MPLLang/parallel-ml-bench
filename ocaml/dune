@@ -19,6 +19,12 @@
  (modes native))
 
 (executable
+ (name ms_queue)
+ (libraries util cla seq benchmark readfile tokenize msqueue)
+ (modules ms_queue)
+ (modes native))
+
+(executable
  (name primes)
  (libraries cla seqbasis benchmark)
  (modules primes)
@@ -64,4 +70,10 @@
  (name nbody)
  (libraries cla domainslib unix benchmark)
  (modules nbody)
+ (modes native))
+
+(library
+ (name msqueue)
+ (libraries seqbasis forkjoin)
+ (modules msqueue)
  (modes native))

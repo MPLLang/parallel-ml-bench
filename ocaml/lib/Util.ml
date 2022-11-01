@@ -20,3 +20,10 @@ let mod64 x y =
     r
   else
     Int64.add r y
+
+let modint x y =
+  let r = x mod y in
+  if compare y 0 < 0 || compare r 0 >= 0 then
+    r
+  else
+    r + y
