@@ -7,7 +7,7 @@ struct
       val n = Real.fromInt (Seq.length points)
       fun sumPair((x1,y1),(x2,y2)) = (x1 + x2, y1 + y2)
       fun sum f =
-        SeqBasis.reduce 5000 sumPair (0.0, 0.0)
+        SeqBasis.reduce 10000 sumPair (0.0, 0.0)
           (0, Seq.length points)
           (f o Seq.nth points)
       (* Seq.reduce sumPair (0.0, 0.0) (Seq.map f points) *)

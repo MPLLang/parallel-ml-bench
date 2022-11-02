@@ -39,7 +39,7 @@ struct
       val (lines, words) =
         Seq.reduce (fn ((lb1, ws1), (lb2, ws2)) => (lb1 + lb2, ws1 + ws2)) (0, 0) x *)
       val (lines, words) =
-        SeqBasis.reduce 5000
+        SeqBasis.reduce 10000
           (fn ((lb1, ws1), (lb2, ws2)) => (lb1 + lb2, ws1 + ws2))
           (0, 0)
           (0, ASeq.length seq)

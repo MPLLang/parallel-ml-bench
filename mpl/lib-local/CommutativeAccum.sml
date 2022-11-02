@@ -19,15 +19,15 @@ struct
       let
         val acc = ref z
 
-        fun put x =
+        fun put current x =
           let
-            val current = !acc
             val desired = g (current, x)
+            val current' = Concurrency.cas acc (current, desired)
           in
-            if MLton.eq (current, Concurrency.cas acc (current, desired)) then
+            if MLton.eq (current, current') then
               ()
             else
-              put x
+              put current' x
           end
 
         val n = hi - lo
@@ -35,10 +35,11 @@ struct
       in
         ForkJoin.parfor 1 (0, m) (fn b =>
           let
-            val start = b * grain
+            val start = lo + b * grain
             val stop = Int.min (hi, start + grain)
+            val result = SeqBasis.foldl g z (start, stop) f
           in
-            put (SeqBasis.foldl g z (start, stop) f)
+            put (!acc) result
           end);
         
         !acc
