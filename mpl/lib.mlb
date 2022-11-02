@@ -1,3 +1,4 @@
 lib.$(COMPAT).mlb
 lib-local/stats.$(COMPAT).mlb
 lib-local/Benchmark.sml
+lib-local/CommutativeAccum.sml

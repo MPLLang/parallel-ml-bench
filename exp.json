@@ -166,6 +166,11 @@
         "args": ["-n 500000000"]
       },
       {
+        "tag": ["linefit-entangled"],
+        "bench": ["linefit-entangled"],
+        "args": ["-n 500000000"]
+      },
+      {
         "tag": ["linearrec"],
         "bench": ["linearrec"],
         "args": ["-n 200000000"]
@@ -188,6 +193,11 @@
       {
         "tag": ["wc"],
         "bench": ["wc-opt"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["wc-entangled"],
+        "bench": ["wc-entangled"],
         "args": ["-infile ../inputs/rmat-10M-symm"]
       },
       {

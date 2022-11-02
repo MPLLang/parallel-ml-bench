@@ -695,7 +695,8 @@ cppTags = {
   "sparse-mxv": "sparse-mxv",
   "tokens": "tokens",
   "wc": "wc",
-  "dedup-strings": "dedup-strings"
+  "dedup-strings": "dedup-strings",
+  "ms-queue": "ms-queue"
 }
 
 javaTags = {
@@ -706,7 +707,8 @@ javaTags = {
   "linefit": "linefit",
   "sparse-mxv": "sparse-mxv",
   "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings"
+  "dedup-strings": "dedup-strings",
+  "ms-queue": "ms-queue"
 }
 
 goTags = {
@@ -717,7 +719,8 @@ goTags = {
   "linefit": "linefit",
   "sparse-mxv": "sparse-mxv",
   "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings"
+  "dedup-strings": "dedup-strings",
+  "ms-queue": "ms-queue"
 }
 
 sandmarkTags = [
@@ -1062,7 +1065,8 @@ allShootoutTags = sorted([
   "mcss",
   "linefit",
   "sparse-mxv",
-  "dedup-strings"
+  "dedup-strings",
+  "ms-queue"
 ], key=displayTag)
 
 def doFullShootoutTime():
