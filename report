@@ -384,6 +384,8 @@ def su(x):
 def bu(x):
   if x is None:
     return None
+  elif x < 1.0:
+    return "{:.2f}".format(x)
   return "{:.1f}".format(x)
 
 def noLeadZero(x):
@@ -1502,9 +1504,9 @@ def doMLtonComparison(mltonConfigName):
       makeBold(fmt(su(sd(mltont, mtp)))),
       sfmt(mltonr),
       sfmt(mr1),
-      makeBold(fmt(bu(sd(mr1, mltonr)))),
+      makeBold(noLeadZero(fmt(bu(sd(mr1, mltonr))))),
       sfmt(mrp),
-      makeBold(fmt(bu(sd(mrp, mltonr)))),
+      makeBold(noLeadZero(fmt(bu(sd(mrp, mltonr))))),
       sp(pin),
       # sp(pinW),
       epPctStr
@@ -1641,8 +1643,8 @@ def runtimeStatsSummary():
     avgCGCtimeMilli = 1000.0 * cgcTime(D, 'mpl-em', tag, maxp) / cc
 
     # throughput = gb/sec
-    lgcRecThrough = sd(sd(lr, lgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
-    cgcRecThrough = sd(sd(cr, cgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
+    # lgcRecThrough = sd(sd(lr, lgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
+    # cgcRecThrough = sd(sd(cr, cgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
 
     row = [
       approxWork,
@@ -1654,9 +1656,7 @@ def runtimeStatsSummary():
       cgcCountPct,
       sd(lr+cr, 1000.0),
       toPctStr(lr, lr+cr),
-      toPctStr(cr, lr+cr),
-      lgcRecThrough,
-      cgcRecThrough
+      toPctStr(cr, lr+cr)
     ]
 
     row = [ fmt(x) for x in row ]
