@@ -33,13 +33,27 @@ val _ = print ("parity check in " ^ Time.fmt 4 tm ^ "s\n")
 
 val b = (CommandLineArgs.parseReal "b" 0.3)
 
-val (cluster, parent) =
+val (cluster, parent, boundary) =
   Benchmark.run "running ldd: " (fn _ => LDD.ldd graph b)
 
 val numVisited =
   SeqBasis.reduce 10000 op+ 0 (0, Seq.length parent)
     (fn i => if Seq.nth parent i < (G.numVertices graph + 1) then 1 else 0)
 val _ = print ("visited " ^ Int.toString numVisited ^ "\n")
+
+val numBoundary =
+  let
+    fun loop q k =
+      if MSQueue.isEmpty q then
+        k
+      else
+        (MSQueue.dequeue q; loop q (k+1))
+  in
+    SeqBasis.reduce 1 op+ 0 (0, Seq.length boundary) (fn i =>
+      loop (Seq.nth boundary i) 0
+    )
+  end
+val _ = print ("boundary " ^ Int.toString numBoundary ^ "\n")
 
 (* val numClusters =
   SeqBasis.reduce 10000 op+ 0 (0, Seq.length cluster) (fn i =>

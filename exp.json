@@ -126,6 +126,11 @@
         "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
+        "tag": ["low-d-decomp-boundary"],
+        "bench": ["low-d-decomp-boundary"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
         "tag": ["max-indep-set"],
         "bench": ["max-indep-set"],
         "args": ["../inputs/rmat-10M-symm-bin"]
