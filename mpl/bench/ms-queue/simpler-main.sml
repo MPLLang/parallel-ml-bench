@@ -1,13 +1,15 @@
 structure CLA = CommandLineArgs
 
-val nq = CLA.parseInt "nq" 100000
-val bs = CLA.parseInt "bs" 1000000
+val nq = CLA.parseInt "nq" 100
+val bs = CLA.parseInt "bs" 100000
+val nb = CLA.parseInt "nb" 10
 val work = CLA.parseInt "work" 1000
 val penq = CLA.parseReal "p-enq" 0.5
 val pdeq = CLA.parseReal "p-deq" 0.5
 
 val _ = print ("nq " ^ Int.toString nq ^ "\n")
 val _ = print ("bs " ^ Int.toString bs ^ "\n")
+val _ = print ("nb " ^ Int.toString nb ^ "\n")
 val _ = print ("work " ^ Int.toString work ^ "\n")
 val _ = print ("p-enq " ^ Real.toString penq ^ "\n")
 val _ = print ("p-deq " ^ Real.toString pdeq ^ "\n")
@@ -31,19 +33,21 @@ fun bench () : (int * int) MSQueue.queue Seq.t =
     val seed = 0
     val grain = Int.max (1, 10000 div work)
   in
-    ForkJoin.parfor grain (0, bs) (fn i =>
-      let
-        val k = Util.hash (seed + 3*i)
-        val v = workload k
-        val p = Real.fromInt (Util.hash (seed + 3*i+1) mod 1000) / 1000.0
-        val qi = Util.hash (3*i+2) mod nq
-        val q = Seq.nth qs qi
-      in
-        if p < penq then
-          (MSQueue.enqueue q (k, v); ())
-        else
-          (MSQueue.dequeue q; MSQueue.enqueue q (k, v); ())
-      end);
+    Util.for (0, nb) (fn j =>
+      ForkJoin.parfor grain (0, bs) (fn i =>
+        let
+          val k = Util.hash (seed + bs*j + 3*i)
+          val v = workload k
+          val p = Real.fromInt (Util.hash (seed + bs*j + 3*i+1) mod 1000) / 1000.0
+          val qi = Util.hash (seed + bs*j + 3*i+2) mod nq
+          val q = Seq.nth qs qi
+        in
+          if p < penq then
+            (MSQueue.enqueue q (k, v); ())
+          else
+            (MSQueue.dequeue q; MSQueue.enqueue q (k, v); ())
+        end)
+    );
     qs
   end
 

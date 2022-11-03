@@ -1,13 +1,15 @@
 structure CLA = CommandLineArgs
 
-val nq = CLA.parseInt "nq" 100000
-val bs = CLA.parseInt "bs" 1000000
+val nq = CLA.parseInt "nq" 100
+val bs = CLA.parseInt "bs" 10000
+val nb = CLA.parseInt "nb" 10
 val work = CLA.parseInt "work" 15
 val penq = CLA.parseReal "p-enq" 0.5
 val pdeq = CLA.parseReal "p-deq" 0.5
 
 val _ = print ("nq " ^ Int.toString nq ^ "\n")
 val _ = print ("bs " ^ Int.toString bs ^ "\n")
+val _ = print ("nb " ^ Int.toString nb ^ "\n")
 val _ = print ("work " ^ Int.toString work ^ "\n")
 val _ = print ("p-enq " ^ Real.toString penq ^ "\n")
 val _ = print ("p-deq " ^ Real.toString pdeq ^ "\n")
@@ -44,7 +46,7 @@ fun workload seed =
 fun bench () : (int, int) LindenQueue.pq Seq.t =
   let
     fun log2Int i = Real.ceil ((Math.log10(Real.fromInt i)) / (Math.log10 (2.0)))
-    val height = log2Int (1 + Util.ceilDiv bs nq)
+    val height = log2Int (1 + Util.ceilDiv (bs * nb) nq)
 
     fun mk () =
       let
@@ -65,22 +67,24 @@ fun bench () : (int, int) LindenQueue.pq Seq.t =
     (* val grain = Int.max (1, 10000 div work) *)
     val grain = Int.max (1, bs div 100)
   in
-    ForkJoin.parfor grain (0, bs) (fn i =>
-      let
-        val k = Util.hash (seed + 4*i)
-        (* val v = workload k *)
-        val v = workload k
-        val k = k mod 1000
-        val p = Real.fromInt (Util.hash (seed + 4*i+1) mod 1000) / 1000.0
-        val qi = Util.hash (seed + 4*i+2) mod nq
-        val q = Seq.nth qs qi
-        val r = Util.hash (seed + 4*i+3)
-      in
-        if p < penq then
-          (LindenQueue.insert r q (k, v); ())
-        else
-          (LindenQueue.delMin q; LindenQueue.insert r q (k, v); ())
-      end);
+    Util.for (0, nb) (fn j =>
+      ForkJoin.parfor grain (0, bs) (fn i =>
+        let
+          val k = Util.hash (seed + bs*j + 4*i)
+          (* val v = workload k *)
+          val v = workload k
+          val k = k mod 1000
+          val p = Real.fromInt (Util.hash (seed + bs*j + 4*i+1) mod 1000) / 1000.0
+          val qi = Util.hash (seed + bs*j + 4*i+2) mod nq
+          val q = Seq.nth qs qi
+          val r = Util.hash (seed + bs*j + 4*i+3)
+        in
+          if p < penq then
+            (LindenQueue.insert r q (k, v); ())
+          else
+            (LindenQueue.delMin q; LindenQueue.insert r q (k, v); ())
+        end)
+    );
     qs
   end
 
