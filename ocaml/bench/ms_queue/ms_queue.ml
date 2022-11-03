@@ -22,6 +22,7 @@ let pdeq = Cla.parse_float "p-deq" 0.5
 
 let _ = Printf.printf "nq %d\n" nq
 let _ = Printf.printf "bs %d\n" bs
+let _ = Printf.printf "nb %d\n" nb
 let _ = Printf.printf "work %d\n" work
 let _ = Printf.printf "p-enq %.02f\n" penq
 let _ = Printf.printf "p-deq %.02f\n" pdeq
