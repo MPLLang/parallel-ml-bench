@@ -35,7 +35,7 @@ func wc(contents []byte) (int, int, int) {
 	}
 
   z := BS { lineBreaks: 0, wordStarts: 0 }
-  bs := commutativeAccum(5000, sumBS, z, 0, len(contents), f)
+  bs := commutativeAccum(100000, sumBS, z, 0, len(contents), f)
 
 	return bs.lineBreaks, bs.wordStarts, len(contents)
 }

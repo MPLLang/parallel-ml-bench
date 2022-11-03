@@ -22,7 +22,7 @@ func linefit (input []P) P {
 	z := P { x: 0.0, y: 0.0 }
 
 	sum := func (f func (P) P) P {
-		return commutativeAccum(5000, sumPair, z, 0, len(input), func (i int) P {
+		return commutativeAccum(100000, sumPair, z, 0, len(input), func (i int) P {
 			return f(input[i])
 		})
 	}
