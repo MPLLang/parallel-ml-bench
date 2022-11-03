@@ -111,6 +111,11 @@
         "args": ["../inputs/rmat-10M-symm-bin --no-dir-opt"]
       },
       {
+        "tag": ["bfs-find-hideg"],
+        "bench": ["bfs-find-hideg"],
+        "args": ["../inputs/rmat-10M-symm-bin -hideg-thresh 200 --no-dir-opt"]
+      },
+      {
         "tag": ["centrality"],
         "bench": ["centrality"],
         "args": ["../inputs/rmat-10M-symm-bin"]
