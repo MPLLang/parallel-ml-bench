@@ -45,6 +45,11 @@
         "args": ["-f ../inputs/words256.txt --no-output"]
       },
       {
+        "tag": ["wc-accum"],
+        "bench": ["wc_accum"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
         "tag": ["raytracer"],
         "bench": ["raytracer"],
         "args": ["-n 1000 -m 1000"]

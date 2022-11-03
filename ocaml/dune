@@ -43,6 +43,12 @@
  (modes native))
 
 (executable
+ (name wc_accum)
+ (libraries util cla benchmark readfile bytes accumulate)
+ (modules wc_accum)
+ (modes native))
+
+(executable
  (name game_of_life)
  (libraries cla domainslib unix benchmark)
  (modules game_of_life)

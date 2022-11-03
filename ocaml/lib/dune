@@ -19,6 +19,12 @@
  (modes native))
 
 (library
+ (name accumulate)
+ (libraries seqbasis forkjoin)
+ (modules Accumulate)
+ (modes native))
+
+(library
  (name util)
  (modules Util)
  (modes native))
