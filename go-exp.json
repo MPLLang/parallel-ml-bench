@@ -76,6 +76,11 @@
         "tag": ["sparse-mxv"],
         "bench": ["sparse-mxv"],
         "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["wc-accum"],
+        "bench": ["wc-accum"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
       }
     ]
 }
