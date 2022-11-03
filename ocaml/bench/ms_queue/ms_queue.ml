@@ -13,8 +13,9 @@ let _ = Printf.printf "%d\n" x
 let _ = Printf.printf "%b\n" (Msqueue.isEmpty q)
 *)
 
-let nq = Cla.parse_int "nq" 100000
-let bs = Cla.parse_int "bs" 1000000
+let nq = Cla.parse_int "nq" 100
+let bs = Cla.parse_int "bs" 100000
+let nb = Cla.parse_int "nb" 10
 let work = Cla.parse_int "work" 1000
 let penq = Cla.parse_float "p-enq" 0.5
 let pdeq = Cla.parse_float "p-deq" 0.5
@@ -45,24 +46,26 @@ let bench () =
     let qs = Seq.tabulate (fun _ -> Msqueue.mkQueue (-1, -1)) nq in
     let seed = 0 in
     let grain = max 1 (10000 / work) in
-    Forkjoin.parfor grain (0, bs) (fun i ->
-      let k = hasher (seed + 3*i) in
-      let v = workload k in
-      let p = float_of_int (Int64.to_int (Util.mod64 (Util.hash64 (Int64.of_int (seed + 3*i+1))) 1000L)) /. 1000.0 in
-      let qi = Util.modint (hasher (seed + 3*i+2)) nq in
-      let q = Seq.get qs qi in
-      if Float.compare p penq < 0 then
-        begin
-          Msqueue.enqueue q (k, v);
-          ()
-        end
-      else
-        begin
-          let _ = Msqueue.dequeue q in
-          Msqueue.enqueue q (k, v);
-          ()
-        end
-    );
+    for j = 0 to nb-1 do
+      Forkjoin.parfor grain (0, bs) (fun i ->
+        let k = hasher (seed + bs*j + 3*i) in
+        let v = workload k in
+        let p = float_of_int (Int64.to_int (Util.mod64 (Util.hash64 (Int64.of_int (seed + bs*j + 3*i+1))) 1000L)) /. 1000.0 in
+        let qi = Util.modint (hasher (seed + bs*j + 3*i+2)) nq in
+        let q = Seq.get qs qi in
+        if Float.compare p penq < 0 then
+          begin
+            Msqueue.enqueue q (k, v);
+            ()
+          end
+        else
+          begin
+            let _ = Msqueue.dequeue q in
+            Msqueue.enqueue q (k, v);
+            ()
+          end
+      )
+    done;
     qs
   )
 
