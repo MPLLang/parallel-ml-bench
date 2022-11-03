@@ -4,6 +4,9 @@ import (
 	// "github.com/intel/forGoParallel/parallel"
 	"golang.org/x/exp/constraints"
 	"time"
+	"sync/atomic"
+	"unsafe"
+	// "fmt"
 )
 
 func tabulate[T any](grain int, n int, f func(int) T) []T {
@@ -201,6 +204,65 @@ func reduce[T any](grain int, g func(T, T) T, z T, lo, hi int, f func(int) T) T 
 	<-done
 
 	return g(left, right)
+}
+
+
+func Cas[T any](slot **T, old *T, new *T) bool {
+	return atomic.CompareAndSwapPointer(
+		(*unsafe.Pointer)(unsafe.Pointer(slot)),
+		unsafe.Pointer(old),
+		unsafe.Pointer(new),
+	)
+}
+
+
+func accumPut[T any](slot **T, g func(T, T) T, x T) {
+	// fmt.Print("accumPut ", slot, x, "\n")
+	unsafeSlot := (*unsafe.Pointer)(unsafe.Pointer(slot))
+	for {
+		curr := (*T)(atomic.LoadPointer(unsafeSlot))
+		desired := g(*curr, x)
+		if Cas(slot, curr, &desired) {
+			// fmt.Print("DONE: accumPut ", slot, x, "\n")
+			return
+		}
+	}
+}
+
+
+func commutativeAccum[T any](grain int, g func(T, T) T, z T, lo, hi int, f func(int) T) T {
+	if hi-lo <= grain {
+		acc := z
+		for i := lo; i < hi; i++ {
+			acc = g(acc, f(i))
+		}
+		return acc
+	}
+
+  // fmt.Print("hello1\n")
+
+  var total **T
+  addr_z := &z
+	total = &addr_z
+
+  n := hi - lo
+  blockSize := grain
+	numBlocks := 1 + (n-1) / blockSize
+	// fmt.Print("blockSize ", blockSize, "numBlocks ", numBlocks, "\n")
+	parallelRange(1, 0, numBlocks, func(bLo, bHi int) {
+		for b := bLo; b < bHi; b++ {
+			// fmt.Print("block ", b, "\n")
+			start := lo + b*blockSize
+			stop := min(hi, start + blockSize)
+			acc := z
+			for i := start; i < stop; i++ {
+				acc = g(acc, f(i))
+			}
+			accumPut(total, g, acc)
+		}
+	})
+
+	return **total
 }
 
 
