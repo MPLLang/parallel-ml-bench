@@ -645,40 +645,82 @@ foundProcs = set()
 foundTags = set()
 
 def keepTag(t):
-  return True
+  return t in [
+    'bfs-find-hideg',
+    'centrality',
+    'connectivity',
+    'dedup-strings',
+    'delaunay-entangled',
+    'grep',
+    'harris-linked-list',
+    'interval-tree',
+    'linden-pq',
+    'linefit-entangled',
+    'low-d-decomp-boundary',
+    'max-indep-set',
+    'mcss',
+    'ms-queue',
+    'msort-ints',
+    'nearest-nbrs',
+    'pfa-bst',
+    'primes',
+    'quant-synth',
+    'quickhull',
+    'range-query',
+    'reverb',
+    'seam-carve',
+    'spanner',
+    'tokens',
+    'triangle-count',
+    'wc-entangled'
+    # 'wc',
+    # 'wc-accum',
+    # 'linefit',
+    # 'linefit-accum',
+    # 'sort-longs'
+  ]
 
-nondetTags = [
-  'bfs',
-  'centrality',
-  'connectivity',
-  'dedup-strings',
-  'delaunay',
-  'delaunay-entangled',
-  'harris-linked-list',
-  'linden-pq',
-  'low-d-decomp',
-  'max-indep-set',
-  'ms-queue',
-  'pfa-bst',
-  'sk-net',
-  'spanner'
-]
 
-orderedTags = [ t for t in orderedTags if keepTag(t) ]
+# nondetTags = [
+#   'bfs',
+#   'bfs-find-hideg',
+#   'centrality',
+#   'connectivity',
+#   'dedup-strings',
+#   'delaunay',
+#   'delaunay-entangled',
+#   'harris-linked-list',
+#   'linden-pq',
+#   'low-d-decomp',
+#   'low-d-decomp-boundary',
+#   'max-indep-set',
+#   'ms-queue',
+#   'pfa-bst',
+#   'sk-net',
+#   'spanner'
+# ]
 
-ocamlTags = [
-  "tokens",
-  "msort-ints",
-  "primes",
-  "raytracer",
-  "lu-decomp",
-  "msort-strings",
-  "dedup-strings",
-  "nbody",
-  "game-of-life",
-  "binarytrees5",
-  "sparse-mxv"
-]
+mplOnlyTags = [ t for t in orderedTags if keepTag(t) ]
+
+ocamlTags = {
+  "tokens": "tokens",
+  "msort-ints": "msort-ints",
+  "primes": "primes",
+  "raytracer": "raytracer",
+  "lu-decomp": "lu-decomp",
+  "msort-strings": "msort-strings",
+  "dedup-strings": "dedup-strings",
+  "nbody": "nbody",
+  "game-of-life": "game-of-life",
+  "binarytrees5": "binarytrees5",
+  "sparse-mxv": "sparse-mxv",
+  "wc-entangled": "wc-accum",
+  "ms-queue": "ms-queue",
+  "wc": "",
+  "linefit": "",
+  "linefit-entangled": "",
+  "mcss": ""
+}
 
 # map each MPL tag to the correct C++ tag for comparison
 cppTags = {
@@ -688,7 +730,8 @@ cppTags = {
   "grep": "grep",
   "integrate": "integrate",
   "linearrec": "linearrec",
-  "linefit": "linefit",
+  "linefit": "",
+  "linefit-entangled": "linefit",
   "mcss": "mcss",
   "msort-ints": "msort",
   "nearest-nbrs": "nearest-nbrs",
@@ -696,7 +739,8 @@ cppTags = {
   "quickhull": "quickhull",
   "sparse-mxv": "sparse-mxv",
   "tokens": "tokens",
-  "wc": "wc",
+  "wc": "",
+  "wc-entangled": "wc",
   "dedup-strings": "dedup-strings",
   "ms-queue": "ms-queue"
 }
@@ -707,6 +751,9 @@ javaTags = {
   "tokens": "tokens",
   "mcss": "mcss",
   "linefit": "linefit",
+  "linefit-entangled": "",
+  "wc": "",
+  "wc-entangled": "",
   "sparse-mxv": "sparse-mxv",
   "msort-strings": "msort-strings",
   "dedup-strings": "dedup-strings",
@@ -719,6 +766,9 @@ goTags = {
   "tokens": "tokens",
   "mcss": "mcss",
   "linefit": "linefit",
+  "wc": "",
+  "linefit-entangled": "linefit-accum",
+  "wc-entangled": "wc-accum",
   "sparse-mxv": "sparse-mxv",
   "msort-strings": "msort-strings",
   "dedup-strings": "dedup-strings",
@@ -912,16 +962,16 @@ print("")
 headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
 headers1 = ['Benchmark', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M']
 tt = [headers, "-", headers1, "="]
-for tag in ocamlTags:
+for tag in ocamlTags.keys():
   mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
   mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
   mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
   mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
-  ot1 = tm(averageTime(D, 'ocaml', tag, 1))
-  otp = tm(averageTime(D, 'ocaml', tag, maxp))
-  or1 = spg(averageSpace(D, 'ocaml', tag, 1))
-  orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+  ot1 = tm(averageTime(D, 'ocaml', ocamlTags[tag], 1))
+  otp = tm(averageTime(D, 'ocaml', ocamlTags[tag], maxp))
+  or1 = spg(averageSpace(D, 'ocaml', ocamlTags[tag], 1))
+  orp = spg(averageSpace(D, 'ocaml', ocamlTags[tag], maxp))
 
   thisRow = [
     ot1,
@@ -1065,10 +1115,11 @@ allShootoutTags = sorted([
   "msort-ints",
   "tokens",
   "mcss",
-  "linefit",
+  "linefit-entangled",
   "sparse-mxv",
   "dedup-strings",
-  "ms-queue"
+  "ms-queue",
+  "wc-entangled"
 ], key=displayTag)
 
 def doFullShootoutTime():
@@ -1094,7 +1145,7 @@ def doFullShootoutTime():
       # jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
       # grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
 
-      otp = tm(averageTime(D, 'ocaml', tag, maxp))
+      otp = tm(averageTime(D, 'ocaml', ocamlTags[tag], maxp))
       mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
       ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
       jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
@@ -1153,7 +1204,7 @@ def doFullShootoutSpace():
   fullShootoutTable = "figures/full-shootout-space.tex"
   with open(fullShootoutTable, 'w') as output:
     for tag in allShootoutTags:
-      orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+      orp = spg(averageSpace(D, 'ocaml', ocamlTags[tag], maxp))
       mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
       crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
       jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
@@ -1213,7 +1264,7 @@ def doOCamlComparison():
   ensureFigDir()
   ocamlComparisonTable = "figures/ocaml-space-time-comparison.tex"
   with open(ocamlComparisonTable, 'w') as output:
-    for tag in ocamlTags:
+    for tag in ocamlTags.keys():
       or1 = spg(averageSpace(D, 'ocaml', tag, 1))
       orp = spg(averageSpace(D, 'ocaml', tag, maxp))
       mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
@@ -1446,9 +1497,10 @@ doCppComparison()
 # ============================================================================
 
 mltonCmpTags = sorted([
-  tag for tag in orderedTags
+  tag for tag in mplOnlyTags
   if (averageTime(D, 'mpl-em', tag, maxp) is not None)
   and tag not in sandmarkTags
+  and keepTag(tag)
 ], key=displayTag)
 
 
@@ -1520,12 +1572,13 @@ def doMLtonComparison(mltonConfigName):
   ensureFigDir()
   mltonCmpTable = "figures/{}-comparison.tex".format(mltonConfigName)
   with open(mltonCmpTable, 'w') as output:
-    for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-      doTag(tag, output)
+    # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
+    #   doTag(tag, output)
+    # output.write("\\midrule\n")
+    # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+    #   doTag(tag, output)
 
-    output.write("\\midrule\n")
-    
-    for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+    for tag in mltonCmpTags:
       doTag(tag, output)
 
     output.write("\\midrule\n")
@@ -1582,10 +1635,13 @@ def runtimeStats(procs):
   ensureFigDir()
   runtimeStatsTable = "figures/runtime-stats-{}.tex".format(procs)
   with open(runtimeStatsTable, 'w') as output:
-    for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-      doTag(tag, output)
-    output.write("\\midrule\n")
-    for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+    # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
+    #   doTag(tag, output)
+    # output.write("\\midrule\n")
+    # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+    #   doTag(tag, output)
+    
+    for tag in mltonCmpTags:
       doTag(tag, output)
 
     # output.write("\\midrule\n")
@@ -1666,10 +1722,13 @@ def runtimeStatsSummary():
   ensureFigDir()
   runtimeStatsTable = "figures/runtime-stats-summary.tex"
   with open(runtimeStatsTable, 'w') as output:
-    for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-      doTag(tag, output)
-    output.write("\\midrule\n")
-    for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+    # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
+    #   doTag(tag, output)
+    # output.write("\\midrule\n")
+    # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
+    #   doTag(tag, output)
+
+    for tag in mltonCmpTags:
       doTag(tag, output)
 
     # output.write("\\midrule\n")
@@ -1791,7 +1850,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
 
 
 speedupTags = sorted([
-  tag for tag in orderedTags
+  tag for tag in mplOnlyTags
   if (averageTime(D, 'mpl-em', tag, maxp) is not None)
   and tag not in sandmarkTags
 ], key=displayTag)

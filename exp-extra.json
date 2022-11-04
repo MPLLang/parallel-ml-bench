@@ -46,6 +46,26 @@
         "args": ["-N 100000000"]
       },
       {
+        "tag": ["dense-matmul"],
+        "bench": ["dense-matmul"],
+        "args": ["-N 1024"]
+      },
+      {
+        "tag": ["raytracer"],
+        "bench": ["raytracer"],
+        "args": ["-n 1000 -m 1000"]
+      },
+      {
+        "tag": ["tinykaboom"],
+        "bench": ["tinykaboom"],
+        "args": ["-width 100 -height 100 -frames 10 -fps 1"]
+      },
+      {
+        "tag": ["msort-strings"],
+        "bench": ["msort-strings"],
+        "args": ["../inputs/words64.txt"]
+      },
+      {
         "tag": ["msort-ints"],
         "bench": ["msort"],
         "args": ["-N 20000000"]
@@ -76,9 +96,19 @@
         "args": ["-f ../inputs/words256-shuffled.txt"]
       },
       {
+        "tag": ["suffix-array"],
+        "bench": ["suffix-array"],
+        "args": ["--benchmark -N 10000000"]
+      },
+      {
         "tag": ["grep"],
         "bench": ["grep"],
         "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
+      },
+      {
+        "tag": ["bfs"],
+        "bench": ["bfs"],
+        "args": ["../inputs/rmat-10M-symm-bin --no-dir-opt"]
       },
       {
         "tag": ["bfs-find-hideg"],
@@ -88,6 +118,11 @@
       {
         "tag": ["centrality"],
         "bench": ["centrality"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["low-d-decomp"],
+        "bench": ["low-d-decomp"],
         "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
@@ -101,9 +136,19 @@
         "args": ["../inputs/rmat-10M-symm-bin"]
       },
       {
+        "tag": ["palindrome"],
+        "bench": ["palindrome"],
+        "args": ["-N 1000000"]
+      },
+      {
         "tag": ["tokens"],
         "bench": ["tokens"],
         "args": ["../inputs/words256.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["nqueens"],
+        "bench": ["nqueens"],
+        "args": ["-N 13"]
       },
       {
         "tag": ["triangle-count"],
@@ -116,14 +161,49 @@
         "args": ["-n 1000000 -q 1000000"]
       },
       {
+        "tag": ["delaunay"],
+        "bench": ["delaunay"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
         "tag": ["delaunay-entangled"],
         "bench": ["delaunay-entangled"],
         "args": ["-input ../inputs/uniform-circle-1M"]
       },
       {
+        "tag": ["linefit"],
+        "bench": ["linefit-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
         "tag": ["linefit-entangled"],
         "bench": ["linefit-entangled"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linearrec"],
+        "bench": ["linearrec"],
+        "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["bignum-add"],
+        "bench": ["bignum-add-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["integrate"],
+        "bench": ["integrate-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["sparse-mxv-opt"],
+        "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["wc"],
+        "bench": ["wc-opt"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
       },
       {
         "tag": ["wc-entangled"],
@@ -134,6 +214,26 @@
         "tag": ["mcss"],
         "bench": ["mcss-opt"],
         "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["game-of-life"],
+        "bench": ["ocaml-game-of-life"],
+        "args": ["-n_times 100 -board_size 1024"]
+      },
+      {
+        "tag": ["nbody"],
+        "bench": ["ocaml-nbody-imm"],
+        "args": ["-n 500 -num_bodies 1024"]
+      },
+      {
+        "tag": ["lu-decomp"],
+        "bench": ["ocaml-lu-decomp"],
+        "args": ["-mat_size 1024"]
+      },
+      {
+        "tag": ["binarytrees5"],
+        "bench": ["ocaml-binarytrees5"],
+        "args": ["-max_depth 19"]
       },
       {
         "tag": ["connectivity"],
