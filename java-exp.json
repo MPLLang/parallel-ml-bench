@@ -66,6 +66,11 @@
         "tag": ["msort-strings"],
         "bench": ["SortStrings"],
         "args": ["-input ../inputs/words64.txt"]
+      },
+      {
+        "tag": ["dedup-strings"],
+        "bench": ["DedupStrings"],
+        "args": ["-input ../inputs/words264-shuffled.txt"]
       }
     ]
 }
