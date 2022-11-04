@@ -753,7 +753,7 @@ javaTags = {
   "linefit": "linefit",
   "linefit-entangled": "linefit-accum",
   "wc": "",
-  "wc-entangled": "",
+  "wc-entangled": "wc-accum",
   "sparse-mxv": "sparse-mxv",
   "msort-strings": "msort-strings",
   "dedup-strings": "dedup-strings",
