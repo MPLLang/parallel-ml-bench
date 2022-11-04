@@ -88,6 +88,11 @@
         "tag": ["ms-queue"],
         "bench": ["ms_queue"],
         "args": ["-nq 100 -bs 100000 -nb 10 -work 1000"]
+      },
+      {
+        "tag": ["linefit-accum"],
+        "bench": ["linefit_accum"],
+        "args": ["-n 500000000"]
       }
     ]
 }

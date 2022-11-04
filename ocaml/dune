@@ -49,6 +49,12 @@
  (modes native))
 
 (executable
+ (name linefit_accum)
+ (libraries seq util cla benchmark accumulate)
+ (modules linefit_accum)
+ (modes native))
+
+(executable
  (name game_of_life)
  (libraries cla domainslib unix benchmark)
  (modules game_of_life)
