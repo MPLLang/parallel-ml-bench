@@ -719,7 +719,7 @@ ocamlTags = {
   "wc": "",
   "linefit": "",
   "linefit-entangled": "linefit-accum",
-  "mcss": ""
+  "mcss": "mcss"
 }
 
 # map each MPL tag to the correct C++ tag for comparison
