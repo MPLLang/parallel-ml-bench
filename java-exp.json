@@ -70,7 +70,7 @@
       {
         "tag": ["dedup-strings"],
         "bench": ["DedupStrings"],
-        "args": ["-input ../inputs/words264-shuffled.txt"]
+        "args": ["-input ../inputs/words256-shuffled.txt"]
       }
     ]
 }
