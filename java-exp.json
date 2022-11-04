@@ -58,6 +58,11 @@
         "args": ["-n 500000000"]
       },
       {
+        "tag": ["linefit-accum"],
+        "bench": ["LinefitAccum"],
+        "args": ["-n 500000000"]
+      },
+      {
         "tag": ["sparse-mxv"],
         "bench": ["SparseMxV"],
         "args": ["-n 200000000"]

@@ -751,7 +751,7 @@ javaTags = {
   "tokens": "tokens",
   "mcss": "mcss",
   "linefit": "linefit",
-  "linefit-entangled": "",
+  "linefit-entangled": "linefit-accum",
   "wc": "",
   "wc-entangled": "",
   "sparse-mxv": "sparse-mxv",
