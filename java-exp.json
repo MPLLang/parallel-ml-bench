@@ -53,11 +53,6 @@
         "args": ["-n 500000000"]
       },
       {
-        "tag": ["linefit"],
-        "bench": ["Linefit"],
-        "args": ["-n 500000000"]
-      },
-      {
         "tag": ["linefit-accum"],
         "bench": ["LinefitAccum"],
         "args": ["-n 500000000"]
@@ -66,11 +61,6 @@
         "tag": ["sparse-mxv"],
         "bench": ["SparseMxV"],
         "args": ["-n 200000000"]
-      },
-      {
-        "tag": ["msort-strings"],
-        "bench": ["SortStrings"],
-        "args": ["-input ../inputs/words64.txt"]
       },
       {
         "tag": ["dedup-strings"],
