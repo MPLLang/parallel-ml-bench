@@ -68,13 +68,13 @@ fun bench () =
     val (failed, t) = ForkJoin.par (left, right)
     val l = !(Vector.sub (tangles, 0))
 
-    val a = PureSeq.nth (fstl l) 0
-    val b = PureSeq.nth (fstt t) 0
+    val a = List.length (PureSeq.nth (fstl l) 0) handle _ => 42
+    val b = List.length (PureSeq.nth (fstt t) 0) handle _ => 42
 
     val szlTotal =
       Vector.foldl (fn (tangle, acc) => acc + szl (!tangle)) 0 tangles
   in
-    (szlTotal, szt t, List.length a, List.length b, failed)
+    (szlTotal, szt t, a, b, failed)
   end
 
 

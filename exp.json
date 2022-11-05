@@ -174,6 +174,16 @@
         "tag": ["interval-tree"],
         "bench": ["interval-tree"],
         "args": ["-n 1000000 -q 100"]
+      },
+      {
+        "tag": ["tangle"],
+        "bench": ["tangle"],
+        "args": ["-elem-size 1000000 -num-elems 200 -num-tangles 10"],
+        "args1": [
+          "-p-ent 0.0", "-p-ent 0.1", "-p-ent 0.2", "-p-ent 0.3", "-p-ent 0.4",
+          "-p-ent 0.5", "-p-ent 0.6", "-p-ent 0.7", "-p-ent 0.8", "-p-ent 0.9",
+          "-p-ent 1.0"
+        ]
       }
     ]
 }
