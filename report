@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import json
 import sys
@@ -14,8 +14,9 @@ def ensureFigDir():
     os.mkdir("figures")
 
 def getGitRoot():
-  return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
+  data = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
     stdout=subprocess.PIPE).communicate()[0].rstrip()
+  return "".join(chr(x) for x in data)
 
 ROOT = getGitRoot()
 
@@ -148,7 +149,7 @@ def renameConfig(c):
 
 def renameTag(row):
   t = row['tag']
-  if (t != 'tangle') and (t != 'tangle-small'):
+  if (t != 'tangle') and (t != 'tangle-small') and (t != 'tangle-small2'):
     return t
   pat = re.compile(r"-p-ent\s+(.*)")
   m = pat.search(row['args1'])
@@ -578,7 +579,7 @@ def makeline(row, widths, align):
     j = i+1
     while j < len(row) and (row[j] is None):
       j += 1
-    availableWidth = sum(widths[i:j]) + delimWidth*(j-i-1)
+    availableWidth = int(sum(widths[i:j]) + delimWidth*(j-i-1))
     s = str(row[i])
     w = " " * (availableWidth - len(row[i]))
     aa = align(i)
@@ -611,12 +612,12 @@ def table(rows, align=None):
       # rw = len(stripANSI(str(row[i])))
       # rw = len(str(row[i]))
       rw = len(row[i])
-      for k in xrange(i, j):
+      for k in range(i, j):
         w = (rw / (j-i)) + (1 if k < rw % (j-i) else 0)
         widths[k] = max(widths[k], w)
       i = j
 
-  totalWidth = sum(widths) + delimWidth*(numCols-1)
+  totalWidth = int(sum(widths) + delimWidth*(numCols-1))
 
   def aa(i):
     try:
@@ -638,7 +639,12 @@ def table(rows, align=None):
 # =========================================================================
 
 def mostRecentResultsFile(suffix=""):
-  files = os.listdir(os.path.join(ROOT, "results"))
+  try:
+    files = os.listdir(os.path.join(str(ROOT), "results"))
+  except Exception as e:
+    print(e)
+    raise e
+
   pattern = r'\d{6}-\d{6}'
   if suffix != "":
     pattern = pattern + "-" + suffix + "$"
@@ -655,7 +661,8 @@ else:
   print("[INFO] no results file argument; finding most recent")
   try:
     mostRecent = mostRecentResultsFile()
-  except:
+  except Exception as e:
+    print(e)
     print("[ERR] could not find most recent results file\n " + \
           "  check that these are formatted as 'YYMMSS-hhmmss'")
     sys.exit(1)
@@ -1804,7 +1811,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
   for tag in tagsSortedByName:
     try:
       baseline = averageTime(D, 'mlton', tag, 1)
-      speedups = map((lambda p: getspeedup(tag, p)), procs)
+      speedups = list(map((lambda p: getspeedup(tag, p)), procs))
 
       i = tagsSortedBySpeedups.index(tag)
       ci = i % len(colors)
@@ -1846,7 +1853,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
   # set legend position
   matplotlib.rcParams['legend.loc'] = 'upper left'
 
-  ticks = [1] + range(10, maxp+1, 10)
+  ticks = [1] + list(range(10, maxp+1, 10))
 
   plt.xlabel('Processors', fontsize=fontSize)
   plt.ylabel('Speedup', fontsize=fontSize)
@@ -1908,37 +1915,62 @@ speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags)
 # PDF: Tangle plot
 # ============================================================================
 
-def reportTangle():
+def reportTangle(doLogScale):
   plt.figure(figsize=(7,7))
-  colors = ['blue', 'darkturquoise', 'darkgreen', 'darkviolet', 'red', 'goldenrod','dimgrey', 'brown']
+  colors = ['darkviolet', 'darkturquoise', 'goldenrod', 'darkgreen', 'red', 'blue', 'dimgrey', 'brown']
   markers = ['o','v','^','<','>','s','d']
   linestyles = ['solid', 'dashed','dashdot']
   fontSize = 14
   legendFontSize = 12
   markerSize = 8
-
-  params = ['0.0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
-  # xs = map(float, params)
+  
+  params = ["0.01", "0.02", "0.03", "0.04", "0.05", "0.06", "0.07", "0.08", "0.09", '0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
 
   def ratEntangled(tag):
-    pin = pinnedEntangledSingle(D, 'mpl-em', tag, maxp)
-    return pin / averageSpaceSingle(D, 'mpl-em', tag, maxp)
+    try:
+      pin = pinnedEntangledSingle(D, 'mpl-em', tag, maxp)
+      return pin / averageSpaceSingle(D, 'mpl-em', tag, maxp)
+    except Exception as e:
+      # sys.stderr.write('[WARN] error on tangle ratEntangled({}): {}\n'.format(tag, e))
+      return None
 
   def thisOverhead(a, b):
-    baseline = averageTime(D, 'mpl-em', b, maxp)
-    tm = averageTime(D, 'mpl-em', a, maxp)
-    return tm / baseline
-
-  bigX = [ratEntangled('tangle-{}'.format(p)) for p in params]
-  smallX = [ratEntangled('tangle-small-{}'.format(p)) for p in params]
-
-  bigY = [thisOverhead('tangle-{}'.format(p), 'tangle-0.0') for p in params]
-  smallY = [thisOverhead('tangle-small-{}'.format(p), 'tangle-small-0.0') for p in params]
+    try:
+      baseline = averageTime(D, 'mpl-em', b, maxp)
+      tm = averageTime(D, 'mpl-em', a, maxp)
+      return tm / baseline
+    except Exception as e:
+      # sys.stderr.write('[WARN] error on tangle thisOverhead({}, {}): {}\n'.format(a, b, e))
+      return None
+  
+  def tagger(version, p):
+    return 'tangle{}-{}'.format(version, p)
 
   lines = []
-  lines.append(plt.plot(bigX, bigY, linestyle='solid', marker='o', markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color='darkturquoise', alpha=0.8))
-  lines.append(plt.plot(smallX, smallY, linestyle='solid', marker='v', markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color='darkviolet', alpha=0.8))
-  legendNames = ['total size = 1.6 GB', 'total size = 800 MB']
+  legendNames = []
+  for i, version in enumerate(['', '-small', '-small2']):
+    theseParams = [p for p in params if (ratEntangled(tagger(version, p)) is not None) and (thisOverhead(tagger(version, p), tagger(version, '0.0')) is not None)]
+    X = [ratEntangled(tagger(version, p)) for p in theseParams]
+    Y = [thisOverhead(tagger(version, p), tagger(version, '0.0')) for p in theseParams]
+    ci = i % len(colors)
+    mi = i % len(markers)
+    si = i % len(linestyles)
+    color = colors[ci]
+    marker = markers[mi]
+    linestyle = linestyles[si]
+    lines.append(plt.plot(X, Y, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
+    legendNames.append('config{}'.format(i))
+
+  # bigX = [ratEntangled('tangle-{}'.format(p)) for p in params]
+  # smallX = [ratEntangled('tangle-small-{}'.format(p)) for p in params]
+
+  # bigY = [thisOverhead('tangle-{}'.format(p), 'tangle-0.0') for p in params]
+  # smallY = [thisOverhead('tangle-small-{}'.format(p), 'tangle-small-0.0') for p in params]
+
+  # lines = []
+  # lines.append(plt.plot(bigX, bigY, linestyle='solid', marker='o', markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color='darkturquoise', alpha=0.8))
+  # lines.append(plt.plot(smallX, smallY, linestyle='solid', marker='v', markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color='darkviolet', alpha=0.8))
+  # legendNames = ['total size = 1.6 GB', 'total size = 800 MB']
 
   font = {
     'size': legendFontSize,
@@ -1954,13 +1986,24 @@ def reportTangle():
   # set legend position
   matplotlib.rcParams['legend.loc'] = 'upper left'
 
-  ticks = np.arange(0.0, 1.0, 0.1)
-
+  
+  if doLogScale:
+    xticks = [0.005 * (2.0 ** i) for i in range(0,8)] + [1.0]
+    xlabels = [str(2**(i-1)) + '%' for i in range(0,8)] + ['100%']
+    plt.gca().set_xscale('log', base=2)
+    plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
+    plt.xlim(0.004, 1.0)
+  else:
+    xticks = np.arange(0.0, 1.1, 0.1)
+    xlabels = [str(int(i*10)) + '%' for i in range(0, 11)]
+    plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
+    plt.xlim(0, 1)
+  
   plt.xlabel('Fraction of Memory Entangled', fontsize=fontSize)
   plt.ylabel('Slowdown due to Entanglement Management', fontsize=fontSize)
   # plt.yticks(ticks, fontsize=fontSize)
-  plt.xticks(ticks, fontsize=fontSize)
-  plt.xlim(0, 1.0)
+  # plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
+  # plt.xlim(0.009, 1.0)
   # plt.ylim(0, 0.2)
   plt.gca().grid(axis='both', linestyle='dotted')
   plt.gca().set_axisbelow(True)
@@ -1978,12 +2021,13 @@ def reportTangle():
     )
 
   ensureFigDir()
-  outputName = 'figures/tangle.pdf'
+  outputName = 'figures/tangle{}.pdf'.format('-logscale' if doLogScale else '')
   plt.savefig(outputName, bbox_inches='tight')
   sys.stdout.write("[INFO] output written to {}\n".format(outputName))
   plt.close()
 
-reportTangle()
+reportTangle(True)
+reportTangle(False)
 
 # ============================================================================
 # ============================================================================

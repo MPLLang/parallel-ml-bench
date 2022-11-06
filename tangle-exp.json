@@ -53,6 +53,14 @@
           "-p-ent 0.05", "-p-ent 0.06", "-p-ent 0.07", "-p-ent 0.08", "-p-ent 0.09",
           "-p-ent 0.1"
         ]
+      },
+      {
+        "tag": ["tangle-small3"],
+        "bench": ["tangle"],
+        "args": ["-elem-size 100000 -num-elems 1000 -num-tangles 10"],
+        "args1": [
+          "-p-ent 0.0", "-p-ent 0.15", "-p-ent 0.2", "-p-ent 0.25"
+        ]
       }
     ]
 }
