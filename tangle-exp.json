@@ -51,15 +51,15 @@
         "args1": [
           "-p-ent 0.0", "-p-ent 0.01", "-p-ent 0.02", "-p-ent 0.03", "-p-ent 0.04",
           "-p-ent 0.05", "-p-ent 0.06", "-p-ent 0.07", "-p-ent 0.08", "-p-ent 0.09",
-          "-p-ent 0.1"
+          "-p-ent 0.1", "-p-ent 0.13", "-p-ent 0.15", "-p-ent 0.2", "-p-ent 0.25"
         ]
       },
       {
         "tag": ["tangle-small3"],
         "bench": ["tangle"],
-        "args": ["-elem-size 100000 -num-elems 1000 -num-tangles 10"],
+        "args": ["-elem-size 200000 -num-elems 1000 -num-tangles 10"],
         "args1": [
-          "-p-ent 0.0", "-p-ent 0.15", "-p-ent 0.2", "-p-ent 0.25"
+          "-p-ent 0.0", "-p-ent 0.05", "-p-ent 0.1", "-p-ent 0.15", "-p-ent 0.2", "-p-ent 0.25"
         ]
       }
     ]
