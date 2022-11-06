@@ -1915,7 +1915,9 @@ speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags)
 # PDF: Tangle plot
 # ============================================================================
 
-def reportTangle(doLogScale):
+
+
+def reportTangle(plotType):
   plt.figure(figsize=(7,7))
   colors = ['darkviolet', 'darkturquoise', 'goldenrod', 'darkgreen', 'red', 'blue', 'dimgrey', 'brown']
   markers = ['o','v','^','<','>','s','d']
@@ -1990,17 +1992,26 @@ def reportTangle(doLogScale):
   matplotlib.rcParams['legend.loc'] = 'upper left'
 
   
-  if doLogScale:
+  if plotType == 'log':
     xticks = [0.005 * (2.0 ** i) for i in range(0,8)] + [1.0]
     xlabels = [str(2**(i-1)) + '%' for i in range(0,8)] + ['100%']
     plt.gca().set_xscale('log', base=2)
     plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
     plt.xlim(0.004, 1.0)
-  else:
+  elif plotType == 'linear':
     xticks = np.arange(0.0, 1.1, 0.1)
     xlabels = [str(int(i*10)) + '%' for i in range(0, 11)]
     plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
     plt.xlim(0, 1)
+  elif plotType == 'linear-zoom':
+    xticks = np.arange(0.0, 0.25, 0.05)
+    xlabels = [str(int(i*5)) + '%' for i in range(0, 5)]
+    plt.ylim(0.9, 1.5)
+    plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
+    plt.xlim(0, 0.2)
+  else:
+    print('[ERR] unknown plot type {}'.format(plotType))
+    return
   
   plt.xlabel('Fraction of Memory Entangled', fontsize=fontSize)
   plt.ylabel('Slowdown due to Entanglement Management', fontsize=fontSize)
@@ -2024,13 +2035,14 @@ def reportTangle(doLogScale):
     )
 
   ensureFigDir()
-  outputName = 'figures/tangle{}.pdf'.format('-logscale' if doLogScale else '')
+  outputName = 'figures/tangle-{}.pdf'.format(plotType)
   plt.savefig(outputName, bbox_inches='tight')
   sys.stdout.write("[INFO] output written to {}\n".format(outputName))
   plt.close()
 
-reportTangle(True)
-reportTangle(False)
+reportTangle('log')
+reportTangle('linear')
+reportTangle('linear-zoom')
 
 # ============================================================================
 # ============================================================================
