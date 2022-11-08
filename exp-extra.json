@@ -88,7 +88,7 @@
       {
         "tag": ["seam-carve"],
         "bench": ["seam-carve"],
-        "args": ["../inputs/pano.ppm -num-seams 100"]
+        "args": ["../inputs/pano.ppm -num-seams 25 -block-width 200"]
       },
       {
         "tag": ["dedup-strings"],
