@@ -1964,6 +1964,7 @@ def reportTangle(plotType):
     marker = markers[mi]
     linestyle = linestyles[si]
     lines.append(plt.plot(X, Y, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
+    # lines.append(plt.scatter(X, Y, marker=marker, color=color, alpha=0.8))
     legendNames.append('config{}'.format(i))
 
   # bigX = [ratEntangled('tangle-{}'.format(p)) for p in params]
@@ -2026,6 +2027,7 @@ def reportTangle(plotType):
   if True:
     plt.legend(
       [b[0] for b in lines],
+      # lines,
       legendNames,
       # bbox_to_anchor=(-0.16,1.05),
       # loc='upper right',
