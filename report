@@ -1153,7 +1153,6 @@ allShootoutTags = sorted([
   "linefit-entangled",
   "sparse-mxv",
   "dedup-strings",
-  "ms-queue",
   "wc-entangled"
 ], key=displayTag)
 
