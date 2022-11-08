@@ -737,6 +737,53 @@ def keepTag(t):
 
 mplOnlyTags = [ t for t in orderedTags if keepTag(t) ]
 
+
+mplCmpTags = [
+  "primes",
+  "dense-matmul",
+  "raytracer",
+  "tinykaboom",
+  "msort-strings",
+  "msort-ints",
+  "nearest-nbrs",
+  "quickhull",
+  "reverb",
+  "seam-carve",
+  # "dedup-strings-entangled",
+  "suffix-array",
+  "grep",
+  "bfs",
+  # "bfs-find-hideg",
+  "centrality",
+  "low-d-decomp",
+  # "low-d-decomp-boundary",
+  "max-indep-set",
+  "palindrome",
+  "tokens",
+  "nqueens",
+  "triangle-count",
+  "range-query",
+  "delaunay",
+  # "delaunay-entangled",
+  "linefit",
+  # "linefit-entangled",
+  "linearrec",
+  "bignum-add",
+  "integrate",
+  "sparse-mxv",
+  "wc",
+  # "wc-entangled",
+  "mcss",
+  # "connectivity-entangled",
+  # "spanner-entangled",
+  # "ms-queue",
+  # "harris-linked-list",
+  # "linden-pq",
+  # "pfa-bst",
+  # "sk-net",
+  "interval-tree"
+]
+
 ocamlTags = {
   "tokens": "tokens",
   "msort-ints": "msort-ints",
@@ -1777,6 +1824,67 @@ def runtimeStatsSummary():
   print("[INFO] wrote to {}".format(runtimeStatsTable))
 
 runtimeStatsSummary()
+
+# ============================================================================
+# PDF: Speedup plot
+# ============================================================================
+
+def doMplComparison():
+  proc1TimeDiffs = []
+  proc72TimeDiffs = []
+  proc1SpaceDiffs = []
+  proc72SpaceDiffs = []
+
+  mplComparisonTable = "figures/mpl-space-time-comparison.tex"
+  with open(mplComparisonTable, 'w') as output:
+    for tag in sorted(mplCmpTags):
+
+      if tag in sandmarkTags:
+        continue
+
+      # mlton = spg(averageSpace(DS, 'mlton', tag, 1))
+      R_mpl1 = spg(averageSpace(D, 'mpl', tag, 1))
+      R_mplp = spg(averageSpace(D, 'mpl', tag, maxp))
+      R_mplcc1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+      R_mplccp = spg(averageSpace(D, 'mpl-em', tag, maxp))
+
+      T_mpl1 = tm(averageTime(D, 'mpl', tag, 1))
+      T_mplp = tm(averageTime(D, 'mpl', tag, maxp))
+      T_mplcc1 = tm(averageTime(D, 'mpl-em', tag, 1))
+      T_mplccp = tm(averageTime(D, 'mpl-em', tag, maxp))
+
+      proc1TimeDiffs.append(pcd(T_mplcc1, T_mpl1))
+      proc72TimeDiffs.append(pcd(T_mplccp, T_mplp))
+      proc1SpaceDiffs.append(pcd(R_mplcc1, R_mpl1))
+      proc72SpaceDiffs.append(pcd(R_mplccp, R_mplp))
+
+      row = \
+        [ fmt(T_mpl1)
+        , makeBold(latexpcd(T_mplcc1, T_mpl1, highlight=False))
+        , fmt(T_mplp)
+        , makeBold(latexpcd(T_mplccp, T_mplp, highlight=False))
+        , sfmt(R_mpl1)
+        , makeBold(latexpcd(R_mplcc1, R_mpl1, highlight=False))
+        , sfmt(R_mplp)
+        , makeBold(latexpcd(R_mplccp, R_mplp, highlight=False))
+        ]
+
+      output.write(" & ".join([displayTag(tag)] + row))
+      output.write("  \\\\\n")
+
+    output.write("\\midrule\n")
+    row = [
+      "", makeBold(fmtpcd(average(proc1TimeDiffs), highlight=False)),
+      "", makeBold(fmtpcd(average(proc72TimeDiffs), highlight=False)),
+      "", makeBold(fmtpcd(average(proc1SpaceDiffs), highlight=False)),
+      "", makeBold(fmtpcd(average(proc72SpaceDiffs), highlight=False))
+    ]
+    output.write(" & ".join(["average"] + row))
+    output.write("  \\\\\n")
+
+  print("[INFO] wrote to {}".format(mplComparisonTable))
+
+doMplComparison()
 
 # ============================================================================
 # PDF: Speedup plot
