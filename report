@@ -164,7 +164,17 @@ def displayTag(t):
   if t in sandmarkTags:
     return "SM:" + t
   if t == "delaunay-entangled":
-    return "delaunay-e"
+    return "delaunay"
+  if t == "delaunay":
+    return "delaunay-disentangled"
+  if t == "wc-entangled":
+    return "wc"
+  if t == "linefit-entangled":
+    return "linefit"
+  if t == "wc":
+    return "wc-disentangled"
+  if t == "linefit":
+    return "linefit-disentangled"
   if t == "msort-ints":
     return "msort-int64"
   if t == "dedup-strings":
@@ -1585,6 +1595,22 @@ mltonCmpTags = sorted([
 ], key=displayTag)
 
 
+def ovToPctStr(x):
+  try:
+    epPct = 100.0 * x
+    if x < 0.00001:
+      return ""
+    elif epPct > 99.999:
+      return "100\\%"
+    elif epPct > 99:
+      return ">99\\%"
+    elif epPct < 1:
+      return "<1\\%"
+    else:
+      return str(int(round(epPct))) + "\\%"
+  except:
+    return "--"
+
 def toPctStr(a, b):
   try:
     eep = float(a)
@@ -1604,7 +1630,7 @@ def toPctStr(a, b):
     return "--"
 
 
-def doMLtonComparison(mltonConfigName):
+def doMLtonComparison(mltonConfigName, includeEntanglement):
   ovRats = []
   suRats = []
   bu1Rats = []
@@ -1640,10 +1666,14 @@ def doMLtonComparison(mltonConfigName):
       makeBold(noLeadZero(fmt(bu(sd(mr1, mltonr))))),
       sfmt(mrp),
       makeBold(noLeadZero(fmt(bu(sd(mrp, mltonr))))),
-      sp(pin),
-      # sp(pinW),
-      epPctStr
     ]
+
+    if includeEntanglement:
+      row += [
+        sp(pin),
+        # sp(pinW),
+        epPctStr
+      ]
 
     row = [ fmt(x) for x in row ]
     output.write(" & ".join([displayTag(tag)] + row))
@@ -1673,8 +1703,8 @@ def doMLtonComparison(mltonConfigName):
     output.write("  \\\\\n")
   print("[INFO] wrote to {}".format(mltonCmpTable))
 
-doMLtonComparison('mlton')
-doMLtonComparison('mlton-tight')
+doMLtonComparison('mlton', True)
+doMLtonComparison('mlton-tight', False)
 
 # ============================================================================
 # LaTeX figure: GC and Runtime Stats
@@ -1736,8 +1766,8 @@ def runtimeStats(procs):
     # output.write("  \\\\\n")
   print("[INFO] wrote to {}".format(runtimeStatsTable))
 
-runtimeStats(1)
-runtimeStats(maxp)
+# runtimeStats(1)
+# runtimeStats(maxp)
 
 # ============================================================================
 # LaTeX figure: GC and Runtime Stats, Summary
@@ -1748,6 +1778,10 @@ def runtimeStatsSummary():
   # suRats = []
   # bu1Rats = []
   # bupRats = []
+
+  gcRats = []
+  gcLRecRats = []
+  gcCRecRats = []
 
   def doTag(tag, output):
     # r = averageSpace(D, 'mpl-em', tag, maxp)
@@ -1764,6 +1798,9 @@ def runtimeStatsSummary():
     lgcCountPct = toPctStr(lc, totCount)
     cgcCountPct = toPctStr(cc, totCount)
 
+    gcLRecRats.append(sd(lr, lr+cr))
+    gcCRecRats.append(sd(cr, lr+cr))
+
     try:
       totGC1 = lgcTime(D, 'mpl-em', tag, 1) + cgcTime(D, 'mpl-em', tag, 1)
       approxWork = tm(averageTime(D, 'mpl-em', tag, 1) - totGC1)
@@ -1773,6 +1810,7 @@ def runtimeStatsSummary():
     try:
       totGCp = lgcTime(D, 'mpl-em', tag, maxp) + cgcTime(D, 'mpl-em', tag, maxp)
       pctGCWork = toPctStr(totGCp, approxWork)
+      gcRats.append(sd(totGCp, approxWork))
     except:
       pctGCWork = None
 
@@ -1812,15 +1850,15 @@ def runtimeStatsSummary():
     for tag in mltonCmpTags:
       doTag(tag, output)
 
-    # output.write("\\midrule\n")
-    # row = [
-    #   "", "", makeBold(fmt(ov(geomean(ovRats)))),
-    #   "",     makeBold(fmt(su(geomean(suRats)))),
-    #   "", "", makeBold(fmt(ov(geomean(bu1Rats)))),
-    #   "",     makeBold(fmt(ov(geomean(bupRats))))
-    # ]
-    # output.write(" & ".join(["geomean"] + row))
-    # output.write("  \\\\\n")
+    output.write("\\midrule\n")
+    row = [
+      "", makeBold(fmt(ovToPctStr(geomean(gcRats)))),
+      "", "", "", "", "", "",
+      makeBold(fmt(ovToPctStr(geomean(gcLRecRats)))),
+      makeBold(fmt(ovToPctStr(geomean(gcCRecRats))))
+    ]
+    output.write(" & ".join(["geomean"] + row))
+    output.write("  \\\\\n")
   print("[INFO] wrote to {}".format(runtimeStatsTable))
 
 runtimeStatsSummary()
