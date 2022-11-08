@@ -29,7 +29,7 @@
 
   "globals":
     {
-      "config": ["mlton", "mlton-tight", "mpl-em"],
+      "config": ["mlton", "mlton-tight", "mpl-em", "mpl"],
       "cwd": ["mpl"],
       "exp": ["time","space"],
       "trials": ["1","10"]

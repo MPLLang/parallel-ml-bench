@@ -1,0 +1,9 @@
+local
+  $(SML_LIB)/basis/basis.mlb
+  $(SML_LIB)/basis/mlton.mlb
+  $(SML_LIB)/basis/mpl.mlb
+  $(SML_LIB)/basis/fork-join.mlb
+  RuntimeStats.mlton.sml  (* just for now *)
+in
+  structure RuntimeStats
+end
