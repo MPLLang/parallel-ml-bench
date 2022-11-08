@@ -1,6 +1,10 @@
 {
   "compiler": "mpl",
   "mpl-switch-commit": "v0.3",
-  "flags": ["-disable-pass", "splitTypes1", "-disable-pass", "splitTypes2"],
+  "flags": [
+    "-disable-pass", "splitTypes1",
+    "-disable-pass", "splitTypes2",
+    "-detect-entanglement", "true"
+  ],
   "compat": "mpl"
 }
