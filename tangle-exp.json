@@ -59,7 +59,7 @@
         "bench": ["tangle"],
         "args": ["-elem-size 200000 -num-elems 1000 -num-tangles 10"],
         "args1": [
-          "-p-ent 0.0", "-p-ent 0.05", "-p-ent 0.1", "-p-ent 0.15", "-p-ent 0.2", "-p-ent 0.25"
+          "-p-ent 0.0", "-p-ent 0.02", "-p-ent 0.05", "-p-ent 0.1", "-p-ent 0.15", "-p-ent 0.2", "-p-ent 0.25", "-p-ent 0.3", "-p-ent 0.4", "-p-ent 0.5", "-p-ent 0.6", "-p-ent 0.7", "-p-ent-0.8", "-p-ent 0.9", "-p-ent 1.0"
         ]
       }
     ]
