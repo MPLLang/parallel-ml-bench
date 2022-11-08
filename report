@@ -2071,9 +2071,9 @@ def reportTangle(plotType):
   colors = ['darkviolet', 'darkturquoise', 'goldenrod', 'darkgreen', 'red', 'blue', 'dimgrey', 'brown']
   markers = ['o','v','^','<','>','s','d']
   linestyles = ['solid', 'dashed','dashdot']
-  fontSize = 14
+  fontSize = 28
   legendFontSize = 12
-  markerSize = 8
+  markerSize = 15
   
   params = [
     '0.01','0.02','0.03','0.04','0.05','0.06','0.07','0.08','0.09',
@@ -2103,7 +2103,7 @@ def reportTangle(plotType):
   def doPlotting(ax):
     lines = []
     legendNames = []
-    for i, version in enumerate(['-small', '-small3']):
+    for i, version in enumerate(['-small3']):
       theseParams = [p for p in params if (ratEntangled(tagger(version, p)) is not None) and (thisOverhead(tagger(version, p), tagger(version, '0.0')) is not None)]
       if version == '-small':
         theseParams = list(filter(lambda p: p not in ["0.02", "0.05"], theseParams))
@@ -2155,8 +2155,8 @@ def reportTangle(plotType):
     plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
     plt.xlim(0.004, 1.0)
   elif plotType == 'linear':
-    xticks = np.arange(0.0, 1.1, 0.1)
-    xlabels = [str(int(i*10)) + '%' for i in range(0, 11)]
+    xticks = np.arange(0.0, 1.1, 0.25)
+    xlabels = [str(int(i*25)) + '%' for i in range(0, 5)]
     plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
     plt.xlim(0, 1)
   elif plotType == 'linear-zoom':
@@ -2169,33 +2169,34 @@ def reportTangle(plotType):
     print('[ERR] unknown plot type {}'.format(plotType))
     return
 
-  yticks = np.arange(1.0, 3.5, 0.25)
+  yticks = np.arange(1.0, 3.0, 0.25)
+  ylabels = ["%.2f" % x for x in yticks]
   
   plt.xlabel('Fraction of Memory Entangled', fontsize=fontSize)
-  plt.ylabel('Slowdown due to Entanglement Management', fontsize=fontSize)
-  # plt.yticks(yticks, fontsize=fontSize)
+  plt.ylabel('Overhead', fontsize=fontSize)
+  plt.yticks(yticks, labels=ylabels, fontsize=fontSize)
   # plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
   # plt.xlim(0.009, 1.0)
   # plt.ylim(0, 0.2)
-  ax.yaxis.set_major_locator(MultipleLocator(0.2))
-  ax.yaxis.set_minor_locator(MultipleLocator(0.1))
+  # ax.yaxis.set_major_locator(MultipleLocator(0.25))
+  # ax.yaxis.set_minor_locator(MultipleLocator(0.1))
   plt.gca().grid(axis='both', which='major', linestyle='dotted')
   plt.gca().grid(axis='y', which='minor', visible=False)
   # ax.yaxis.grid(True, which='minor')
   plt.gca().set_axisbelow(True)
   # plt.margins(y=10)
 
-  if True:
-    ax.legend(
-      [b[0] for b in lines],
-      # lines,
-      legendNames,
-      # bbox_to_anchor=(-0.16,1.05),
-      # loc='upper right',
-      bbox_to_anchor=(-0.1,1.01),
-      loc='lower left',
-      ncol=3
-    )
+  # if True:
+  #   ax.legend(
+  #     [b[0] for b in lines],
+  #     # lines,
+  #     legendNames,
+  #     # bbox_to_anchor=(-0.16,1.05),
+  #     # loc='upper right',
+  #     bbox_to_anchor=(-0.1,1.01),
+  #     loc='lower left',
+  #     ncol=3
+  #   )
 
   # if plotType == "linear":
   #   zx1 = 0.0
@@ -2222,9 +2223,9 @@ def reportTangle(plotType):
   sys.stdout.write("[INFO] output written to {}\n".format(outputName))
   plt.close()
 
-reportTangle('log')
+# reportTangle('log')
 reportTangle('linear')
-reportTangle('linear-zoom')
+# reportTangle('linear-zoom')
 
 # ============================================================================
 # ============================================================================
