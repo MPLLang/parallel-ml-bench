@@ -173,7 +173,7 @@
       {
         "tag": ["interval-tree"],
         "bench": ["interval-tree"],
-        "args": ["-n 1000000 -q 100"]
+        "args": ["-n 500000 -q 1000"]
       }
     ]
 }

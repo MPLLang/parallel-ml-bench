@@ -7,7 +7,7 @@ struct
       val s' = s + delta/2.0
     in
       delta *
-      SeqBasis.reduce 5000 op+ 0.0 (0, n)
+      SeqBasis.reduce 100000 op+ 0.0 (0, n)
         (fn i => f(s' + (Real.fromInt i) * delta))
     end
 
