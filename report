@@ -183,6 +183,10 @@ def displayTag(t):
     return "persistent-arr"
   if t == "connectivity":
     return "reachability"
+  if t == "low-d-decomp-boundary":
+    return "ldd-boundary"
+  if t == "bfs-find-hideg":
+    return "find-influencers"
   return t
 
 
@@ -708,7 +712,7 @@ def keepTag(t):
     'msort-ints',
     'nearest-nbrs',
     'pfa-bst',
-    'primes',
+    # 'primes',
     'quant-synth',
     'quickhull',
     'range-query',
@@ -1783,6 +1787,10 @@ def runtimeStatsSummary():
   gcLRecRats = []
   gcCRecRats = []
 
+  totRec = [0]
+  totCr = [0]
+  totLr = [0]
+
   def doTag(tag, output):
     # r = averageSpace(D, 'mpl-em', tag, maxp)
     lc = lgcCount(D, 'mpl-em', tag, maxp)
@@ -1800,6 +1808,10 @@ def runtimeStatsSummary():
 
     gcLRecRats.append(sd(lr, lr+cr))
     gcCRecRats.append(sd(cr, lr+cr))
+
+    totRec[0] += lr+cr
+    totCr[0] += cr
+    totLr[0] += lr
 
     try:
       totGC1 = lgcTime(D, 'mpl-em', tag, 1) + cgcTime(D, 'mpl-em', tag, 1)
@@ -1852,12 +1864,14 @@ def runtimeStatsSummary():
 
     output.write("\\midrule\n")
     row = [
-      "", makeBold(fmt(ovToPctStr(geomean(gcRats)))),
-      "", "", "", "", "", "",
-      makeBold(fmt(ovToPctStr(geomean(gcLRecRats)))),
-      makeBold(fmt(ovToPctStr(geomean(gcCRecRats))))
+      "", "", "", "", "", "", "", "",
+      # makeBold(fmt(ovToPctStr(geomean(gcRats)))),
+      # makeBold(fmt(ovToPctStr(geomean(gcLRecRats)))),
+      # makeBold(fmt(ovToPctStr(geomean(gcCRecRats))))
+      makeBold(fmt(toPctStr(totLr[0], totRec[0]))),
+      makeBold(fmt(toPctStr(totCr[0], totRec[0])))
     ]
-    output.write(" & ".join(["geomean"] + row))
+    output.write(" & ".join(["total"] + row))
     output.write("  \\\\\n")
   print("[INFO] wrote to {}".format(runtimeStatsTable))
 
@@ -1935,7 +1949,10 @@ from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from matplotlib.ticker import MultipleLocator
 
-def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
+usedFull = dict()
+usedNoc = dict()
+
+def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
   plt.figure(figsize=(7,7))
   # markers = ['o','v','^','<','>','s','*','d','D','+','x','|','','','','','']
   colors = ['blue', 'darkturquoise', 'darkgreen', 'darkviolet', 'red', 'goldenrod','dimgrey', 'brown']
@@ -1947,12 +1964,9 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
   # markers = ['.'] * len(speedupTags)
   procs = P
 
-  fontSize = 14
-  legendFontSize = 12
-  markerSize = 8
-
-  usedFull = dict()
-  usedNoc = dict()
+  fontSize = 22
+  legendFontSize = 16
+  markerSize = 14
 
   plt.plot([0,maxp+1], [0,maxp+1], marker="", color="grey", linewidth=0.8)
   lines = []
@@ -1961,7 +1975,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
       baseline = averageTime(D, 'mlton', tag, 1)
       speedups = list(map((lambda p: getspeedup(tag, p)), procs))
 
-      i = tagsSortedBySpeedups.index(tag)
+      i = offset + tagsSortedBySpeedups.index(tag)
       ci = i % len(colors)
       mi = i % len(markers)
       si = i % len(linestyles)
@@ -1982,6 +1996,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
       color = colors[ci]
       marker = markers[mi]
       linestyle = linestyles[si]
+      print("tag {} is index {}: {} {} {}".format(tag, i, color, marker, linestyle))
       lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
     except Exception as e:
       sys.stderr.write('[WARN] error while plotting speedup for {}: {}\n'.format(tag, e))
@@ -2019,9 +2034,9 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName):
       map(displayTag, tagsSortedByName),
       # bbox_to_anchor=(-0.16,1.05),
       # loc='upper right',
-      bbox_to_anchor=(-0.1,1.01),
-      loc='lower left',
-      ncol=3
+      bbox_to_anchor=(-0.16,1.01),
+      loc='upper right',
+      ncol=1
     )
 
   ensureFigDir()
@@ -2046,17 +2061,23 @@ def getspeedup(tag, p):
     sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
     return None
 
-sortedBySpeedups = sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
+half = int(len(speedupTags)/2)
+groupATags = speedupTags[:half]
+groupBTags = speedupTags[half:]
+groupA = sorted(groupATags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
+groupB = sorted(groupBTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
 
-groupA = sortedBySpeedups[::2]
-groupB = sortedBySpeedups[1::2]
+# sortedBySpeedups = list(sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp))))
 
-groupATags = [t for t in speedupTags if t in groupA]
-groupBTags = [t for t in speedupTags if t in groupB]
+# groupA = sortedBySpeedups[::2]
+# groupB = sortedBySpeedups[1::2]
 
-speedupPlot("figures/mpl-speedups.pdf", sortedBySpeedups, speedupTags)
-speedupPlot("figures/mpl-speedups-1.pdf", groupA, groupATags)
-speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags)
+# groupATags = [t for t in speedupTags if t in groupA]
+# groupBTags = [t for t in speedupTags if t in groupB]
+
+# speedupPlot("figures/mpl-speedups.pdf", sortedBySpeedups, speedupTags)
+speedupPlot("figures/mpl-speedups-1.pdf", groupA, groupATags, 0)
+speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags, len(groupA))
 
 
 # ============================================================================
