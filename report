@@ -1676,7 +1676,7 @@ def doMLtonComparison(mltonConfigName, includeEntanglement):
       row += [
         sp(pin),
         # sp(pinW),
-        epPctStr
+        # epPctStr
       ]
 
     row = [ fmt(x) for x in row ]
