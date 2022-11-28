@@ -1,0 +1,29 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+GEN=scripts/gencmds
+RUN=scripts/runcmds
+
+NOW=$(date '+%y%m%d-%H%M%S')
+mkdir -p $ROOT/results
+RESULTS=$ROOT/results/$NOW
+
+rm -f $ROOT/mpl/bin/*.bin
+rm -f $ROOT/cpp/bin/*.bin
+#rm -f $ROOT/ocaml/bin/*.bin
+#rm -f $ROOT/java/*.class
+#rm -f $ROOT/go/bin/*.bin
+
+## NOTE: when filtering with jq, remember to pass -c
+## (compact output, ensures each line is a single json object)
+##
+## For example:
+##   ... | jq -c 'select(.config == "mpl")'
+
+( \
+  $GEN $@ $ROOT/exp-big.json; \
+  $GEN $@ $ROOT/cpp-exp-big.json \
+) \
+| $RUN --compile --output $RESULTS
+
+echo "[INFO] wrote results to $RESULTS"

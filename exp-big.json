@@ -1,0 +1,94 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "mpl", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mpl", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      }
+    ],
+
+  "globals":
+    {
+      "config": ["mpl-em","mpl"],
+      "cwd": ["mpl"],
+      "exp": ["time"],
+      "trials": ["1","10"]
+    },
+
+  "jqselect":
+    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
+
+  "specs":
+    [
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-N 100000000"]
+      },
+      {
+        "tag": ["msort-ints"],
+        "bench": ["msort"],
+        "args": ["-N 20000000"]
+      },
+      {
+        "tag": ["nearest-nbrs"],
+        "bench": ["nearest-nbrs"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["quickhull"],
+        "bench": ["quickhull"],
+        "args": ["-infile ../inputs/uniform-circle-20M"]
+      },
+      {
+        "tag": ["grep"],
+        "bench": ["grep"],
+        "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["../inputs/words256.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["triangle-count"],
+        "bench": ["triangle-count"],
+        "args": ["../inputs/rmat-1M-symm-bin"]
+      },
+      {
+        "tag": ["interval-tree"],
+        "bench": ["interval-tree"],
+        "args": ["-n 500000 -q 1000"]
+      },
+      {
+        "tag": ["linefit"],
+        "bench": ["linefit-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["wc"],
+        "bench": ["wc-opt"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      }
+    ]
+}
