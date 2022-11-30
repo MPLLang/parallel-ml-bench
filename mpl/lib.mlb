@@ -3,3 +3,6 @@ lib-local/stats.$(COMPAT).mlb
 lib-local/Benchmark.sml
 lib-local/CommutativeAccum.sml
 lib-local/AugMap.sml
+lib-local/OneTrueGrain.sml
+lib-local/ForkJoinNG.$(COMPAT).sml
+lib-local/SeqBasisNG.sml
