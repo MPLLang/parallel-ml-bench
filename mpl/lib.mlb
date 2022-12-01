@@ -6,3 +6,6 @@ lib-local/AugMap.sml
 lib-local/OneTrueGrain.sml
 lib-local/ForkJoinNG.$(COMPAT).sml
 lib-local/SeqBasisNG.sml
+lib-local/QuicksortNG.sml
+lib-local/MergeNG.sml
+lib-local/MergesortNG.sml
