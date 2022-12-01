@@ -9,3 +9,4 @@ lib-local/SeqBasisNG.sml
 lib-local/QuicksortNG.sml
 lib-local/MergeNG.sml
 lib-local/MergesortNG.sml
+lib-local/NearestNeighborsNG.sml
