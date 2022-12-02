@@ -5,10 +5,14 @@ structure DS = DelayedSeq
 structure M = SparseMxV
 
 val n = CLA.parseInt "n" (1000 * 1000 * 100)
+val rowLen = CLA.parseInt "row-len" 100
+val numRows = n div rowLen
 val doCheck = CLA.parseFlag "check"
 
-val rowLen = 100
-val numRows = n div rowLen
+val _ = print ("n " ^ Int.toString n ^ "\n")
+val _ = print ("row-len " ^ Int.toString rowLen ^ "\n")
+val _ = print ("(num rows: " ^ Int.toString numRows ^ ")\n")
+
 val vec = Seq.tabulate (fn i => 1.0) numRows
 fun gen i j =
   ((Util.hash (i * rowLen + j) mod numRows), 1.0)
