@@ -25,7 +25,7 @@ val prefix = CharVector.tabulate (32, fn _ => #"a")
 
 val tokens =
   if not makeLong then tokens
-  else Seq.map (fn str => prefix ^ str) tokens
+  else SeqNG.map (fn str => prefix ^ str) tokens
 
 val result =
   Benchmark.run "running mergesort" (fn _ => MergesortNG.sort String.compare tokens)

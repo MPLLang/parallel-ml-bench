@@ -28,7 +28,7 @@ struct
         ()
       end
 
-  
+(*
   fun binarySplitting' f {lo, width} () =
     if width <= OneTrueGrain.asWord64 then
       for (lo, lo+width) f
@@ -42,7 +42,7 @@ struct
           );
         ()
       end
-
+*)
 
   fun parfor (lo, hi) f =
     if lo >= hi then () else

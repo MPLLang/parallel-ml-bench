@@ -135,7 +135,7 @@ struct
 
       val ((sorted, offsets), tm) = Util.getTime (fn () =>
         CountingSort.sort idx (fn i =>
-          G.quadrant center (Seq.nth verts (Seq.nth idx i))) 4)
+          G.quadrant center (SeqNG.nth verts (SeqNG.nth idx i))) 4)
 
       (* val _ =
         if AS.length idx >= 4 * leafSize then
@@ -203,12 +203,12 @@ struct
       (* calculate the bounding box *)
       fun maxPt ((x1,y1),(x2,y2)) = (Real.max (x1, x2), Real.max (y1, y2))
       fun minPt ((x1,y1),(x2,y2)) = (Real.min (x1, x2), Real.min (y1, y2))
-      fun getPt i = Seq.nth verts i
+      fun getPt i = SeqNG.nth verts i
       val (xLeft,yBot) = SeqBasisNG.reduce minPt (Real.posInf, Real.posInf) (0, AS.length verts) getPt
       val (xRight,yTop) = SeqBasisNG.reduce maxPt (Real.negInf, Real.negInf) (0, AS.length verts) getPt
       val width = Real.max (xRight-xLeft, yTop-yBot)
 
-      val idx = Seq.tabulate (fn i => i) (Seq.length verts)
+      val idx = SeqNG.tabulate (fn i => i) (SeqNG.length verts)
       val result = makeTreeBounded leafSize verts idx (xLeft, yBot) width
     in
       (* clearAndReport upperTime "upper sort time"; *)
@@ -237,7 +237,7 @@ struct
     *)
   fun nearestNeighbor_ (t : tree, pts) (p: G.point, isSamePoint: int -> bool) =
     let
-      fun pt i = Seq.nth pts i
+      fun pt i = SeqNG.nth pts i
 
       fun refineNearest (qi, (bestPt, bestDist)) =
         if isSamePoint qi then (bestPt, bestDist) else
@@ -280,7 +280,7 @@ struct
 
 
   fun nearestNeighborOfId (tree, pts) pi =
-    nearestNeighbor_ (tree, pts) (Seq.nth pts pi, fn qi => pi = qi)
+    nearestNeighbor_ (tree, pts) (SeqNG.nth pts pi, fn qi => pi = qi)
 
   fun nearestNeighbor (tree, pts) p =
     nearestNeighbor_ (tree, pts) (p, fn _ => false)
@@ -288,13 +288,13 @@ struct
 
   fun allNearestNeighbors (t, pts) =
     let
-      val n = Seq.length pts
+      val n = SeqNG.length pts
       val idxs = flatten t
       val nn = ForkJoin.alloc n
     in
       ForkJoinNG.parfor (0, n) (fn i =>
         let
-          val j = Seq.nth idxs i
+          val j = SeqNG.nth idxs i
         in
           A.update (nn, j, nearestNeighborOfId (t, pts) j)
         end);

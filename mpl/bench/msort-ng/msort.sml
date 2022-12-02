@@ -7,7 +7,7 @@ val _ = print ("generating " ^ Int.toString n ^ " random integers\n")
 
 fun elem i =
   Word64.toInt (Word64.mod (Util.hash64 (Word64.fromInt i), Word64.fromInt n))
-val input = ArraySlice.full (SeqBasis.tabulate 10000 (0, n) elem)
+val input = ArraySlice.full (SeqBasisNG.tabulate (0, n) elem)
 
 val result =
   Benchmark.run "running mergesort" (fn _ => MergesortNG.sort Int.compare input)

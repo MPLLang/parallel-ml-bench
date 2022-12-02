@@ -34,6 +34,8 @@ sig
   val tabFilter: (int * int)
               -> (int -> 'a option)
               -> 'a array
+
+  val BLOCK_SIZE: int
 end =
 struct
 
@@ -103,7 +105,7 @@ struct
     end
 
 
-  val BLOCK_SIZE = CommandLineArgs.parseInt "seq-basis-ng-block-size" 1000
+  val BLOCK_SIZE = CommandLineArgs.parseInt "seq-basis-ng-block-size" 100
 
 
   fun scan g b (lo, hi) (f : int -> 'a) =
