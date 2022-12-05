@@ -16,9 +16,11 @@ struct
   val par = ForkJoin.par
   val allocate = ForkJoin.alloc
 
+  val seqSortThreshold = CommandLineArgs.parseInt "mergesort-ng-threshold" 10
+
   (* in-place sort s, using t as a temporary array if needed *)
   fun sortInPlace' cmp s t =
-    if AS.length s <= 1024 then
+    if AS.length s <= seqSortThreshold then
       QuicksortNG.sortInPlace cmp s
     else let
       val half = AS.length s div 2
@@ -34,7 +36,7 @@ struct
 
   (* destructively sort s, writing the result in t *)
   and writeSort cmp s t =
-    if AS.length s <= 1024 then
+    if AS.length s <= seqSortThreshold then
       ( Util.foreach s (fn (i, x) => AS.update (t, i, x))
       ; QuicksortNG.sortInPlace cmp t
       )
