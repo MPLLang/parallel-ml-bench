@@ -5,8 +5,9 @@ local
   $(SML_LIB)/basis/mlton.mlb
   $(SML_LIB)/basis/mpl.mlb
   $(SML_LIB)/basis/fork-join.mlb
-  mpl.sml
+  Grains.vanilla.sml
   ForkJoinNG.sml
+  mpl.sml
 in
   structure Grains
   structure ForkJoinNG

@@ -5,8 +5,9 @@ local
   $(SML_LIB)/basis/mlton.mlb
   $(SML_LIB)/basis/mpl.mlb
   $(SML_LIB)/basis/fork-join.mlb
-  mpl-hb.sml
+  Grains.heartbeat.sml
   ForkJoinNG.sml
+  mpl-hb.sml
 in
   structure Grains
   structure ForkJoinNG

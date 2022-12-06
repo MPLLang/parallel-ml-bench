@@ -3,6 +3,7 @@
 local
   $(SML_LIB)/basis/basis.mlb
   $(SML_LIB)/basis/mlton.mlb
+  Grains.vanilla.sml
   mlton.sml
 in
   structure Grains

@@ -1,14 +1,3 @@
-structure Grains:
-sig
-  type grain = int
-  val parfor: grain
-end =
-struct
-  type grain = int
-  val parfor = CommandLineArgs.parseInt "parfor-grain" 32
-end
-
-
 structure RuntimeStats:
 sig
   type t
