@@ -241,7 +241,7 @@ struct
       val total = offset (length s)
       val result = alloc total
 
-      val blockSize = SeqBasisNG.BLOCK_SIZE
+      val blockSize = Grains.block
       val numBlocks = Util.ceilDiv total blockSize
     in
       parfor (0, numBlocks) (fn blockIdx =>

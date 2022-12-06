@@ -34,8 +34,6 @@ sig
   val tabFilter: (int * int)
               -> (int -> 'a option)
               -> 'a array
-
-  val BLOCK_SIZE: int
 end =
 struct
 
@@ -107,11 +105,8 @@ struct
     end
 
 
-  val BLOCK_SIZE = CommandLineArgs.parseInt "seq-basis-ng-block-size" 100
-
-
   fun scan g b (lo, hi) (f : int -> 'a) =
-    if hi - lo <= BLOCK_SIZE then
+    if hi - lo <= Grains.block then
       let
         val n = hi - lo
         val result = allocate (n+1)
@@ -124,7 +119,7 @@ struct
     else
       let
         val n = hi - lo
-        val k = BLOCK_SIZE
+        val k = Grains.block
         val m = 1 + (n-1) div k (* number of blocks *)
         val sums = tabulate (0, m) (fn i =>
           let val start = lo + i*k
@@ -149,7 +144,7 @@ struct
   fun filter (lo, hi) f g =
     let
       val n = hi - lo
-      val k = BLOCK_SIZE
+      val k = Grains.block
       val m = 1 + (n-1) div k (* number of blocks *)
       fun count (i, j) c =
         if i >= j then c
@@ -177,7 +172,7 @@ struct
   fun tabFilter (lo, hi) (f : int -> 'a option) =
     let
       val n = hi - lo
-      val k = BLOCK_SIZE
+      val k = Grains.block
       val m = 1 + (n-1) div k (* number of blocks *)
       val tmp = allocate n
 
