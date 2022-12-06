@@ -1,0 +1,11 @@
+../../lib/github.com/mpllang/mpllib/sources.mlton.mlb
+
+local
+  $(SML_LIB)/basis/basis.mlb
+  $(SML_LIB)/basis/mlton.mlb
+  mlton.sml
+in
+  structure Grains
+  structure ForkJoinNG
+  structure RuntimeStats
+end

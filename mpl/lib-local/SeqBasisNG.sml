@@ -90,8 +90,10 @@ struct
 
   fun reduce g b (lo, hi) f =
     let
+      val grain = Word64.fromInt Grains.parfor
+      
       fun loop lo hi () =
-        if hi-lo <= OneTrueGrain.asWord64 then
+        if hi-lo <= grain then
           foldl g b (Word64.toIntX lo, Word64.toIntX hi) f
         else
           let

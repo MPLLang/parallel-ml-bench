@@ -1,0 +1,12 @@
+compat/$(COMPAT).mlb
+
+Benchmark.sml
+CommutativeAccum.sml
+AugMap.sml
+
+SeqBasisNG.sml
+SeqNG.sml
+QuicksortNG.sml
+MergeNG.sml
+MergesortNG.sml
+NearestNeighborsNG.sml

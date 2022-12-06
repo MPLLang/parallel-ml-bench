@@ -1,3 +1,23 @@
+structure ForkJoinNG:
+sig
+  val parfor: int * int -> (int -> unit) -> unit
+end =
+struct
+  fun parfor (lo, hi) f = Util.for (lo, hi) f
+end
+
+
+structure Grains:
+sig
+  type grain = int
+  val parfor: grain
+end =
+struct
+  type grain = int
+  val parfor = 1
+end
+
+
 structure RuntimeStats:
 sig
   type t

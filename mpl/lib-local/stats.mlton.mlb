@@ -1,7 +1,0 @@
-local
-  $(SML_LIB)/basis/basis.mlb
-  $(SML_LIB)/basis/mlton.mlb
-  RuntimeStats.mlton.sml
-in
-  structure RuntimeStats
-end

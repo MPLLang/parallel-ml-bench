@@ -12,9 +12,10 @@ struct
     if wlo >= whi then ()
     else (f (Word64.toIntX wlo); for (wlo+0w1, whi) f)
 
+  val grain = i2w Grains.parfor
 
   fun binarySplitting f {lo, hi} () =
-    if hi-lo <= OneTrueGrain.asWord64 then
+    if hi-lo <= grain then
       for (lo, hi) f
     else
       let
@@ -30,7 +31,7 @@ struct
 
 (*
   fun binarySplitting' f {lo, width} () =
-    if width <= OneTrueGrain.asWord64 then
+    if width <= grain then
       for (lo, lo+width) f
     else
       let
@@ -52,7 +53,7 @@ struct
 
 (*
   fun binarySplittingPow2 f {lo, width} () =
-    if width <= OneTrueGrain.asWord64 then
+    if width <= grain then
       for (lo, lo+width) f
     else
       let
