@@ -9,7 +9,7 @@ end =
 struct
   type grain = int
   val parfor = CommandLineArgs.parseInt "parfor-grain" 5000
-  val merge = CommandLineArgs.parseInt "merge-grain" 400
+  val merge = CommandLineArgs.parseInt "merge-grain" 1000
   val mergesort = CommandLineArgs.parseInt "mergesort-grain" 10
-  val block = CommandLineArgs.parseInt "block-grain" 100
+  val block = CommandLineArgs.parseInt "block-grain" 1000
 end

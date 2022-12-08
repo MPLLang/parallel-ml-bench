@@ -14,6 +14,18 @@
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
       },
       {
+        "match": { "config": "local-hb", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "local-hb", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
         "match": { "config": "mlton$", "exp": "space", "procs": "1$" },
         "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
       },
@@ -82,12 +94,12 @@
       },
       {
         "tag": ["msort-long-strings-ng"],
-        "bench": ["msort-long-strings-ng"],
+        "bench": ["msort-strings-ng"],
         "args": ["../inputs/words64.txt --long"]
       },
       {
         "tag": ["msort-long-strings"],
-        "bench": ["msort-long-strings"],
+        "bench": ["msort-strings"],
         "args": ["../inputs/words64.txt --long"]
       },
       {
