@@ -38,7 +38,7 @@ fun doHeavy () =
     fun iteratedHash k x =
       if k = 0 then x else iteratedHash (k-1) (Util.hash x)
     val result =
-      Benchmark.run "map light" (fn _ => SeqNG.map (fn x => iteratedHash 100000 x mod n) input)
+      Benchmark.run "map heavy" (fn _ => SeqNG.map (fn x => iteratedHash 100000 x mod n) input)
   in
     print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")
   end
