@@ -16,6 +16,17 @@ val filename =
 
 val makeLong = CLA.parseFlag "long"
 
+(*
+fun stringCompare (s1, s2) =
+  let
+    val n = Int.min (String.size s1, String.size s2)
+  in
+    case FindFirst.findFirst 100 (0, n) (fn i => String.sub (s1, i) <> String.sub (s2, i)) of
+      SOME i => Char.compare (String.sub (s1, i), String.sub (s2, i))
+    | NONE => Int.compare (String.size s1, String.size s2)
+  end
+*)
+
 val (contents, tm) = Util.getTime (fn _ => ReadFile.contentsSeq filename)
 val _ = print ("read file in " ^ Time.fmt 4 tm ^ "s\n")
 val (tokens, tm) = Util.getTime (fn _ => Tokenize.tokens Char.isSpace contents)
@@ -30,6 +41,12 @@ val tokens =
 val result =
   Benchmark.run "running mergesort" (fn _ => MergesortNG.sort String.compare tokens)
 
-val _ = print ("result " ^ Util.summarizeArraySlice 8 (fn x => x) result ^ "\n")
+fun short s =
+  if String.size s > 5 then
+    String.substring (s, 0, 5) ^ "..."
+  else
+    s
+
+val _ = print ("result " ^ Util.summarizeArraySlice 8 short result ^ "\n")
 
 
