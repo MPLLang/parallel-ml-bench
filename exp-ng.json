@@ -141,6 +141,16 @@
         "tag": ["map-ng-light"],
         "bench": ["map-ng"],
         "args": ["-n 50000000 -fn-cost light"]
+      },
+      {
+        "tag": ["mandelbrot"],
+        "bench": ["mandelbrot"],
+        "args": ["-w 10000"]
+      },
+      {
+        "tag": ["mandelbrot-ng"],
+        "bench": ["mandelbrot-ng"],
+        "args": ["-w 10000"]
       }
     ]
 
