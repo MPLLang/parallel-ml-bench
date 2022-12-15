@@ -7,71 +7,77 @@ val _ = print ("w " ^ Int.toString w ^ "\n")
 
 fun incr x = (x := !x + 1)
 
+fun mark w x y =
+  let
+    val fw = Real.fromInt w / 2.0
+    val fh = fw
+    val ci = Real.fromInt y / fh - 1.0
+    val cr = Real.fromInt x / fw - 1.5
+
+    fun loop (zr, zi, trmti) i =
+      let
+        val zi = 2.0 * zr * zi + ci
+        val zr = trmti + cr
+        val tr = zr * zr
+        val ti = zi * zi
+      in
+        if tr + ti > limit then
+          false
+        else if i+1 = niter then
+          true
+        else
+          loop (zr, zi, tr - ti) (i+1)
+      end
+  in
+    loop (0.0, 0.0, 0.0) 0
+  end
+
+
+fun packByte w y (xlo, xhi) =
+  let
+    fun loop byte x =
+      if x >= xhi then
+        byte
+      else
+        let
+          val byte =
+            if mark w x y then
+              Word.orb (Word.<< (byte, 0w1), 0wx01)
+            else
+              Word.<< (byte, 0w1)
+        in
+          loop byte (x+1)
+        end
+    
+    val byte = loop 0w0 xlo
+
+    val byte =
+      if xhi-xlo = 8 then
+        byte
+      else
+        Word.<< (byte, Word.fromInt (8-(xhi-xlo)))
+  in
+    byte
+  end
+
 fun worker w h_lo h_hi =
   let
     val buf = ForkJoin.alloc ((w div 8 + (if w mod 8 > 0 then 1 else 0)) * (h_hi - h_lo))
     val ptr = ref 0
-    val fw = Real.fromInt w / 2.0
-    val fh = fw
-    val byte = ref 0w0
-
-    fun mark x y =
-      let
-        val ci = Real.fromInt y / fh - 1.0
-        val cr = Real.fromInt x / fw - 1.5
-
-        fun loop (zr, zi, trmti) i =
-          let
-            val zi = 2.0 * zr * zi + ci
-            val zr = trmti + cr
-            val tr = zr * zr
-            val ti = zi * zi
-          in
-            if tr + ti > limit then
-              false
-            else if i+1 = niter then
-              true
-            else
-              loop (zr, zi, tr - ti) (i+1)
-          end
-      in
-        loop (0.0, 0.0, 0.0) 0
-      end
   in
     Util.for (h_lo, h_hi) (fn y =>
-      let
-        (* val ci = Real.fromInt y / fh - 1.0 *)
-      in
-        (* print ("y=" ^ Int.toString y ^ "\n"); *)
-        Util.for (0, w) (fn x =>
-          let in
-            (* print ("x=" ^ Int.toString x ^ "\n"); *)
-            if mark x y then
-              byte := Word.orb (Word.<< (!byte, 0w1), 0wx01)
-            else
-              byte := Word.<< (!byte, 0w1);
-
-            if x mod 8 = 7 then
-              ( Array.update (buf, !ptr, Char.chr (Word.toInt (!byte)))
-              ; incr ptr
-              ; byte := 0w0
-              )
-            else ()
-          end);
-
+      Util.for (0, Util.ceilDiv w 8) (fn bx =>
         let
-          val rem = w mod 8
-        in
-          if rem <> 0 then
-            ( Array.update (buf, !ptr,
-                Char.chr (Word.toInt (Word.<< (!byte, Word.fromInt (8 - rem)))))
-            ; incr ptr
-            ; byte := 0w0
-            )
-          else ()
-        end
+          val xlo = bx*8
+          val xhi = Int.min (xlo + 8, w)
 
-      end);
+          val byte = packByte w y (xlo, xhi)
+
+          val char = Char.chr (Word.toInt byte)
+        in
+          Array.update (buf, !ptr, char);
+          incr ptr
+        end));
 
     buf
   end
