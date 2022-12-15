@@ -63,23 +63,22 @@ fun packByte w y (xlo, xhi) =
 
 fun worker w h_lo h_hi =
   let
-    val buf = ForkJoin.alloc ((w div 8 + (if w mod 8 > 0 then 1 else 0)) * (h_hi - h_lo))
+    val numBytesPerRow = Util.ceilDiv w 8 
+    val buf = ForkJoin.alloc (numBytesPerRow * (h_hi - h_lo))
   in
-    Util.for (h_lo, h_hi) (fn y =>
+    Util.for (0, h_hi - h_lo) (fn i =>
       let
-        val numBytes = Util.ceilDiv w 8 
-        val offset = numBytes * (y - h_lo)
+        val y = h_lo+i
+        val offset = i * numBytesPerRow
       in
-        Util.for (0, numBytes) (fn bx =>
+        Util.for (0, numBytesPerRow) (fn j =>
           let
-            val xlo = bx*8
+            val xlo = j*8
             val xhi = Int.min (xlo + 8, w)
-
             val byte = packByte w y (xlo, xhi)
-
             val char = Char.chr (Word.toInt byte)
           in
-            Array.update (buf, offset+bx, char)
+            Array.update (buf, offset + j, char)
           end)
       end);
 
