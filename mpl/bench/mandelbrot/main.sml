@@ -14,35 +14,39 @@ fun worker w h_lo h_hi =
     val fw = Real.fromInt w / 2.0
     val fh = fw
     val byte = ref 0w0
+
+    fun mark x y =
+      let
+        val ci = Real.fromInt y / fh - 1.0
+        val cr = Real.fromInt x / fw - 1.5
+
+        fun loop (zr, zi, trmti) i =
+          let
+            val zi = 2.0 * zr * zi + ci
+            val zr = trmti + cr
+            val tr = zr * zr
+            val ti = zi * zi
+          in
+            if tr + ti > limit then
+              false
+            else if i+1 = niter then
+              true
+            else
+              loop (zr, zi, tr - ti) (i+1)
+          end
+      in
+        loop (0.0, 0.0, 0.0) 0
+      end
   in
     Util.for (h_lo, h_hi) (fn y =>
       let
-        val ci = Real.fromInt y / fh - 1.0
+        (* val ci = Real.fromInt y / fh - 1.0 *)
       in
         (* print ("y=" ^ Int.toString y ^ "\n"); *)
         Util.for (0, w) (fn x =>
-          let
-            val cr = Real.fromInt x / fw - 1.5
-
-            fun loop (zr, zi, trmti) i =
-              let
-                val zi = 2.0 * zr * zi + ci
-                val zr = trmti + cr
-                val tr = zr * zr
-                val ti = zi * zi
-              in
-                if tr + ti > limit then
-                  false
-                else if i+1 = niter then
-                  true
-                else
-                  loop (zr, zi, tr - ti) (i+1)
-              end
-            
-            val mark = loop (0.0, 0.0, 0.0) 0
-          in
+          let in
             (* print ("x=" ^ Int.toString x ^ "\n"); *)
-            if mark then
+            if mark x y then
               byte := Word.orb (Word.<< (!byte, 0w1), 0wx01)
             else
               byte := Word.<< (!byte, 0w1);
