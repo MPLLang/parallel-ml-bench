@@ -1,0 +1,5 @@
+This is adapted from the OCaml mandelbrot benchmark; see bench/ocaml-mandelbrot.
+The goal here was to:
+  - eliminate unnecessary mutation
+  - eliminate the notion of a "worker". Rewrite in a style that does not
+  conflate parallelism grain with sequential algorithm.
