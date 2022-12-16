@@ -143,6 +143,16 @@
         "args": ["-n 50000000 -fn-cost light"]
       },
       {
+        "tag": ["map-heavy"],
+        "bench": ["map"],
+        "args": ["-n 5000 -fn-cost heavy"]
+      },
+      {
+        "tag": ["map-light"],
+        "bench": ["map"],
+        "args": ["-n 50000000 -fn-cost light"]
+      },
+      {
         "tag": ["mandelbrot"],
         "bench": ["mandelbrot"],
         "args": ["-w 10000"]
