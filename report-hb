@@ -1240,12 +1240,13 @@ def doGoCmp():
 # ============================================================================
 
 def doHeartbeatTimeCmp():
-  headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, '|', 'Overhead', None, 'Speedup', None]
-  headers1 = ['Benchmark', 'MLton', 'MPL', 'HB', 'MPL', 'HB', '|', 'MPL', 'HB', 'MPL', 'HB']
+  headers = ['', 'T(1)', None, None, None, 'T({})'.format(maxp), None, '|', 'Overhead', None, 'Speedup', None]
+  headers1 = ['Benchmark', 'MLton', 'MLton-FHS', 'MPL', 'HB', 'MPL', 'HB', '|', 'MPL', 'HB', 'MPL', 'HB']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
     ts = tm(averageTime(D, 'mlton', tag, 1))
+    tfhs = tm(averageTime(D, 'mlton-fhs', tag, 1))
     mt1 = tm(averageTime(D, 'mpl', tag, 1))
     ht1 = tm(averageTime(D, 'local-hb', tag, 1))
     mtp = tm(averageTime(D, 'mpl', tag, maxp))
@@ -1253,6 +1254,7 @@ def doHeartbeatTimeCmp():
 
     row = [
       ts,
+      tfhs,
       mt1,
       ht1,
       mtp,
