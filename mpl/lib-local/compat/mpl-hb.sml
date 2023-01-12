@@ -5,11 +5,11 @@ sig
   val benchReport: {before: t, after: t} -> unit
 end =
 struct
-  type t = unit
-  fun get () = ()
-  fun benchReport _ =
+  type t = {numSpawns: int}
+  fun get () = { numSpawns = ForkJoin.numSpawnsSoFar () }
+  fun benchReport {before=b : t, after=a : t} =
     ( print ("======== Runtime Stats ========\n")
-    ; print ("none yet...\n")
+    ; print ("num-spawns " ^ Int.toString (#numSpawns a - #numSpawns b) ^ "\n")
     ; print ("====== End Runtime Stats ======\n")
     )
 end
