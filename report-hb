@@ -1248,9 +1248,9 @@ def doHeartbeatTimeCmp():
     ts = tm(averageTime(D, 'mlton', tag, 1))
     tfhs = tm(averageTime(D, 'mlton-fhs', tag, 1))
     mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb-eh1', tag, 1))
     mtp = tm(averageTime(D, 'mpl', tag, maxp))
-    htp = tm(averageTime(D, 'local-hb', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb-eh1', tag, maxp))
 
     row = [
       ts,
@@ -1280,6 +1280,7 @@ def doHeartbeatTimeCmp():
   print(table(tt, defaultAlign))
   print("")
 
+# ============================================================================
 
 def doHeartbeatSpaceCmp():
   headers = ['', 'R(1)', None, 'R({})'.format(maxp), None, '|', 'R Overhead (1)', 'R Overhead ({})'.format(maxp)]
@@ -1289,9 +1290,9 @@ def doHeartbeatSpaceCmp():
   def doTag(tag):
     # rs = spg(averageSpace(D, 'mlton', tag, 1))
     mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    hr1 = spg(averageSpace(D, 'local-hb', tag, 1))
+    hr1 = spg(averageSpace(D, 'local-hb-eh1', tag, 1))
     mrp = spg(averageSpace(D, 'mpl', tag, maxp))
-    hrp = spg(averageSpace(D, 'local-hb', tag, maxp))
+    hrp = spg(averageSpace(D, 'local-hb-eh1', tag, maxp))
 
     row = [
       # rs,
@@ -1318,8 +1319,66 @@ def doHeartbeatSpaceCmp():
   print(table(tt, defaultAlign))
   print("")
 
+# ============================================================================
+
+def doHeartbeatPolicyCmp():
+  headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'R(1)', None, None, '|', 'R({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'EH1', 'EH2', 'GWA', '|', 'EH1', 'EH2', 'GWA', '|', 'EH1', 'EH2', 'GWA', '|', 'EH1', 'EH2', 'GWA']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    eh1t1 = tm(averageTime(D, 'local-hb-eh1', tag, 1))
+    eh1r1 = spg(averageSpace(D, 'local-hb-eh1', tag, 1))
+    eh1tp = tm(averageTime(D, 'local-hb-eh1', tag, maxp))
+    eh1rp = spg(averageSpace(D, 'local-hb-eh1', tag, maxp))
+
+    eh2t1 = tm(averageTime(D, 'local-hb-eh2', tag, 1))
+    eh2r1 = spg(averageSpace(D, 'local-hb-eh2', tag, 1))
+    eh2tp = tm(averageTime(D, 'local-hb-eh2', tag, maxp))
+    eh2rp = spg(averageSpace(D, 'local-hb-eh2', tag, maxp))
+
+    gwat1 = tm(averageTime(D, 'local-hb-gwa', tag, 1))
+    gwar1 = spg(averageSpace(D, 'local-hb-gwa', tag, 1))
+    gwatp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
+    gwarp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
+
+    row = [
+      eh1t1,
+      eh2t1,
+      gwat1,
+      '|',
+      eh1tp,
+      eh2tp,
+      gwatp,
+      '|',
+      eh1r1,
+      eh2r1,
+      gwar1,
+      '|',
+      eh1rp,
+      eh2rp,
+      gwarp
+    ]
+    row = [displayTag(tag)] + [str(x) if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in notNGTags:
+    doTag(tag)
+  
+  tt.append("-")
+
+  for tag in ngTags:
+    doTag(tag)
+
+  print("HEARTBEAT POLICY COMPARISON")
+  print(table(tt, defaultAlign))
+  print("")
+
+# ============================================================================
+
 doHeartbeatTimeCmp()
 doHeartbeatSpaceCmp()
+doHeartbeatPolicyCmp()
 
 # ============================================================================
 # LaTeX figure: Language shootout (time comparison)
@@ -2176,7 +2235,7 @@ def speedupPlot(outputName, config, tagsSortedBySpeedups, tagsSortedByName, offs
 
 speedupTags = sorted([
   tag for tag in mplOnlyTags
-  if (averageTime(D, 'local-hb', tag, maxp) is not None)
+  if (averageTime(D, 'local-hb-eh1', tag, maxp) is not None)
   and tag not in sandmarkTags
 ], key=displayTag)
 
@@ -2199,8 +2258,8 @@ def doSpeedups(outputName, config, tags):
 
 doSpeedups('mpl-speedups-ng', 'mpl', ngTags)
 doSpeedups('mpl-speedups-notng', 'mpl', notNGTags)
-doSpeedups('local-hb-speedups-ng', 'local-hb', ngTags)
-doSpeedups('local-hb-speedups-notng', 'local-hb', notNGTags)
+doSpeedups('local-hb-speedups-ng', 'local-hb-eh1', ngTags)
+doSpeedups('local-hb-speedups-notng', 'local-hb-eh1', notNGTags)
 
 # ============================================================================
 # PDF: Tangle plot
