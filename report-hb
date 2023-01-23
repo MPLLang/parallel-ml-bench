@@ -1321,12 +1321,17 @@ def doHeartbeatSpaceCmp():
 
 # ============================================================================
 
-def doHeartbeatPolicyCmp():
-  headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'R(1)', None, None, '|', 'R({})'.format(maxp), None, None]
-  headers1 = ['Benchmark', 'EH1', 'EH2', 'GWA', '|', 'EH1', 'EH2', 'GWA', '|', 'EH1', 'EH2', 'GWA', '|', 'EH1', 'EH2', 'GWA']
+def doHeartbeatPolicyNums():
+  headers = ['', 'T(1)', None, None, None, '|', 'T({})'.format(maxp), None, None, None, '|', 'R(1)', None, None, None, '|', 'R({})'.format(maxp), None, None, None]
+  headers1 = ['Benchmark', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
+    npct1 = tm(averageTime(D, 'local-hb-npc', tag, 1))
+    npcr1 = spg(averageSpace(D, 'local-hb-npc', tag, 1))
+    npctp = tm(averageTime(D, 'local-hb-npc', tag, maxp))
+    npcrp = spg(averageSpace(D, 'local-hb-npc', tag, maxp))
+
     eh1t1 = tm(averageTime(D, 'local-hb-eh1', tag, 1))
     eh1r1 = spg(averageSpace(D, 'local-hb-eh1', tag, 1))
     eh1tp = tm(averageTime(D, 'local-hb-eh1', tag, maxp))
@@ -1343,23 +1348,93 @@ def doHeartbeatPolicyCmp():
     gwarp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
 
     row = [
-      eh1t1,
-      eh2t1,
-      gwat1,
+      str(npct1),
+      str(eh1t1),
+      str(eh2t1),
+      str(gwat1),
       '|',
-      eh1tp,
-      eh2tp,
-      gwatp,
+      str(npctp),
+      str(eh1tp),
+      str(eh2tp),
+      str(gwatp),
       '|',
-      eh1r1,
-      eh2r1,
-      gwar1,
+      str(npcr1),
+      str(eh1r1),
+      str(eh2r1),
+      str(gwar1),
       '|',
-      eh1rp,
-      eh2rp,
-      gwarp
+      str(npcrp),
+      str(eh1rp),
+      str(eh2rp),
+      str(gwarp)
     ]
-    row = [displayTag(tag)] + [str(x) if x is not None else "--" for x in row]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in notNGTags:
+    doTag(tag)
+  
+  tt.append("-")
+
+  for tag in ngTags:
+    doTag(tag)
+
+  print("HEARTBEAT POLICIES: RAW NUMBERS")
+  print("| NPC (naive pcall):       use pcall for all forks")
+  print("| EH1 (eager-heuristic-1): eager fork below lowP depth via MPL-style closure-on-deque")
+  print("| EH2 (eager-heuristic-2): eager fork below lowP depth by sending self heartbeat immediately after pcall")
+  print("| GWA (greedy-work-amort): collect spare heartbeat tokens and spend eagerly at fork (by sending self heartbeat)")
+  print(table(tt, defaultAlign))
+  print("")
+
+def doHeartbeatPolicyCmp():
+  headers = ['', 'T(1)', None, None, None, '|', 'T({})'.format(maxp), None, None, None, '|', 'R(1)', None, None, None, '|', 'R({})'.format(maxp), None, None, None]
+  headers1 = ['Benchmark', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    npct1 = tm(averageTime(D, 'local-hb-npc', tag, 1))
+    npcr1 = spg(averageSpace(D, 'local-hb-npc', tag, 1))
+    npctp = tm(averageTime(D, 'local-hb-npc', tag, maxp))
+    npcrp = spg(averageSpace(D, 'local-hb-npc', tag, maxp))
+
+    eh1t1 = tm(averageTime(D, 'local-hb-eh1', tag, 1))
+    eh1r1 = spg(averageSpace(D, 'local-hb-eh1', tag, 1))
+    eh1tp = tm(averageTime(D, 'local-hb-eh1', tag, maxp))
+    eh1rp = spg(averageSpace(D, 'local-hb-eh1', tag, maxp))
+
+    eh2t1 = tm(averageTime(D, 'local-hb-eh2', tag, 1))
+    eh2r1 = spg(averageSpace(D, 'local-hb-eh2', tag, 1))
+    eh2tp = tm(averageTime(D, 'local-hb-eh2', tag, maxp))
+    eh2rp = spg(averageSpace(D, 'local-hb-eh2', tag, maxp))
+
+    gwat1 = tm(averageTime(D, 'local-hb-gwa', tag, 1))
+    gwar1 = spg(averageSpace(D, 'local-hb-gwa', tag, 1))
+    gwatp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
+    gwarp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
+
+    row = [
+      str(npct1),
+      color_pcd(eh1t1, npct1),
+      color_pcd(eh2t1, npct1),
+      color_pcd(gwat1, npct1),
+      '|',
+      str(npctp),
+      color_pcd(eh1tp, npctp),
+      color_pcd(eh2tp, npctp),
+      color_pcd(gwatp, npctp),
+      '|',
+      str(npcr1),
+      color_pcd(eh1r1, npcr1),
+      color_pcd(eh2r1, npcr1),
+      color_pcd(gwar1, npcr1),
+      '|',
+      str(npcrp),
+      color_pcd(eh1rp, npcrp),
+      color_pcd(eh2rp, npcrp),
+      color_pcd(gwarp, npcrp)
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
 
   for tag in notNGTags:
@@ -1371,6 +1446,10 @@ def doHeartbeatPolicyCmp():
     doTag(tag)
 
   print("HEARTBEAT POLICY COMPARISON")
+  print("| NPC (naive pcall):       use pcall for all forks")
+  print("| EH1 (eager-heuristic-1): eager fork below lowP depth via MPL-style closure-on-deque")
+  print("| EH2 (eager-heuristic-2): eager fork below lowP depth by sending self heartbeat immediately after pcall")
+  print("| GWA (greedy-work-amort): collect spare heartbeat tokens and spend eagerly at fork (by sending self heartbeat)")
   print(table(tt, defaultAlign))
   print("")
 
@@ -1378,6 +1457,7 @@ def doHeartbeatPolicyCmp():
 
 doHeartbeatTimeCmp()
 doHeartbeatSpaceCmp()
+doHeartbeatPolicyNums()
 doHeartbeatPolicyCmp()
 
 # ============================================================================
