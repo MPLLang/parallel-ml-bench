@@ -45,7 +45,7 @@
 
   "globals":
     {
-      "config": ["mlton", "mlton-fhs", "mpl", "local-hb"],
+      "config": ["mlton", "mlton-fhs", "mpl", "local-hb-eh1", "local-hb-eh2", "local-hb-gwa"],
       "cwd": ["mpl"],
       "exp": ["time","space"],
       "trials": ["1","10"]
