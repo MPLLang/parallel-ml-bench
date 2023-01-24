@@ -761,9 +761,15 @@ mplOnlyTags = [ t for t in orderedTags if keepTag(t) ]
 def isNGTag(tag):
   return "-ng" in tag
 
-ngTags = [t for t in orderedTags if isNGTag(t)]
-notNGTags = [t for t in orderedTags if not isNGTag(t)]
+def isNormalTag(tag):
+  return not isNGTag(tag) and tag != "fork-stress"
 
+def isOtherTag(tag):
+  return tag == "fork-stress"
+
+ngTags = [t for t in orderedTags if isNGTag(t)]
+normalTags = [t for t in orderedTags if isNormalTag(t)]
+otherTags = [t for t in orderedTags if isOtherTag(t)]
 
 mplCmpTags = [
   "primes",
@@ -1248,9 +1254,9 @@ def doHeartbeatTimeCmp():
     ts = tm(averageTime(D, 'mlton', tag, 1))
     tfhs = tm(averageTime(D, 'mlton-fhs', tag, 1))
     mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    ht1 = tm(averageTime(D, 'local-hb-eh1', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb-gwa', tag, 1))
     mtp = tm(averageTime(D, 'mpl', tag, maxp))
-    htp = tm(averageTime(D, 'local-hb-eh1', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
 
     row = [
       ts,
@@ -1268,12 +1274,17 @@ def doHeartbeatTimeCmp():
     row = [displayTag(tag)] + [str(x) if x is not None else "--" for x in row]
     tt.append(row)
 
-  for tag in notNGTags:
+  for tag in normalTags:
     doTag(tag)
   
   tt.append("-")
 
   for tag in ngTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT TIME COMPARISON")
@@ -1290,9 +1301,9 @@ def doHeartbeatSpaceCmp():
   def doTag(tag):
     # rs = spg(averageSpace(D, 'mlton', tag, 1))
     mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    hr1 = spg(averageSpace(D, 'local-hb-eh1', tag, 1))
+    hr1 = spg(averageSpace(D, 'local-hb-gwa', tag, 1))
     mrp = spg(averageSpace(D, 'mpl', tag, maxp))
-    hrp = spg(averageSpace(D, 'local-hb-eh1', tag, maxp))
+    hrp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
 
     row = [
       # rs,
@@ -1307,12 +1318,17 @@ def doHeartbeatSpaceCmp():
     row = [displayTag(tag)] + [str(x) if x is not None else "--" for x in row]
     tt.append(row)
 
-  for tag in notNGTags:
+  for tag in normalTags:
     doTag(tag)
   
   tt.append("-")
 
   for tag in ngTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT SPACE COMPARISON")
@@ -1371,12 +1387,17 @@ def doHeartbeatPolicyNums():
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
 
-  for tag in notNGTags:
+  for tag in normalTags:
     doTag(tag)
   
   tt.append("-")
 
   for tag in ngTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT POLICIES: RAW NUMBERS")
@@ -1437,12 +1458,17 @@ def doHeartbeatPolicyCmp():
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
 
-  for tag in notNGTags:
+  for tag in normalTags:
     doTag(tag)
   
   tt.append("-")
 
   for tag in ngTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT POLICY COMPARISON")
@@ -2337,9 +2363,9 @@ def doSpeedups(outputName, config, tags):
     0)
 
 doSpeedups('mpl-speedups-ng', 'mpl', ngTags)
-doSpeedups('mpl-speedups-notng', 'mpl', notNGTags)
-doSpeedups('local-hb-speedups-ng', 'local-hb-eh1', ngTags)
-doSpeedups('local-hb-speedups-notng', 'local-hb-eh1', notNGTags)
+doSpeedups('mpl-speedups-normal', 'mpl', normalTags)
+doSpeedups('local-hb-gwa-speedups-ng', 'local-hb-gwa', ngTags)
+doSpeedups('local-hb-gwa-speedups-normal', 'local-hb-gwa', normalTags)
 
 # ============================================================================
 # PDF: Tangle plot
