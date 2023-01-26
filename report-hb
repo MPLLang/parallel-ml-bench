@@ -1246,8 +1246,8 @@ def doGoCmp():
 # ============================================================================
 
 def doHeartbeatTimeCmp():
-  headers = ['', 'T(1)', None, None, None, 'T({})'.format(maxp), None, '|', 'Overhead', None, 'Speedup', None]
-  headers1 = ['Benchmark', 'MLton', 'MLton-FHS', 'MPL', 'HB', 'MPL', 'HB', '|', 'MPL', 'HB', 'MPL', 'HB']
+  headers = ['', 'Baseline', None, '|', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'Overhead', None, '|', 'Speedup', None]
+  headers1 = ['Benchmark', 'MLton', 'MLton-FHS', '|', 'MPL', 'HB', 'HB diff', '|', 'MPL', 'HB', 'HB diff', '|', 'MPL', 'HB', '|', 'MPL', 'HB']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
@@ -1259,20 +1259,30 @@ def doHeartbeatTimeCmp():
     htp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
 
     row = [
-      ts,
-      tfhs,
-      mt1,
-      ht1,
-      mtp,
-      htp,
+      str(ts),
+      str(tfhs),
+      '|',
+      str(mt1),
+      str(ht1),
+      color_pcd(ht1, mt1),
+      '|',
+      str(mtp),
+      str(htp),
+      color_pcd(htp, mtp),
       '|',
       ov(sd(mt1, ts)),
       ov(sd(ht1, ts)),
+      '|',
       su(sd(ts, mtp)),
       su(sd(ts, htp))
     ]
-    row = [displayTag(tag)] + [str(x) if x is not None else "--" for x in row]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
+
+  for tag in otherTags:
+    doTag(tag)
+
+  tt.append("-")
 
   for tag in normalTags:
     doTag(tag)
@@ -1282,11 +1292,6 @@ def doHeartbeatTimeCmp():
   for tag in ngTags:
     doTag(tag)
 
-  tt.append("-")
-
-  for tag in otherTags:
-    doTag(tag)
-
   print("HEARTBEAT TIME COMPARISON")
   print(table(tt, defaultAlign))
   print("")
@@ -1294,8 +1299,8 @@ def doHeartbeatTimeCmp():
 # ============================================================================
 
 def doHeartbeatSpaceCmp():
-  headers = ['', 'R(1)', None, 'R({})'.format(maxp), None, '|', 'R Overhead (1)', 'R Overhead ({})'.format(maxp)]
-  headers1 = ['Benchmark', 'MPL', 'HB', 'MPL', 'HB', '|', 'HB/MPL', 'HB/MPL']
+  headers = ['', 'R(1)', None, None, '|', 'R({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'MPL', 'HB', 'HB diff', '|', 'MPL', 'HB', 'HB diff']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
@@ -1307,16 +1312,24 @@ def doHeartbeatSpaceCmp():
 
     row = [
       # rs,
-      mr1,
-      hr1,
-      mrp,
-      hrp,
+      str(mr1),
+      str(hr1),
+      color_pcd(hr1, mr1),
       '|',
-      ov(sd(hr1, mr1)),
-      ov(sd(hrp, mrp))
+      str(mrp),
+      str(hrp),
+      color_pcd(hrp, mrp)
+      # '|',
+      # ov(sd(hr1, mr1)),
+      # ov(sd(hrp, mrp))
     ]
-    row = [displayTag(tag)] + [str(x) if x is not None else "--" for x in row]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
+
+  for tag in otherTags:
+    doTag(tag)
+
+  tt.append("-")
 
   for tag in normalTags:
     doTag(tag)
@@ -1324,11 +1337,6 @@ def doHeartbeatSpaceCmp():
   tt.append("-")
 
   for tag in ngTags:
-    doTag(tag)
-
-  tt.append("-")
-
-  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT SPACE COMPARISON")
@@ -1387,17 +1395,17 @@ def doHeartbeatPolicyNums():
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
 
+  for tag in otherTags:
+    doTag(tag)
+
+  tt.append("-")
+
   for tag in normalTags:
     doTag(tag)
   
   tt.append("-")
 
   for tag in ngTags:
-    doTag(tag)
-
-  tt.append("-")
-
-  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT POLICIES: RAW NUMBERS")
@@ -1458,17 +1466,17 @@ def doHeartbeatPolicyCmp():
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
 
+  for tag in otherTags:
+    doTag(tag)
+
+  tt.append("-")
+
   for tag in normalTags:
     doTag(tag)
   
   tt.append("-")
 
   for tag in ngTags:
-    doTag(tag)
-
-  tt.append("-")
-
-  for tag in otherTags:
     doTag(tag)
 
   print("HEARTBEAT POLICY COMPARISON")
@@ -1483,8 +1491,8 @@ def doHeartbeatPolicyCmp():
 
 doHeartbeatTimeCmp()
 doHeartbeatSpaceCmp()
-doHeartbeatPolicyNums()
 doHeartbeatPolicyCmp()
+doHeartbeatPolicyNums()
 
 # ============================================================================
 # LaTeX figure: Language shootout (time comparison)
