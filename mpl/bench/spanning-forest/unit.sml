@@ -14,12 +14,16 @@ val _ = print ("num vertices: " ^ Int.toString (G.numVertices graph) ^ "\n")
 val _ = print ("num edges: " ^ Int.toString (G.numEdges graph) ^ "\n")
 *)
 
-val filename =
-  case CLA.positional () of
-    [x] => x
-  | _ => Util.die "missing filename"
 
-val (graph, tm) = Util.getTime (fn _ => G.parseFile filename)
+(* Graph diagram:
+    0 - 1    2 - 3 - 4
+                   \ |
+                     5 - 6
+*)
+val edges = Seq.fromList ([(0, 1), (1, 0), (2, 3), (3, 2), (3, 4), (3, 5), (4, 3), (4, 5), (5, 3), (5, 4), (5, 6), (6, 5)])
+
+val graph = G.fromSortedEdges edges
+
 val _ = print ("num vertices: " ^ Int.toString (G.numVertices graph) ^ "\n")
 val _ = print ("num edges: " ^ Int.toString (G.numEdges graph) ^ "\n")
 
@@ -30,10 +34,20 @@ val (_, tm) = Util.getTime (fn _ =>
     "or might have duplicate- or self-edges\n"))
 val _ = print ("parity check in " ^ Time.fmt 4 tm ^ "s\n")
 
-val edges = Benchmark.run "running spanning forest: " (fn _ => SpanningForest.sf graph 0.3)
-val _ = if doCheck then SpanningForest.check_sf graph edges else ()
-(* val _ = GCStats.report () *)
+
+val b = (CommandLineArgs.parseReal "b" 0.3)
+
+val edges = SpanningForest.get_symm (SpanningForest.sf graph b)
+val str_edges = Seq.iterate (fn (acc, (u, v)) => acc ^ " " ^ "(" ^ (Int.toString u) ^ ", " ^ (Int.toString v) ^ ")") "" edges
+val _ = print ("sf = " ^ str_edges ^ "\n")
+(* val comps = Seq.iterate (fn (a, b) => a ^ " " ^ (Int.toString b)) "" P
+val _ = print ("components = " ^ comps ^ "\n")
+val num_comps = Connectivity.num_components graph (SOME P)
+val _ = print ("num components = " ^ (Int.toString num_comps) ^ "\n") *)
+
+
 (* val _ = print ("num-triangles = " ^ (Int.toString P) ^ "\n") *)
+(* val _ = LDD.check_ldd graph (#1 P) (#2 P) *)
 (* val _ = Benchmark.run "running connectivity" (fn _ => LDD.connectivity graph b) *)
 (*
 val numVisited =
@@ -68,4 +82,4 @@ fun check () =
 
 val _ = if doCheck then check () else ()
 
-val _ = GCStats.report () *)
+ *)

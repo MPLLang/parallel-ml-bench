@@ -1,4 +1,5 @@
-../../lib/sources.mlb
-../ldd/ldd-alt.sml
+../../lib.mlb
+../low-d-decomp/ldd-alt.sml
+../connectivity-entangled/Connectivity.sml
 SpanningForest.sml
 main.sml
