@@ -27,14 +27,14 @@ struct
           else distribute r ((subseq s (w, r))::acc)
         end
     in
-      Seq.rev (Seq.fromList (distribute 0 []))
+      Seq.fromList (distribute 0 [])
     end
 
   fun ldd g b =
     let
       val n = G.numVertices g
       val (pr, tm) = Util.getTime (fn _ => partition n b)
-      val _ = print ("partition: " ^ Time.fmt 4 tm ^ "\n")
+      (* val _ = print ("partition: " ^ Time.fmt 4 tm ^ "\n") *)
       val pr_len = Seq.length pr
       val visited = strip (Seq.tabulate (fn i => false) n)
       val cluster = Seq.tabulate (fn i => n + 1) n
@@ -65,7 +65,7 @@ struct
       val denseThreshold = G.numEdges g div (20*(1 + deg))
 
       fun ldd_helper fr i =
-        if i >= pr_len then ()
+        if i < 0 then ()
         else
           let
             val (fr', tm) = Util.getTime (fn _ =>
@@ -83,15 +83,15 @@ struct
                 (* (app_frontier, fr_len + (Seq.length nc)) *)
                 app_frontier
               end)
-            val _ = print ("round " ^ Int.toString i ^ ": new_clusters: " ^ Time.fmt 4 tm ^ "\n")
+            (* val _ = print ("round " ^ Int.toString i ^ ": new_clusters: " ^ Time.fmt 4 tm ^ "\n") *)
             val (fr'', tm) = Util.getTime (fn _ => AdjInt.edge_map g fr' update cond)
             (* val b = if (should_process_sparse g fr') then "sparse" else "dense" *)
-            val _ = print ("round " ^ Int.toString i ^ " edge_map: " ^ Time.fmt 4 tm ^ "\n")
+            (* val _ = print ("round " ^ Int.toString i ^ " edge_map: " ^ Time.fmt 4 tm ^ "\n") *)
           in
-            ldd_helper fr'' (i + 1)
+            ldd_helper fr'' (i - 1)
           end
     in
-      (ldd_helper (AdjInt.empty (denseThreshold)) 0;
+      (ldd_helper (AdjInt.empty (denseThreshold)) (pr_len - 1);
       (cluster, parent))
     end
 
