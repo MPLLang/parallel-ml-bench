@@ -1254,9 +1254,9 @@ def doHeartbeatTimeCmp():
     ts = tm(averageTime(D, 'mlton', tag, 1))
     tfhs = tm(averageTime(D, 'mlton-fhs', tag, 1))
     mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    ht1 = tm(averageTime(D, 'local-hb-gwa', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb-gwa-new', tag, 1))
     mtp = tm(averageTime(D, 'mpl', tag, maxp))
-    htp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb-gwa-new', tag, maxp))
 
     row = [
       str(ts),
@@ -1306,9 +1306,9 @@ def doHeartbeatSpaceCmp():
   def doTag(tag):
     # rs = spg(averageSpace(D, 'mlton', tag, 1))
     mr1 = spg(averageSpace(D, 'mpl', tag, 1))
-    hr1 = spg(averageSpace(D, 'local-hb-gwa', tag, 1))
+    hr1 = spg(averageSpace(D, 'local-hb-gwa-new', tag, 1))
     mrp = spg(averageSpace(D, 'mpl', tag, maxp))
-    hrp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
+    hrp = spg(averageSpace(D, 'local-hb-gwa-new', tag, maxp))
 
     row = [
       # rs,
@@ -1346,8 +1346,8 @@ def doHeartbeatSpaceCmp():
 # ============================================================================
 
 def doHeartbeatPolicyNums():
-  headers = ['', 'T(1)', None, None, None, '|', 'T({})'.format(maxp), None, None, None, '|', 'R(1)', None, None, None, '|', 'R({})'.format(maxp), None, None, None]
-  headers1 = ['Benchmark', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA']
+  headers = ['', 'T(1)', None, None, None, None, '|', 'T({})'.format(maxp), None, None, None, None, '|', 'R(1)', None, None, None, None, '|', 'R({})'.format(maxp), None, None, None, None]
+  headers1 = ['Benchmark', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN', '|', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN', '|', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN', '|', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
@@ -1371,26 +1371,35 @@ def doHeartbeatPolicyNums():
     gwatp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
     gwarp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
 
+    gwant1 = tm(averageTime(D, 'local-hb-gwa-new', tag, 1))
+    gwanr1 = spg(averageSpace(D, 'local-hb-gwa-new', tag, 1))
+    gwantp = tm(averageTime(D, 'local-hb-gwa-new', tag, maxp))
+    gwanrp = spg(averageSpace(D, 'local-hb-gwa-new', tag, maxp))
+
     row = [
       str(npct1),
       str(eh1t1),
       str(eh2t1),
       str(gwat1),
+      str(gwant1),
       '|',
       str(npctp),
       str(eh1tp),
       str(eh2tp),
       str(gwatp),
+      str(gwantp),
       '|',
       str(npcr1),
       str(eh1r1),
       str(eh2r1),
       str(gwar1),
+      str(gwanr1),
       '|',
       str(npcrp),
       str(eh1rp),
       str(eh2rp),
-      str(gwarp)
+      str(gwarp),
+      str(gwanrp)
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
@@ -1417,8 +1426,8 @@ def doHeartbeatPolicyNums():
   print("")
 
 def doHeartbeatPolicyCmp():
-  headers = ['', 'T(1)', None, None, None, '|', 'T({})'.format(maxp), None, None, None, '|', 'R(1)', None, None, None, '|', 'R({})'.format(maxp), None, None, None]
-  headers1 = ['Benchmark', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA', '|', 'NPC', 'EH1', 'EH2', 'GWA']
+  headers = ['', 'T(1)', None, None, None, None, '|', 'T({})'.format(maxp), None, None, None, None, '|', 'R(1)', None, None, None, None, '|', 'R({})'.format(maxp), None, None, None, None]
+  headers1 = ['Benchmark', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN', '|', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN', '|', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN', '|', 'NPC', 'EH1', 'EH2', 'GWA', 'GWAN']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
@@ -1442,26 +1451,35 @@ def doHeartbeatPolicyCmp():
     gwatp = tm(averageTime(D, 'local-hb-gwa', tag, maxp))
     gwarp = spg(averageSpace(D, 'local-hb-gwa', tag, maxp))
 
+    gwant1 = tm(averageTime(D, 'local-hb-gwa-new', tag, 1))
+    gwanr1 = spg(averageSpace(D, 'local-hb-gwa-new', tag, 1))
+    gwantp = tm(averageTime(D, 'local-hb-gwa-new', tag, maxp))
+    gwanrp = spg(averageSpace(D, 'local-hb-gwa-new', tag, maxp))
+
     row = [
       str(npct1),
       color_pcd(eh1t1, npct1),
       color_pcd(eh2t1, npct1),
       color_pcd(gwat1, npct1),
+      color_pcd(gwant1, npct1),
       '|',
       str(npctp),
       color_pcd(eh1tp, npctp),
       color_pcd(eh2tp, npctp),
       color_pcd(gwatp, npctp),
+      color_pcd(gwantp, npctp),
       '|',
       str(npcr1),
       color_pcd(eh1r1, npcr1),
       color_pcd(eh2r1, npcr1),
       color_pcd(gwar1, npcr1),
+      color_pcd(gwanr1, npcr1),
       '|',
       str(npcrp),
       color_pcd(eh1rp, npcrp),
       color_pcd(eh2rp, npcrp),
-      color_pcd(gwarp, npcrp)
+      color_pcd(gwarp, npcrp),
+      color_pcd(gwanrp, npcrp)
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
