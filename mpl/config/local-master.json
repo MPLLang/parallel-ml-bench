@@ -1,0 +1,5 @@
+{
+  "compiler": "/usr0/home/swestric/proj/mpl/master/build/bin/mpl",
+  "flags": ["-disable-pass", "splitTypes1", "-disable-pass", "splitTypes2"],
+  "compat": "mpl"
+}

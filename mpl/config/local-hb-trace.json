@@ -3,8 +3,8 @@
   "flags": [
     "-disable-pass", "splitTypes1",
     "-disable-pass", "splitTypes2",
-    "-detect-entanglement", "true",
-    "-mlb-path-var", "PICK_FJ eager-heuristic-1",
+    "-detect-entanglement", "false",
+    "-trace-runtime", "true",
     "-mlb-path-var", "GRAINS small"
   ],
   "compat": "mpl-hb"

@@ -7,7 +7,8 @@
     "-debug", "true",
     "-debug-runtime", "true",
     "-keep", "g",
-    "-type-check", "true"
+    "-type-check", "true",
+    "-mlb-path-var", "GRAINS small"
   ],
   "compat": "mpl-hb"
 }
