@@ -1245,6 +1245,124 @@ def doGoCmp():
 
 # ============================================================================
 
+def safestr(x):
+  if x is None:
+    return "--"
+  return str(x)
+
+# expects grain one of
+# ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
+def doHeartbeatTimeCmpPickGrain(grain):
+  headers = ['', 'Baseline', '|', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'Speedups', None]
+  headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    ts = tm(averageTime(D, 'mlton', tag, 1))
+    mt1 = tm(averageTime(D, 'mpl-{}'.format(grain), tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb-{}'.format(grain), tag, 1))
+    mtp = tm(averageTime(D, 'mpl-{}'.format(grain), tag, maxp))
+    htp = tm(averageTime(D, 'local-hb-{}'.format(grain), tag, maxp))
+
+    row = [
+      safestr(ts),
+      '|',
+      safestr(mt1),
+      safestr(ht1),
+      color_pcd(ht1, mt1),
+      '|',
+      safestr(mtp),
+      safestr(htp),
+      color_pcd(htp, mtp),
+      '|',
+      su(sd(ts, mtp)),
+      su(sd(ts, htp))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  # for tag in otherTags:
+  #   doTag(tag)
+
+  # tt.append("-")
+
+  # for tag in normalTags:
+  #   doTag(tag)
+  
+  # tt.append("-")
+
+  for tag in ngTags:
+    doTag(tag)
+
+  print("HEARTBEAT TIME COMPARISON (GRAIN = {})".format(grain))
+  print(table(tt, defaultAlign))
+  print("")
+
+
+doHeartbeatTimeCmpPickGrain('large-grain')
+doHeartbeatTimeCmpPickGrain('small-grain')
+doHeartbeatTimeCmpPickGrain('cilk-large-grain')
+doHeartbeatTimeCmpPickGrain('cilk-small-grain')
+
+# ============================================================================
+
+# expects grain one of
+# ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
+def doHeartbeatTimeCmpManualGrain():
+  headers = ['', 'Baseline', '|', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'Speedups', None]
+  headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB']
+  tt = [headers, "-", headers1, "="]
+
+  # doesn't matter which grain config we pick, because grains are manually
+  # overridden in these benchmarks
+  mpl = 'mpl-large-grain' 
+  hb = 'local-hb-small-grain'
+
+  def doTag(tag):
+    ts = tm(averageTime(D, 'mlton', tag, 1))
+    mt1 = tm(averageTime(D, mpl, tag, 1))
+    ht1 = tm(averageTime(D, hb, tag, 1))
+    mtp = tm(averageTime(D, mpl, tag, maxp))
+    htp = tm(averageTime(D, hb, tag, maxp))
+
+    row = [
+      safestr(ts),
+      '|',
+      safestr(mt1),
+      safestr(ht1),
+      color_pcd(ht1, mt1),
+      '|',
+      safestr(mtp),
+      safestr(htp),
+      color_pcd(htp, mtp),
+      '|',
+      su(sd(ts, mtp)),
+      su(sd(ts, htp))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  # for tag in otherTags:
+  #   doTag(tag)
+
+  # tt.append("-")
+
+  for tag in normalTags:
+    doTag(tag)
+  
+  # tt.append("-")
+
+  # for tag in ngTags:
+  #   doTag(tag)
+
+  print("HEARTBEAT TIME COMPARISON (MANUAL GRAIN CONTROL)")
+  print(table(tt, defaultAlign))
+  print("")
+
+doHeartbeatTimeCmpManualGrain()
+
+# ============================================================================
+
 def doHeartbeatTimeCmp():
   headers = ['', 'Baseline', None, '|', 'T(1)', None, None, None, None, '|', 'T({})'.format(maxp), None, None, None, None, '|', 'Overhead', None, '|', 'Speedup', None]
   headers1 = ['Benchmark', 'MLton', 'MLton-FHS', '|', 'MPL', 'GWA', 'GWA/M', 'GWAN', 'GWAN/M', '|', 'MPL', 'GWA', 'GWA/M', 'GWAN', 'GWAN/M', '|', 'MPL', 'GWAN', '|', 'MPL', 'GWAN']
@@ -1516,10 +1634,10 @@ def doHeartbeatPolicyCmp():
 
 # ============================================================================
 
-doHeartbeatTimeCmp()
-doHeartbeatSpaceCmp()
-doHeartbeatPolicyCmp()
-doHeartbeatPolicyNums()
+# doHeartbeatTimeCmp()
+# doHeartbeatSpaceCmp()
+# doHeartbeatPolicyCmp()
+# doHeartbeatPolicyNums()
 
 # ============================================================================
 # LaTeX figure: Language shootout (time comparison)
@@ -2397,10 +2515,10 @@ def doSpeedups(outputName, config, tags):
     tags,
     0)
 
-doSpeedups('mpl-speedups-ng', 'mpl', ngTags)
-doSpeedups('mpl-speedups-normal', 'mpl', normalTags)
-doSpeedups('local-hb-gwa-speedups-ng', 'local-hb-gwa', ngTags)
-doSpeedups('local-hb-gwa-speedups-normal', 'local-hb-gwa', normalTags)
+# doSpeedups('mpl-speedups-ng', 'mpl', ngTags)
+# doSpeedups('mpl-speedups-normal', 'mpl', normalTags)
+# doSpeedups('local-hb-gwa-speedups-ng', 'local-hb-gwa', ngTags)
+# doSpeedups('local-hb-gwa-speedups-normal', 'local-hb-gwa', normalTags)
 
 # ============================================================================
 # PDF: Tangle plot
