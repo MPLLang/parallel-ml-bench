@@ -10,7 +10,7 @@ end =
 struct
   type grain = int
 
-  val parforG = CommandLineArgs.parseInt "parfor-grain" 2000
+  val parforG = CommandLineArgs.parseInt "parfor-grain" 5000
   val blockG = CommandLineArgs.parseInt "block-grain" 1000
 
   val P = Concurrency.numberOfProcessors

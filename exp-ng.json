@@ -45,14 +45,14 @@
 
   "globals":
     {
-      "config": ["mlton", "mlton-fhs", "mpl", "local-hb-eh1", "local-hb-eh2", "local-hb-gwa-newest", "local-hb-npc"],
+      "config": ["mlton", "mpl-small-grain", "mpl-large-grain", "mpl-cilk-small-grain", "mpl-cilk-large-grain", "local-hb-small-grain", "local-hb-large-grain", "local-hb-cilk-small-grain", "local-hb-cilk-large-grain"],
       "cwd": ["mpl"],
       "exp": ["time","space"],
       "trials": ["1","10"]
     },
 
   "jqselect":
-    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
+    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and $max_procs != \"1\" and .trials == \"10\")) )  )",
 
   "specs":
     [

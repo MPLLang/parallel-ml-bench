@@ -20,6 +20,6 @@ struct
   fun block n =
     Int.max (2, Int.min (blockG, n div (8 * P)))
 
-  val merge = CommandLineArgs.parseInt "merge-grain" 1000
+  val merge = CommandLineArgs.parseInt "merge-grain" 400
   val mergesort = CommandLineArgs.parseInt "mergesort-grain" 10
 end
