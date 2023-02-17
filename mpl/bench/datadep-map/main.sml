@@ -10,5 +10,5 @@ fun parfib n =
 val inputs = [(1000, fn i => parfib 20)]
 
 val result = Benchmark.run "..." (fn _ =>
-  SeqNG.tabulate (fn _ => parfib 20) 1000)
+  SeqNG.tabulate (fn _ => parfib 30) 1000)
 val _ = print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")

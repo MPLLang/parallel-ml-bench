@@ -9,46 +9,46 @@ struct
 
 
   fun for (wlo, whi) f =
-    if wlo >= whi then ()
-    else (f (Word64.toIntX wlo); for (wlo+0w1, whi) f)
+    if wlo >= whi then () else (f (Word64.toIntX wlo); for (wlo + 0w1, whi) f)
 
-  val grain = i2w Grains.parfor
-
-  fun binarySplitting f {lo, hi} () =
-    if hi-lo <= grain then
+  fun binarySplitting grain f {lo, hi} () =
+    if hi - lo <= grain then
       for (lo, hi) f
     else
       let
-        val half = Word64.>> (hi-lo, 0w1)
+        val half = Word64.>> (hi - lo, 0w1)
         val mid = lo + half
       in
         ForkJoin.par
-          ( binarySplitting f {lo=lo, hi=mid}
-          , binarySplitting f {lo=mid, hi=hi}
+          ( binarySplitting grain f {lo = lo, hi = mid}
+          , binarySplitting grain f {lo = mid, hi = hi}
           );
         ()
       end
 
-(*
-  fun binarySplitting' f {lo, width} () =
-    if width <= grain then
-      for (lo, lo+width) f
-    else
-      let
-        val half = Word64.>> (width, 0w1)
-      in
-        ForkJoin.par
-          ( binarySplitting' f {lo=lo, width=half}
-          , binarySplitting' f {lo=lo+half, width=width-half}
-          );
-        ()
-      end
-*)
+  (*
+    fun binarySplitting' f {lo, width} () =
+      if width <= grain then
+        for (lo, lo+width) f
+      else
+        let
+          val half = Word64.>> (width, 0w1)
+        in
+          ForkJoin.par
+            ( binarySplitting' f {lo=lo, width=half}
+            , binarySplitting' f {lo=lo+half, width=width-half}
+            );
+          ()
+        end
+  *)
 
   fun parfor (lo, hi) f =
-    if lo >= hi then () else
-    binarySplitting f {lo = i2w lo, hi = i2w hi} ()
-    (* binarySplitting' f {lo = i2w lo, width = i2w hi - i2w lo} () *)
+    if lo >= hi then
+      ()
+    else
+      binarySplitting (i2w (Grains.parfor (hi - lo))) f
+        {lo = i2w lo, hi = i2w hi} ()
+(* binarySplitting' f {lo = i2w lo, width = i2w hi - i2w lo} () *)
 
 
 (*

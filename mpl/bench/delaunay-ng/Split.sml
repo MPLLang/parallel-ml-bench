@@ -16,8 +16,8 @@ struct
   fun split s flags =
     let
       val n = DS.length s
-      val blockSize = Grains.block
-      val numBlocks = 1 + (n-1) div blockSize
+      val blockSize = Grains.block n
+      val numBlocks = 1 + (n - 1) div blockSize
 
       (* the later scan(s) appears to be faster when split into two separate
        * scans, rather than doing a single scan on tuples. *)
@@ -35,9 +35,9 @@ struct
               (* A.update (counts, b, (cl, cr)) *)
               (A.update (countl, b, cl); A.update (countr, b, cr))
             else if DS.nth flags i then
-              loop (cl+1, cr) (i+1)
+              loop (cl + 1, cr) (i + 1)
             else
-              loop (cl, cr+1) (i+1)
+              loop (cl, cr + 1) (i + 1)
         in
           loop (0, 0) lo
         end)
@@ -58,11 +58,16 @@ struct
           val offsetl = SeqNG.nth offsetsl b
           val offsetr = SeqNG.nth offsetsr b
           fun loop (cl, cr) i =
-            if i >= hi then ()
+            if i >= hi then
+              ()
             else if DS.nth flags i then
-              (A.update (left, offsetl+cl, DS.nth s i); loop (cl+1, cr) (i+1))
+              ( A.update (left, offsetl + cl, DS.nth s i)
+              ; loop (cl + 1, cr) (i + 1)
+              )
             else
-              (A.update (right, offsetr+cr, DS.nth s i); loop (cl, cr+1) (i+1))
+              ( A.update (right, offsetr + cr, DS.nth s i)
+              ; loop (cl, cr + 1) (i + 1)
+              )
         in
           loop (0, 0) lo
         end)

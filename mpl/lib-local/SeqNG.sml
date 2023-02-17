@@ -35,8 +35,10 @@ struct
   val nth = AS.nth
   val length = AS.length
 
-  fun empty () = AS.full (A.fromList [])
-  fun singleton x = AS.full (A.array (1, x))
+  fun empty () =
+    AS.full (A.fromList [])
+  fun singleton x =
+    AS.full (A.array (1, x))
   val $ = singleton
   fun toString f s =
     "<" ^ String.concatWith "," (List.tabulate (length s, f o nth s)) ^ ">"
@@ -45,19 +47,22 @@ struct
   fun fromArray a = AS.full a
 
 
-  fun fromList l = AS.full (A.fromList l)
+  fun fromList l =
+    AS.full (A.fromList l)
   val % = fromList
   fun toList s =
-    SeqBasisNG.foldl (fn (list, x) => x :: list) []
-      (0, length s) (fn i => nth s (length s - i - 1))
+    SeqBasisNG.foldl (fn (list, x) => x :: list) [] (0, length s) (fn i =>
+      nth s (length s - i - 1))
 
 
   fun subseq s (i, k) =
     AS.subslice (s, i, SOME k)
   fun take s n = subseq s (0, n)
-  fun drop s n = subseq s (n, length s - n)
+  fun drop s n =
+    subseq s (n, length s - n)
   fun first s = nth s 0
-  fun last s = nth s (length s - 1)
+  fun last s =
+    nth s (length s - 1)
 
   fun tabulate f n =
     AS.full (SeqBasisNG.tabulate (0, n) f)
@@ -76,15 +81,12 @@ struct
 
 
   fun zipWith f (s, t) =
-    tabulate
-      (fn i => f (nth s i, nth t i))
-      (Int.min (length s, length t))
+    tabulate (fn i => f (nth s i, nth t i)) (Int.min (length s, length t))
 
 
   fun zipWith3 f (s1, s2, s3) =
-    tabulate
-      (fn i => f (nth s1 i, nth s2 i, nth s3 i))
-      (Int.min (length s1, Int.min (length s2, length s3)))
+    tabulate (fn i => f (nth s1 i, nth s2 i, nth s3 i)) (Int.min
+      (length s1, Int.min (length s2, length s3)))
 
 
   fun zip (s, t) =
@@ -96,13 +98,15 @@ struct
 
 
   (** TODO: make faster *)
-  fun fromRevList list = rev (fromList list)
+  fun fromRevList list =
+    rev (fromList list)
 
 
   fun append (s, t) =
     let
       val (ns, nt) = (length s, length t)
-      fun ith i = if i < ns then nth s i else nth t (i-ns)
+      fun ith i =
+        if i < ns then nth s i else nth t (i - ns)
     in
       tabulate ith (ns + nt)
     end
@@ -112,12 +116,9 @@ struct
     let
       val (na, nb, nc) = (length a, length b, length c)
       fun ith i =
-        if i < na then
-          nth a i
-        else if i < na + nb then
-          nth b (i - na)
-        else
-          nth c (i - na - nb)
+        if i < na then nth a i
+        else if i < na + nb then nth b (i - na)
+        else nth c (i - na - nb)
     in
       tabulate ith (na + nb + nc)
     end
@@ -137,14 +138,12 @@ struct
     let
       val prefixes = alloc (length s)
       fun g ((i, b), a) =
-        let
-          val _ = A.update (prefixes, i, b)
-        in
-          (i+1, f (b, a))
+        let val _ = A.update (prefixes, i, b)
+        in (i + 1, f (b, a))
         end
       val (_, r) = iterate g (0, b) s
     in
-        (AS.full prefixes, r)
+      (AS.full prefixes, r)
     end
 
 
@@ -153,20 +152,16 @@ struct
 
 
   fun scan f b s =
-    let
-      val p = AS.full (SeqBasisNG.scan f b (0, length s) (nth s))
-    in
-      (take p (length s), nth p (length s))
+    let val p = AS.full (SeqBasisNG.scan f b (0, length s) (nth s))
+    in (take p (length s), nth p (length s))
     end
 
   fun scanWithTotal f b s =
     AS.full (SeqBasisNG.scan f b (0, length s) (nth s))
 
   fun scanIncl f b s =
-    let
-      val p = AS.full (SeqBasisNG.scan f b (0, length s) (nth s))
-    in
-      drop p 1
+    let val p = AS.full (SeqBasisNG.scan f b (0, length s) (nth s))
+    in drop p 1
     end
 
 
@@ -176,13 +171,14 @@ struct
 
   fun filterSafe p s =
     (* Does not assume that the predicate p is pure *)
-    AS.full (SeqBasisNG.tabFilter (0, length s) (fn i => if p (nth s i) then SOME (nth s i) else NONE))
+    AS.full (SeqBasisNG.tabFilter (0, length s) (fn i =>
+      if p (nth s i) then SOME (nth s i) else NONE))
 
   fun filterIdx p s =
     AS.full (SeqBasisNG.filter (0, length s) (nth s) (fn i => p (i, nth s i)))
 
-  fun filtermap (p: 'a -> bool) (f:'a -> 'b) (s: 'a t): 'b t =
-     AS.full (SeqBasisNG.filter (0, length s) (fn i => f (nth s i)) (p o nth s))
+  fun filtermap (p: 'a -> bool) (f: 'a -> 'b) (s: 'a t) : 'b t =
+    AS.full (SeqBasisNG.filter (0, length s) (fn i => f (nth s i)) (p o nth s))
 
 
   fun mapOption f s =
@@ -190,9 +186,10 @@ struct
 
 
   fun equal eq (s, t) =
-    length s = length t andalso
-    SeqBasisNG.reduce (fn (a, b) => a andalso b) true (0, length s)
-      (fn i => eq (nth s i, nth t i))
+    length s = length t
+    andalso
+    SeqBasisNG.reduce (fn (a, b) => a andalso b) true (0, length s) (fn i =>
+      eq (nth s i, nth t i))
 
 
   fun inject (s, updates) =
@@ -200,10 +197,8 @@ struct
       val result = map (fn x => x) s
     in
       parfor (0, length updates) (fn i =>
-        let
-          val (idx, r) = nth updates i
-        in
-          AS.update (result, idx, r)
+        let val (idx, r) = nth updates i
+        in AS.update (result, idx, r)
         end);
 
       result
@@ -218,19 +213,15 @@ struct
 
 
   fun indexSearch (start, stop, offset: int -> int) k =
-    case stop-start of
-      0 =>
-        raise Fail "ArraySequence.indexSearch: should not have hit 0"
-    | 1 =>
-        start
+    case stop - start of
+      0 => raise Fail "ArraySequence.indexSearch: should not have hit 0"
+    | 1 => start
     | n =>
         let
           val mid = start + (n div 2)
         in
-          if k < offset mid then
-            indexSearch (start, mid, offset) k
-          else
-            indexSearch (mid, stop, offset) k
+          if k < offset mid then indexSearch (start, mid, offset) k
+          else indexSearch (mid, stop, offset) k
         end
 
 
@@ -241,7 +232,7 @@ struct
       val total = offset (length s)
       val result = alloc total
 
-      val blockSize = Grains.block
+      val blockSize = Grains.block total
       val numBlocks = Util.ceilDiv total blockSize
     in
       parfor (0, numBlocks) (fn blockIdx =>
@@ -257,16 +248,19 @@ struct
             * k = output index, ranges from [lo] to [hi]
             *)
           fun loop i j k =
-            if k >= hi then () else
-            let
-              val inner = nth s i
-              val numAvailableHere = length inner - j
-              val numRemainingInBlock = hi - k
-              val numHere = Int.min (numAvailableHere, numRemainingInBlock)
-            in
-              for (0, numHere) (fn z => A.update (result, k+z, nth inner (j+z)));
-              loop (i+1) 0 (k+numHere)
-            end
+            if k >= hi then
+              ()
+            else
+              let
+                val inner = nth s i
+                val numAvailableHere = length inner - j
+                val numRemainingInBlock = hi - k
+                val numHere = Int.min (numAvailableHere, numRemainingInBlock)
+              in
+                for (0, numHere) (fn z =>
+                  A.update (result, k + z, nth inner (j + z)));
+                loop (i + 1) 0 (k + numHere)
+              end
         in
           loop firstOuterIdx firstInnerIdx lo
         end);
