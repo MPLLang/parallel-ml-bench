@@ -119,12 +119,12 @@
       {
         "tag": ["sparse-mxv-ng"],
         "bench": ["sparse-mxv-ng"],
-        "args": ["-n 200000000"]
+        "args": ["-n 500000000"]
       },
       {
         "tag": ["sparse-mxv"],
         "bench": ["sparse-mxv-opt"],
-        "args": ["-n 200000000"]
+        "args": ["-n 500000000"]
       },
       {
         "tag": ["nearest-nbrs-ng"],
