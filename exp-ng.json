@@ -1,176 +1,360 @@
 {
-  "templates":
-    [
-      {
-        "match": { "config": "mpl", "exp": "time" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
-      },
-      {
-        "match": { "config": "mpl", "exp": "space" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
-      },
-      {
-        "match": { "config": "local-hb", "exp": "time" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
-      },
-      {
-        "match": { "config": "local-hb", "exp": "space" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
-      },
-      {
-        "match": { "config": "mlton$", "exp": "time", "procs": "1$" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
-      },
-      {
-        "match": { "config": "mlton$", "exp": "space", "procs": "1$" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
-      },
-      {
-        "match": { "config": "mlton-fhs$", "exp": "time", "procs": "1$" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
-      },
-      {
-        "match": { "config": "mlton-fhs$", "exp": "space", "procs": "1$" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
-      },
-      {
-        "match": { "config": "mlton-tight$", "exp": "time", "procs": "1$" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
-      },
-      {
-        "match": { "config": "mlton-tight$", "exp": "space", "procs": "1$" },
-        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
-      }
-    ],
-
-  "globals":
+  "templates": [
     {
-      "config": ["mlton", "mpl-small-grain", "mpl-large-grain", "mpl-cilk-small-grain", "mpl-cilk-large-grain", "local-hb-small-grain", "local-hb-large-grain", "local-hb-cilk-small-grain", "local-hb-cilk-large-grain"],
-      "cwd": ["mpl"],
-      "exp": ["time","space"],
-      "trials": ["1","10"]
+      "match": {
+        "config": "mpl",
+        "exp": "time"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
     },
-
-  "jqselect":
-    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and $max_procs != \"1\" and .trials == \"10\")) )  )",
-
-  "specs":
-    [
-      {
-        "tag": ["bfs-ng"],
-        "bench": ["bfs-ng"],
-        "args": ["../inputs/rmat-10M-symm-bin"]
+    {
+      "match": {
+        "config": "mpl",
+        "exp": "space"
       },
-      {
-        "tag": ["bfs"],
-        "bench": ["bfs"],
-        "args": ["../inputs/rmat-10M-symm-bin"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+    },
+    {
+      "match": {
+        "config": "local-hb",
+        "exp": "time"
       },
-      {
-        "tag": ["delaunay-ng"],
-        "bench": ["delaunay-ng"],
-        "args": ["-input ../inputs/uniform-circle-1M"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+    },
+    {
+      "match": {
+        "config": "local-hb",
+        "exp": "space"
       },
-      {
-        "tag": ["delaunay"],
-        "bench": ["delaunay"],
-        "args": ["-input ../inputs/uniform-circle-1M"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+    },
+    {
+      "match": {
+        "config": "mlton$",
+        "exp": "time",
+        "procs": "1$"
       },
-      {
-        "tag": ["msort-ng"],
-        "bench": ["msort-ng"],
-        "args": ["-N 20000000"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+    },
+    {
+      "match": {
+        "config": "mlton$",
+        "exp": "space",
+        "procs": "1$"
       },
-      {
-        "tag": ["msort"],
-        "bench": ["msort"],
-        "args": ["-N 20000000"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+    },
+    {
+      "match": {
+        "config": "mlton-fhs$",
+        "exp": "time",
+        "procs": "1$"
       },
-      {
-        "tag": ["msort-strings-ng"],
-        "bench": ["msort-strings-ng"],
-        "args": ["../inputs/words64.txt"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+    },
+    {
+      "match": {
+        "config": "mlton-fhs$",
+        "exp": "space",
+        "procs": "1$"
       },
-      {
-        "tag": ["msort-strings"],
-        "bench": ["msort-strings"],
-        "args": ["../inputs/words64.txt"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+    },
+    {
+      "match": {
+        "config": "mlton-tight$",
+        "exp": "time",
+        "procs": "1$"
       },
-      {
-        "tag": ["msort-long-strings-ng"],
-        "bench": ["msort-strings-ng"],
-        "args": ["../inputs/words64.txt --long"]
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+    },
+    {
+      "match": {
+        "config": "mlton-tight$",
+        "exp": "space",
+        "procs": "1$"
       },
-      {
-        "tag": ["msort-long-strings"],
-        "bench": ["msort-strings"],
-        "args": ["../inputs/words64.txt --long"]
-      },
-      {
-        "tag": ["primes-ng"],
-        "bench": ["primes-ng"],
-        "args": ["-N 100000000"]
-      },
-      {
-        "tag": ["primes"],
-        "bench": ["primes"],
-        "args": ["-N 100000000"]
-      },
-      {
-        "tag": ["sparse-mxv-ng"],
-        "bench": ["sparse-mxv-ng"],
-        "args": ["-n 500000000"]
-      },
-      {
-        "tag": ["sparse-mxv"],
-        "bench": ["sparse-mxv-opt"],
-        "args": ["-n 500000000"]
-      },
-      {
-        "tag": ["nearest-nbrs-ng"],
-        "bench": ["nearest-nbrs-ng"],
-        "args": ["-input ../inputs/uniform-circle-1M"]
-      },
-      {
-        "tag": ["nearest-nbrs"],
-        "bench": ["nearest-nbrs"],
-        "args": ["-input ../inputs/uniform-circle-1M"]
-      },
-      {
-        "tag": ["map-ng-heavy"],
-        "bench": ["map-ng"],
-        "args": ["-n 5000 -fn-cost heavy"]
-      },
-      {
-        "tag": ["map-ng-light"],
-        "bench": ["map-ng"],
-        "args": ["-n 50000000 -fn-cost light"]
-      },
-      {
-        "tag": ["map-heavy"],
-        "bench": ["map"],
-        "args": ["-n 5000 -fn-cost heavy"]
-      },
-      {
-        "tag": ["map-light"],
-        "bench": ["map"],
-        "args": ["-n 50000000 -fn-cost light"]
-      },
-      {
-        "tag": ["mandelbrot"],
-        "bench": ["mandelbrot"],
-        "args": ["-w 10000"]
-      },
-      {
-        "tag": ["mandelbrot-ng"],
-        "bench": ["mandelbrot-ng"],
-        "args": ["-w 10000"]
-      },
-      {
-        "tag": ["fork-stress"],
-        "bench": ["fork-stress"],
-        "args": ["-width 1000 -length 5000"]
-      }
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+    }
+  ],
+  "globals": {
+    "config": [
+      "mlton",
+      "mpl-small-grain",
+      "mpl-large-grain",
+      "mpl-cilk-small-grain",
+      "mpl-cilk-large-grain",
+      "local-hb-small-grain",
+      "local-hb-large-grain",
+      "local-hb-cilk-small-grain",
+      "local-hb-cilk-large-grain"
+    ],
+    "cwd": [
+      "mpl"
+    ],
+    "exp": [
+      "time",
+      "space"
+    ],
+    "trials": [
+      "1",
+      "10"
     ]
-
+  },
+  "jqselect": "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and $max_procs != \"1\" and .trials == \"10\")) )  )",
+  "specs": [
+    {
+      "tag": [
+        "bfs-ng"
+      ],
+      "bench": [
+        "bfs-ng"
+      ],
+      "args": [
+        "../inputs/rmat-10M-symm-bin"
+      ]
+    },
+    {
+      "tag": [
+        "bfs"
+      ],
+      "bench": [
+        "bfs"
+      ],
+      "args": [
+        "../inputs/rmat-10M-symm-bin"
+      ]
+    },
+    {
+      "tag": [
+        "delaunay-ng"
+      ],
+      "bench": [
+        "delaunay-ng"
+      ],
+      "args": [
+        "-input ../inputs/uniform-circle-1M"
+      ]
+    },
+    {
+      "tag": [
+        "delaunay"
+      ],
+      "bench": [
+        "delaunay"
+      ],
+      "args": [
+        "-input ../inputs/uniform-circle-1M"
+      ]
+    },
+    {
+      "tag": [
+        "msort-ng"
+      ],
+      "bench": [
+        "msort-ng"
+      ],
+      "args": [
+        "-N 20000000"
+      ]
+    },
+    {
+      "tag": [
+        "msort"
+      ],
+      "bench": [
+        "msort"
+      ],
+      "args": [
+        "-N 20000000"
+      ]
+    },
+    {
+      "tag": [
+        "msort-strings-ng"
+      ],
+      "bench": [
+        "msort-strings-ng"
+      ],
+      "args": [
+        "../inputs/words64.txt"
+      ]
+    },
+    {
+      "tag": [
+        "msort-strings"
+      ],
+      "bench": [
+        "msort-strings"
+      ],
+      "args": [
+        "../inputs/words64.txt"
+      ]
+    },
+    {
+      "tag": [
+        "msort-long-strings-ng"
+      ],
+      "bench": [
+        "msort-strings-ng"
+      ],
+      "args": [
+        "../inputs/words64.txt --long"
+      ]
+    },
+    {
+      "tag": [
+        "msort-long-strings"
+      ],
+      "bench": [
+        "msort-strings"
+      ],
+      "args": [
+        "../inputs/words64.txt --long"
+      ]
+    },
+    {
+      "tag": [
+        "primes-ng"
+      ],
+      "bench": [
+        "primes-ng"
+      ],
+      "args": [
+        "-N 100000000"
+      ]
+    },
+    {
+      "tag": [
+        "primes"
+      ],
+      "bench": [
+        "primes"
+      ],
+      "args": [
+        "-N 100000000"
+      ]
+    },
+    {
+      "tag": [
+        "sparse-mxv-ng"
+      ],
+      "bench": [
+        "sparse-mxv-ng"
+      ],
+      "args": [
+        "-n 500000000"
+      ]
+    },
+    {
+      "tag": [
+        "sparse-mxv"
+      ],
+      "bench": [
+        "sparse-mxv-opt"
+      ],
+      "args": [
+        "-n 500000000"
+      ]
+    },
+    {
+      "tag": [
+        "nearest-nbrs-ng"
+      ],
+      "bench": [
+        "nearest-nbrs-ng"
+      ],
+      "args": [
+        "-input ../inputs/uniform-circle-1M"
+      ]
+    },
+    {
+      "tag": [
+        "nearest-nbrs"
+      ],
+      "bench": [
+        "nearest-nbrs"
+      ],
+      "args": [
+        "-input ../inputs/uniform-circle-1M"
+      ]
+    },
+    {
+      "tag": [
+        "map-ng-heavy"
+      ],
+      "bench": [
+        "map-ng"
+      ],
+      "args": [
+        "-n 5000 -fn-cost heavy"
+      ]
+    },
+    {
+      "tag": [
+        "map-ng-light"
+      ],
+      "bench": [
+        "map-ng"
+      ],
+      "args": [
+        "-n 50000000 -fn-cost light"
+      ]
+    },
+    {
+      "tag": [
+        "map-heavy"
+      ],
+      "bench": [
+        "map"
+      ],
+      "args": [
+        "-n 5000 -fn-cost heavy"
+      ]
+    },
+    {
+      "tag": [
+        "map-light"
+      ],
+      "bench": [
+        "map"
+      ],
+      "args": [
+        "-n 50000000 -fn-cost light"
+      ]
+    },
+    {
+      "tag": [
+        "mandelbrot"
+      ],
+      "bench": [
+        "mandelbrot"
+      ],
+      "args": [
+        ""
+      ]
+    },
+    {
+      "tag": [
+        "mandelbrot-ng"
+      ],
+      "bench": [
+        "mandelbrot-ng"
+      ],
+      "args": [
+        ""
+      ]
+    },
+    {
+      "tag": [
+        "fork-stress"
+      ],
+      "bench": [
+        "fork-stress"
+      ],
+      "args": [
+        "-width 1000 -length 5000"
+      ]
+    }
+  ]
 }
