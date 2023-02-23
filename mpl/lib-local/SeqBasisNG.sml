@@ -65,22 +65,30 @@ struct
       end
 
 
+  val w2i = Word64.toIntX
+  val i2w = Word64.fromInt
+
+
   fun reduce g b (lo, hi) f =
     let
-      val grain = Word64.fromInt (Grains.parfor (hi - lo))
+      val grain = Grains.parfor (hi - lo)
+      val wgrain = i2w grain
 
-      fun loop lo hi () =
-        if hi - lo <= grain then
-          foldl g b (Word64.toIntX lo, Word64.toIntX hi) f
-        else
-          let
-            val half = Word64.>> (hi - lo, 0w1)
-            val mid = lo + half
-          in
-            g (ForkJoin.par (loop lo mid, loop mid hi))
-          end
+      fun loopCheck lo hi =
+        if hi - lo <= wgrain then foldl g (f (w2i lo)) (1 + w2i lo, w2i hi) f
+        else loopSplit lo hi
+
+      and loopSplit lo hi =
+        let
+          val half = Word64.>> (hi - lo, 0w1)
+          val mid = lo + half
+        in
+          g (ForkJoin.par (fn _ => loopCheck lo mid, fn _ => loopCheck mid hi))
+        end
     in
-      loop (Word64.fromInt lo) (Word64.fromInt hi) ()
+      if hi - lo <= 0 then b
+      else if hi - lo <= grain then foldl g (f lo) (lo + 1, hi) f
+      else loopSplit (i2w lo) (i2w hi)
     end
 
 

@@ -11,89 +11,26 @@ struct
   fun for (wlo, whi) f =
     if wlo >= whi then () else (f (Word64.toIntX wlo); for (wlo + 0w1, whi) f)
 
-  fun binarySplitting grain f {lo, hi} () =
-    if hi - lo <= grain then
-      for (lo, hi) f
-    else
-      let
-        val half = Word64.>> (hi - lo, 0w1)
-        val mid = lo + half
-      in
-        ForkJoin.par
-          ( binarySplitting grain f {lo = lo, hi = mid}
-          , binarySplitting grain f {lo = mid, hi = hi}
-          );
-        ()
-      end
 
-  (*
-    fun binarySplitting' f {lo, width} () =
-      if width <= grain then
-        for (lo, lo+width) f
-      else
+  fun parfor (lo, hi) f =
+    let
+      val grain = Grains.parfor (hi - lo)
+      val wgrain = i2w grain
+
+      fun loopCheck lo hi =
+        if hi - lo <= wgrain then for (lo, hi) f else loopSplit lo hi
+
+      and loopSplit lo hi =
         let
-          val half = Word64.>> (width, 0w1)
+          val half = Word64.>> (hi - lo, 0w1)
+          val mid = lo + half
         in
-          ForkJoin.par
-            ( binarySplitting' f {lo=lo, width=half}
-            , binarySplitting' f {lo=lo+half, width=width-half}
-            );
+          ForkJoin.par (fn _ => loopCheck lo mid, fn _ => loopCheck mid hi);
           ()
         end
-  *)
-
-  fun parfor (lo, hi) f =
-    if lo >= hi then
-      ()
-    else
-      binarySplitting (i2w (Grains.parfor (hi - lo))) f
-        {lo = i2w lo, hi = i2w hi} ()
-(* binarySplitting' f {lo = i2w lo, width = i2w hi - i2w lo} () *)
-
-
-(*
-  fun binarySplittingPow2 f {lo, width} () =
-    if width <= grain then
-      for (lo, lo+width) f
-    else
-      let
-        val half = Word64.>> (width, 0w1)
-      in
-        ForkJoin.par
-          ( binarySplittingPow2 f {lo=lo, width=half}
-          , binarySplittingPow2 f {lo=lo+half, width=half}
-          );
-        ()
-      end
-
-  fun highestPow2LessOrEqual x =
-    let
-      open Word64
-      fun loop w x =
-        if x = 0w0 then
-          >> (w, 0w1)
-        else
-          loop (<< (w, 0w1)) (>> (x, 0w1))
     in
-      loop 0w1 x
+      if hi - lo <= grain then Util.for (lo, hi) f
+      else loopSplit (i2w lo) (i2w hi)
     end
-
-  fun parfor (lo, hi) f =
-    if hi-lo <= OneTrueGrain.asInt then
-      Util.for (lo, hi) f
-    else
-    let
-      val wlo = i2w lo
-      val whi = i2w hi
-      val width = whi - wlo
-      val half = highestPow2LessOrEqual width
-    in
-      ForkJoin.par
-        ( binarySplittingPow2 f {lo=wlo, width=half}
-        , binarySplitting f {lo=wlo+half, hi=whi}
-        );
-      ()
-    end
-*)
 
 end
