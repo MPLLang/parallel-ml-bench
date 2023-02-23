@@ -1,17 +1,48 @@
 structure CLA = CommandLineArgs
-val niter = 50
-val limit = 4.0
 
-val w = CLA.parseInt "w" 16000
+val maxIter = CLA.parseInt "max-iter" 50
+val divergeThresh = CLA.parseReal "diverge-thresh" 4.0
+
+val _ = print ("max-iter " ^ Int.toString maxIter ^ "\n")
+val _ = print ("diverge-thresh " ^ Real.toString divergeThresh ^ "\n")
+
+(* pixels per unit of the complex plane *)
+val resolution = CLA.parseInt "resolution" 5000
+val _ = print ("resolution " ^ Int.toString resolution ^ "\n")
+
+(* rectangular query region *)
+val top = CLA.parseReal "top" 1.0
+val bot = CLA.parseReal "bot" ~1.0
+val left = CLA.parseReal "left" ~1.5
+val right = CLA.parseReal "right" 0.5
+
+val _ = print ("top " ^ Real.toString top ^ "\n")
+val _ = print ("bot " ^ Real.toString bot ^ "\n")
+val _ = print ("left " ^ Real.toString left ^ "\n")
+val _ = print ("right " ^ Real.toString right ^ "\n")
+
+(* derived width and height, in pixels *)
+val w = Real.ceil (Real.fromInt resolution * (right - left))
+val h = Real.ceil (Real.fromInt resolution * (top - bot))
+val _ = print ("h " ^ Int.toString h ^ "\n")
 val _ = print ("w " ^ Int.toString w ^ "\n")
+
+val dx = (right - left) / Real.fromInt w
+val dy = (top - bot) / Real.fromInt h
+
+(* convert pixel coordinate to complex coordinate *)
+fun xyToComplex (x, y) =
+  let
+    val r = left + (Real.fromInt x * dx)
+    val i = bot + (Real.fromInt y * dy)
+  in
+    (r, i)
+  end
 
 
 fun mark x y =
   let
-    val fw = Real.fromInt w / 2.0
-    val fh = fw
-    val ci = Real.fromInt y / fh - 1.0
-    val cr = Real.fromInt x / fw - 1.5
+    val (cr, ci) = xyToComplex (x, y)
 
     fun loop (zr, zi, trmti) i =
       let
@@ -20,12 +51,9 @@ fun mark x y =
         val tr = zr * zr
         val ti = zi * zi
       in
-        if tr + ti > limit then
-          false
-        else if i+1 = niter then
-          true
-        else
-          loop (zr, zi, tr - ti) (i+1)
+        if tr + ti > divergeThresh then false
+        else if i + 1 = maxIter then true
+        else loop (zr, zi, tr - ti) (i + 1)
       end
   in
     loop (0.0, 0.0, 0.0) 0
@@ -40,21 +68,17 @@ fun packByte y (xlo, xhi) =
       else
         let
           val byte =
-            if mark x y then
-              Word.orb (Word.<< (byte, 0w1), 0wx01)
-            else
-              Word.<< (byte, 0w1)
+            if mark x y then Word.orb (Word.<< (byte, 0w1), 0wx01)
+            else Word.<< (byte, 0w1)
         in
-          loop byte (x+1)
+          loop byte (x + 1)
         end
-    
+
     val byte = loop 0w0 xlo
 
     val byte =
-      if xhi-xlo = 8 then
-        byte
-      else
-        Word.<< (byte, Word.fromInt (8-(xhi-xlo)))
+      if xhi - xlo = 8 then byte
+      else Word.<< (byte, Word.fromInt (8 - (xhi - xlo)))
   in
     byte
   end
@@ -64,10 +88,10 @@ fun mandelbrot () =
   let
     val numBytesPerRow = Util.ceilDiv w 8
   in
-    SeqBasis.tabulate 1 (0, w) (fn y =>
+    SeqBasis.tabulate 1 (0, h) (fn y =>
       SeqBasis.tabulate 1000 (0, numBytesPerRow) (fn b =>
         let
-          val xlo = b*8
+          val xlo = b * 8
           val xhi = Int.min (xlo + 8, w)
           val byte = packByte y (xlo, xhi)
           val char = Char.chr (Word.toInt byte)
@@ -77,8 +101,7 @@ fun mandelbrot () =
   end
 
 
-val results =
-  Benchmark.run "running mandelbrot" mandelbrot
+val results = Benchmark.run "running mandelbrot" mandelbrot
 
 val outfile = CLA.parseString "output" ""
 
@@ -92,10 +115,8 @@ val _ =
       fun dump str = TextIO.output (file, str)
     in
       ( dump "P4\n"
-      ; dump (Int.toString w ^ " " ^ Int.toString w ^ "\n")
+      ; dump (Int.toString w ^ " " ^ Int.toString h ^ "\n")
       ; Array.app (Array.app dump1) results
       ; TextIO.closeOut file
       )
     end
-
-
