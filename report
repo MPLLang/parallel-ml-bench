@@ -1334,11 +1334,11 @@ def doFullShootoutSpace():
 
     output.write("\\midrule\n")
     row = [
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['cpp'])))),
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat.get('cpp'))))),
       "", makeBold(fmt(ov(1.0))),
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['go'])))),
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['java'])))),
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['ocaml']))))
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat.get('go'))))),
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat.get('java'))))),
+      "", makeBold(fmt(ov(geomean(maxPSpaceRat.get('ocaml')))))
     ]
     output.write(" & ".join(["geomean"] + row))
     output.write("  \\\\\n")
@@ -1755,7 +1755,7 @@ def runtimeStats(procs):
     # output.write("\\midrule\n")
     # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
     #   doTag(tag, output)
-    
+
     for tag in mltonCmpTags:
       doTag(tag, output)
 
@@ -1945,7 +1945,7 @@ doMplComparison()
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes 
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from matplotlib.ticker import MultipleLocator
 
@@ -2095,7 +2095,7 @@ def reportTangle(plotType):
   fontSize = 28
   legendFontSize = 12
   markerSize = 15
-  
+
   params = [
     '0.01','0.02','0.03','0.04','0.05','0.06','0.07','0.08','0.09',
     '0.1','0.13','0.15','0.2','0.25',
@@ -2117,7 +2117,7 @@ def reportTangle(plotType):
     except Exception as e:
       # sys.stderr.write('[WARN] error on tangle thisOverhead({}, {}): {}\n'.format(a, b, e))
       return None
-  
+
   def tagger(version, p):
     return 'tangle{}-{}'.format(version, p)
 
@@ -2168,7 +2168,7 @@ def reportTangle(plotType):
   # set legend position
   matplotlib.rcParams['legend.loc'] = 'upper left'
 
-  
+
   if plotType == 'log':
     xticks = [0.005 * (2.0 ** i) for i in range(0,8)] + [1.0]
     xlabels = [str(2**(i-1)) + '%' for i in range(0,8)] + ['100%']
@@ -2192,7 +2192,7 @@ def reportTangle(plotType):
 
   yticks = np.arange(1.0, 3.0, 0.25)
   ylabels = ["%.2f" % x for x in yticks]
-  
+
   plt.xlabel('Fraction of Memory Entangled', fontsize=fontSize)
   plt.ylabel('Overhead', fontsize=fontSize)
   plt.yticks(yticks, labels=ylabels, fontsize=fontSize)
