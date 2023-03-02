@@ -1,0 +1,179 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "mpl", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mpl", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      }
+    ],
+
+  "globals":
+    {
+      "config": ["mlton", "mpl-em"],
+      "cwd": ["mpl"],
+      "exp": ["time","space"],
+      "trials": ["1","10"]
+    },
+
+  "jqselect":
+    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
+
+  "specs":
+    [
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-N 100000000"]
+      },
+      {
+        "tag": ["msort-ints"],
+        "bench": ["msort"],
+        "args": ["-N 20000000"]
+      },
+      {
+        "tag": ["nearest-nbrs"],
+        "bench": ["nearest-nbrs"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["quickhull"],
+        "bench": ["quickhull"],
+        "args": ["-infile ../inputs/uniform-circle-20M"]
+      },
+      {
+        "tag": ["reverb"],
+        "bench": ["reverb"],
+        "args": ["../inputs/mangore-waltz.wav"]
+      },
+      {
+        "tag": ["seam-carve"],
+        "bench": ["seam-carve"],
+        "args": ["../inputs/pano.ppm -num-seams 25 -block-width 200"]
+      },
+      {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup-strings-entangled"],
+        "args": ["-f ../inputs/words256-shuffled.txt"]
+      },
+      {
+        "tag": ["grep"],
+        "bench": ["grep"],
+        "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
+      },
+      {
+        "tag": ["bfs-find-hideg"],
+        "bench": ["bfs-find-hideg"],
+        "args": ["../inputs/rmat-10M-symm-bin -hideg-thresh 200 --no-dir-opt"]
+      },
+      {
+        "tag": ["centrality"],
+        "bench": ["centrality"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["low-d-decomp-boundary"],
+        "bench": ["low-d-decomp-boundary"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["max-indep-set"],
+        "bench": ["max-indep-set"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["../inputs/words256.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["triangle-count"],
+        "bench": ["triangle-count"],
+        "args": ["../inputs/rmat-1M-symm-bin"]
+      },
+      {
+        "tag": ["range-query"],
+        "bench": ["range-tree"],
+        "args": ["-n 1000000 -q 1000000"]
+      },
+      {
+        "tag": ["delaunay-entangled"],
+        "bench": ["delaunay-entangled"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["linefit-entangled"],
+        "bench": ["linefit-entangled"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["wc-entangled"],
+        "bench": ["wc-entangled"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["mcss"],
+        "bench": ["mcss-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["connectivity"],
+        "bench": ["connectivity-entangled"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["spanner"],
+        "bench": ["spanner-entangled"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["ms-queue"],
+        "bench": ["ms-queue"],
+        "args": ["-nq 100 -bs 100000 -nb 10 -work 1000"]
+      },
+      {
+        "tag": ["harris-linked-list"],
+        "bench": ["harris-linked-list"],
+        "args": ["-nq 100 -bs 100000 -work 17"]
+      },
+      {
+        "tag": ["linden-pq"],
+        "bench": ["linden-pq"],
+        "args": ["-nq 100 -bs 100000 -nb 1 -work 17"]
+      },
+      {
+        "tag": ["pfa-bst"],
+        "bench": ["pfa-bst"],
+        "args": ["-n 10000 -nq 10000000 -nu 50"]
+      },
+      {
+        "tag": ["quant-synth"],
+        "bench": ["sk-net"],
+        "args": ["-pmax 10 -depth 5"]
+      },
+      {
+        "tag": ["interval-tree"],
+        "bench": ["interval-tree"],
+        "args": ["-n 500000 -q 1000"]
+      }
+    ]
+}
