@@ -1269,11 +1269,11 @@ def doFullShootoutTime():
 
     output.write("\\midrule\n")
     row = [
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['cpp'])))),
+      "", makeBold(fmt(ov(geomean(maxPTimeRat.get('cpp'))))),
       "", makeBold(fmt(ov(1.0))),
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['go'])))),
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['java'])))),
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['ocaml']))))
+      "", makeBold(fmt(ov(geomean(maxPTimeRat.get('go'))))),
+      "", makeBold(fmt(ov(geomean(maxPTimeRat.get('java'))))),
+      "", makeBold(fmt(ov(geomean(maxPTimeRat.get('ocaml')))))
     ]
     output.write(" & ".join(["geomean"] + row))
     output.write("  \\\\\n")
