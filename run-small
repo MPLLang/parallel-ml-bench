@@ -10,10 +10,15 @@ RESULTS=$ROOT/small/results/$NOW
 
 rm -f $ROOT/mpl/bin/*.bin
 
-PROCLIST=1,8
 
 ( \
-  $GEN --procs $PROCLIST $ROOT/small/exp.json \
+  $GEN $@ $ROOT/small/exp.json; \
+  $GEN $@ $ROOT/small/cpp-exp.json; \
+  $GEN $@ $ROOT/small/ocaml-exp.json; \
+  $GEN $@ $ROOT/small/java-exp.json; \
+  $GEN $@ $ROOT/small/go-exp.json; \
+  $GEN $@ $ROOT/small/tangle-exp.json \
+  $GEN $ROOT/small/exp.json \
 ) \
 | $RUN --compile --output $RESULTS
 
