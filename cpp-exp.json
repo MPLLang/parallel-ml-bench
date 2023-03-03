@@ -38,39 +38,14 @@
         "args": ["-n 100000000"]
       },
       {
-        "tag": ["delaunay"],
-        "bench": ["delaunay"],
-        "args": ["-input ../inputs/uniform-circle-1M"]
-      },
-      {
-        "tag": ["nearest-nbrs"],
-        "bench": ["nearest-nbrs"],
-        "args": ["-input ../inputs/uniform-circle-1M"]
-      },
-      {
-        "tag": ["grep"],
-        "bench": ["grep"],
-        "args": ["-infile ../inputs/words256-shuffled.txt -pattern EE"]
-      },
-      {
         "tag": ["dedup-strings"],
         "bench": ["dedup-strings"],
         "args": ["-infile ../inputs/words256-shuffled.txt"]
       },
       {
-        "tag": ["bignum-add"],
-        "bench": ["bignum-add"],
-        "args": ["-n 500000000"]
-      },
-      {
         "tag": ["linefit"],
         "bench": ["linefit"],
         "args": ["-n 500000000"]
-      },
-      {
-        "tag": ["linearrec"],
-        "bench": ["linearrec"],
-        "args": ["-n 200000000"]
       },
       {
         "tag": ["mcss"],
@@ -96,21 +71,6 @@
         "tag": ["msort"],
         "bench": ["msort"],
         "args": ["-n 20000000"]
-      },
-      {
-        "tag": ["quickhull"],
-        "bench": ["quickhull"],
-        "args": ["-infile ../inputs/uniform-circle-20M"]
-      },
-      {
-        "tag": ["bfs"],
-        "bench": ["bfs"],
-        "args": ["-infile ../inputs/rmat-10M-symm"]
-      },
-      {
-        "tag": ["integrate"],
-        "bench": ["integrate"],
-        "args": ["-n 500000000"]
       }
     ]
 }

@@ -38,11 +38,6 @@
         "args": ["-n 20000000"]
       },
       {
-        "tag": ["msort-strings"],
-        "bench": ["msort-strings"],
-        "args": ["-infile ../inputs/words64.txt"]
-      },
-      {
         "tag": ["dedup-strings"],
         "bench": ["dedup-strings"],
         "args": ["-infile ../inputs/words256-shuffled.txt"]
@@ -60,11 +55,6 @@
       {
         "tag": ["mcss"],
         "bench": ["mcss"],
-        "args": ["-n 500000000"]
-      },
-      {
-        "tag": ["linefit"],
-        "bench": ["linefit"],
         "args": ["-n 500000000"]
       },
       {

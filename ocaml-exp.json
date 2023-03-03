@@ -35,11 +35,6 @@
         "args": ["-N 20000000"]
       },
       {
-        "tag": ["msort-strings"],
-        "bench": ["msort_strings"],
-        "args": ["-f ../inputs/words64.txt"]
-      },
-      {
         "tag": ["tokens"],
         "bench": ["tokens"],
         "args": ["-f ../inputs/words256.txt --no-output"]
@@ -50,31 +45,6 @@
         "args": ["-infile ../inputs/rmat-10M-symm"]
       },
       {
-        "tag": ["raytracer"],
-        "bench": ["raytracer"],
-        "args": ["-n 1000 -m 1000"]
-      },
-      {
-        "tag": ["game-of-life"],
-        "bench": ["game_of_life"],
-        "args": ["-n_times 100 -board_size 1024"]
-      },
-      {
-        "tag": ["nbody"],
-        "bench": ["nbody"],
-        "args": ["-n 500 -num_bodies 1024"]
-      },
-      {
-        "tag": ["lu-decomp"],
-        "bench": ["lu_decomp"],
-        "args": ["-mat_size 1024"]
-      },
-      {
-        "tag": ["binarytrees5"],
-        "bench": ["binarytrees5"],
-        "args": ["-max_depth 19"]
-      },
-      {
         "tag": ["dedup-strings"],
         "bench": ["dedup_strings"],
         "args": ["-f ../inputs/words256-shuffled.txt"]
@@ -83,11 +53,6 @@
         "tag": ["sparse-mxv"],
         "bench": ["sparse_mxv"],
         "args": ["-n 200000000"]
-      },
-      {
-        "tag": ["ms-queue"],
-        "bench": ["ms_queue"],
-        "args": ["-nq 100 -bs 100000 -nb 10 -work 1000"]
       },
       {
         "tag": ["linefit-accum"],
