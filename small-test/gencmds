@@ -119,7 +119,7 @@ if __name__ == "__main__":
   globalkvs = specFileContents['globals']
   selectExpr = specFileContents['jqselect']
   assignmentGroupSpecs = specFileContents['specs']
-  assignmentGroupSpecs = (list(filter(lambda x : x['tag'] == ['primes'], assignmentGroupSpecs)))
+  assignmentGroupSpecs = (list(filter(lambda x : x['tag'] == ['primes'] or x['tag'][0][:6] == 'tangle', assignmentGroupSpecs)))
 
   try:
     procs = sorted(args.procs.split(","), key=int)
