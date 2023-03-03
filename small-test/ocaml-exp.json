@@ -1,0 +1,68 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "ocaml", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <procs?-procs {} ><args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "ocaml", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <procs?-procs {} ><args?{} ><args1?{}> -repeat 20 -warmup 0"
+      }
+    ],
+
+  "globals":
+    {
+      "config": ["ocaml"],
+      "cwd": ["ocaml"],
+      "exp": ["time","space"],
+      "trials": ["1","10"]
+    },
+
+  "jqselect":
+    "(  (.exp == \"time\" and .trials == \"1\" and (.procs == \"1\" or .procs == $max_procs))  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
+
+  "specs":
+    [
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-N 100000000"]
+      },
+      {
+        "tag": ["msort-ints"],
+        "bench": ["msort_ints"],
+        "args": ["-N 20000000"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["-f ../inputs/words256.txt --no-output"]
+      },
+      {
+        "tag": ["wc-accum"],
+        "bench": ["wc_accum"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup_strings"],
+        "args": ["-f ../inputs/words256-shuffled.txt"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["sparse_mxv"],
+        "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["linefit-accum"],
+        "bench": ["linefit_accum"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["mcss"],
+        "bench": ["mcss"],
+        "args": ["-n 500000000"]
+      }
+    ]
+}

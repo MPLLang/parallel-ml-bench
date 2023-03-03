@@ -1,0 +1,279 @@
+{
+  "templates":
+    [
+      {
+        "match": { "config": "mpl", "exp": "time" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mpl", "exp": "space" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "time", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 5"
+      },
+      {
+        "match": { "config": "mlton-tight$", "exp": "space", "procs": "1$" },
+        "template": "/usr/bin/time -v bin/<bench>.<config>.bin @MLton copy-generational-ratio 1.5 copy-ratio 1.5 live-ratio 2.0 grow-ratio 2.0 -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
+      }
+    ],
+
+  "globals":
+    {
+      "config": ["mlton", "mlton-tight", "mpl-em", "mpl"],
+      "cwd": ["mpl"],
+      "exp": ["time","space"],
+      "trials": ["1","10"]
+    },
+
+  "jqselect":
+    "(  (.exp == \"time\" and .trials == \"1\")  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
+
+  "specs":
+    [
+      {
+        "tag": ["primes"],
+        "bench": ["primes"],
+        "args": ["-N 100000000"]
+      },
+      {
+        "tag": ["dense-matmul"],
+        "bench": ["dense-matmul"],
+        "args": ["-N 1024"]
+      },
+      {
+        "tag": ["raytracer"],
+        "bench": ["raytracer"],
+        "args": ["-n 1000 -m 1000"]
+      },
+      {
+        "tag": ["tinykaboom"],
+        "bench": ["tinykaboom"],
+        "args": ["-width 100 -height 100 -frames 10 -fps 1"]
+      },
+      {
+        "tag": ["msort-strings"],
+        "bench": ["msort-strings"],
+        "args": ["../inputs/words64.txt"]
+      },
+      {
+        "tag": ["msort-ints"],
+        "bench": ["msort"],
+        "args": ["-N 20000000"]
+      },
+      {
+        "tag": ["nearest-nbrs"],
+        "bench": ["nearest-nbrs"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["quickhull"],
+        "bench": ["quickhull"],
+        "args": ["-infile ../inputs/uniform-circle-20M"]
+      },
+      {
+        "tag": ["reverb"],
+        "bench": ["reverb"],
+        "args": ["../inputs/mangore-waltz.wav"]
+      },
+      {
+        "tag": ["seam-carve"],
+        "bench": ["seam-carve"],
+        "args": ["../inputs/pano.ppm -num-seams 25 -block-width 200"]
+      },
+      {
+        "tag": ["dedup-strings"],
+        "bench": ["dedup-strings-entangled"],
+        "args": ["-f ../inputs/words256-shuffled.txt"]
+      },
+      {
+        "tag": ["suffix-array"],
+        "bench": ["suffix-array"],
+        "args": ["--benchmark -N 10000000"]
+      },
+      {
+        "tag": ["grep"],
+        "bench": ["grep"],
+        "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
+      },
+      {
+        "tag": ["bfs"],
+        "bench": ["bfs"],
+        "args": ["../inputs/rmat-10M-symm-bin --no-dir-opt"]
+      },
+      {
+        "tag": ["bfs-find-hideg"],
+        "bench": ["bfs-find-hideg"],
+        "args": ["../inputs/rmat-10M-symm-bin -hideg-thresh 200 --no-dir-opt"]
+      },
+      {
+        "tag": ["centrality"],
+        "bench": ["centrality"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["low-d-decomp"],
+        "bench": ["low-d-decomp"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["low-d-decomp-boundary"],
+        "bench": ["low-d-decomp-boundary"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["max-indep-set"],
+        "bench": ["max-indep-set"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["palindrome"],
+        "bench": ["palindrome"],
+        "args": ["-N 1000000"]
+      },
+      {
+        "tag": ["tokens"],
+        "bench": ["tokens"],
+        "args": ["../inputs/words256.txt --verbose --no-output"]
+      },
+      {
+        "tag": ["nqueens"],
+        "bench": ["nqueens"],
+        "args": ["-N 13"]
+      },
+      {
+        "tag": ["triangle-count"],
+        "bench": ["triangle-count"],
+        "args": ["../inputs/rmat-1M-symm-bin"]
+      },
+      {
+        "tag": ["range-query"],
+        "bench": ["range-tree"],
+        "args": ["-n 1000000 -q 1000000"]
+      },
+      {
+        "tag": ["delaunay"],
+        "bench": ["delaunay"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["delaunay-entangled"],
+        "bench": ["delaunay-entangled"],
+        "args": ["-input ../inputs/uniform-circle-1M"]
+      },
+      {
+        "tag": ["linefit"],
+        "bench": ["linefit-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linefit-entangled"],
+        "bench": ["linefit-entangled"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["linearrec"],
+        "bench": ["linearrec"],
+        "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["bignum-add"],
+        "bench": ["bignum-add-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["integrate"],
+        "bench": ["integrate-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["sparse-mxv"],
+        "bench": ["sparse-mxv-opt"],
+        "args": ["-n 200000000"]
+      },
+      {
+        "tag": ["wc"],
+        "bench": ["wc-opt"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["wc-entangled"],
+        "bench": ["wc-entangled"],
+        "args": ["-infile ../inputs/rmat-10M-symm"]
+      },
+      {
+        "tag": ["mcss"],
+        "bench": ["mcss-opt"],
+        "args": ["-n 500000000"]
+      },
+      {
+        "tag": ["game-of-life"],
+        "bench": ["ocaml-game-of-life"],
+        "args": ["-n_times 100 -board_size 1024"]
+      },
+      {
+        "tag": ["nbody"],
+        "bench": ["ocaml-nbody-imm"],
+        "args": ["-n 500 -num_bodies 1024"]
+      },
+      {
+        "tag": ["lu-decomp"],
+        "bench": ["ocaml-lu-decomp"],
+        "args": ["-mat_size 1024"]
+      },
+      {
+        "tag": ["binarytrees5"],
+        "bench": ["ocaml-binarytrees5"],
+        "args": ["-max_depth 19"]
+      },
+      {
+        "tag": ["connectivity"],
+        "bench": ["connectivity-entangled"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["spanner"],
+        "bench": ["spanner-entangled"],
+        "args": ["../inputs/rmat-10M-symm-bin"]
+      },
+      {
+        "tag": ["ms-queue"],
+        "bench": ["ms-queue"],
+        "args": ["-nq 100 -bs 100000 -nb 10 -work 1000"]
+      },
+      {
+        "tag": ["harris-linked-list"],
+        "bench": ["harris-linked-list"],
+        "args": ["-nq 100 -bs 100000 -work 17"]
+      },
+      {
+        "tag": ["linden-pq"],
+        "bench": ["linden-pq"],
+        "args": ["-nq 100 -bs 100000 -nb 1 -work 17"]
+      },
+      {
+        "tag": ["pfa-bst"],
+        "bench": ["pfa-bst"],
+        "args": ["-n 10000 -nq 10000000 -nu 50"]
+      },
+      {
+        "tag": ["quant-synth"],
+        "bench": ["sk-net"],
+        "args": ["-pmax 10 -depth 5"]
+      },
+      {
+        "tag": ["interval-tree"],
+        "bench": ["interval-tree"],
+        "args": ["-n 500000 -q 1000"]
+      }
+    ]
+}
