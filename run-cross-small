@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+GEN=$ROOT/scripts/gencmds
+RUN=$ROOT/scripts/runcmds
+
+NOW=$(date '+%y%m%d-%H%M%S')
+mkdir -p $ROOT/cross-small/results
+RESULTS=$ROOT/cross-small/results/$NOW
+
+rm -f $ROOT/mpl/bin/*.bin
+
+
+( \
+  $GEN $@ $ROOT/cross-small/mpl-exp.json; \
+  $GEN $@ $ROOT/cross-small/cpp-exp.json; \
+  $GEN $@ $ROOT/cross-small/ocaml-exp.json; \
+  $GEN $@ $ROOT/cross-small/java-exp.json; \
+  $GEN $@ $ROOT/cross-small/go-exp.json; \
+) \
+| $RUN --compile --output $RESULTS
+
+echo "[INFO] wrote results to $RESULTS"
