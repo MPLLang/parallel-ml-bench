@@ -2259,14 +2259,15 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
   # set legend position
   matplotlib.rcParams['legend.loc'] = 'upper left'
 
-  ticks = [1] + list(range(10, maxp+1, 10))
+  # ticks = [1] + list(range(10, maxp+1, 10))
+  # print(ticks)
 
   plt.xlabel('Processors', fontsize=fontSize)
   plt.ylabel('Speedup', fontsize=fontSize)
-  plt.yticks(ticks, fontsize=fontSize)
-  plt.xticks(ticks, fontsize=fontSize)
-  plt.xlim(0, 74)
-  plt.ylim(0, 74)
+  # plt.yticks(ticks, fontsize=fontSize)
+  # plt.xticks(ticks, fontsize=fontSize)
+  plt.xlim(0, maxp + 2)
+  plt.ylim(0, maxp + 2)
   plt.gca().grid(axis='both', linestyle='dotted')
   plt.gca().set_axisbelow(True)
   # plt.margins(y=10)
