@@ -1796,7 +1796,7 @@ def printMLtonComparison(mltonConfigName, includeEntanglement):
   tp = 'T({})'.format(maxp)
   spacep = 'R({})'.format(maxp)
   bup = 'R({})/R(s)'.format(maxp)
-  entp = 'ε({})'.format(maxp)
+  entp = 'e({})'.format(maxp)
   headers[3] = 'Time (seconds)'
   headers[9] = 'Space (GB)'
   headers[-1] = '   Bytes Entangled'
@@ -2289,7 +2289,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
   plt.close()
 
 
-def plotSpeedUp():
+def plotSpeedUp(d):
   speedupTags = sorted([
     tag for tag in mplOnlyTags
     if (averageTime(D, 'mpl-em', tag, maxp) is not None)
@@ -2304,8 +2304,8 @@ def plotSpeedUp():
 
   sortedBySpeedups = list(sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp))))
 
-  speedupPlot("figures/mpl-speedups-1.pdf", groupA, groupATags, 0)
-  speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags, len(groupA))
+  speedupPlot(d + "mpl-speedups-1.pdf", groupA, groupATags, 0)
+  speedupPlot(d + "mpl-speedups-2.pdf", groupB, groupBTags, len(groupA))
 # groupA = sortedBySpeedups[::2]
 # groupB = sortedBySpeedups[1::2]
 

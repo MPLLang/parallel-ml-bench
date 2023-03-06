@@ -5,7 +5,11 @@ from report import *
 
 printMLtonComparison('mlton', True)
 #
-plotSpeedUp()
+
+if not os.path.isdir("figures"):
+  os.mkdir("figures")
+
+plotSpeedUp("figures/")
 
 
 
