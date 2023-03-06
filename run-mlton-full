@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+GEN=$ROOT/scripts/gencmds
+RUN=$ROOT/scripts/runcmds
+
+NOW=$(date '+%y%m%d-%H%M%S')
+mkdir -p $ROOT/mlton-full/results
+RESULTS=$ROOT/mlton-full/results/$NOW
+
+rm -f $ROOT/mpl/bin/*.bin
+
+
+( \
+  $GEN $@ $ROOT/mlton-full/exp.json --procs 1,10,20,30,40,50,60,72; \
+) \
+| $RUN --compile --output $RESULTS
+
+echo "[INFO] wrote results to $RESULTS"
