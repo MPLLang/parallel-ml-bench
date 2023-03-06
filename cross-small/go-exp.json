@@ -60,7 +60,7 @@
       {
         "tag": ["linefit-accum"],
         "bench": ["linefit-accum"],
-        "args": ["-n 100000000"]
+        "args": ["-n 500000000"]
       },
       {
         "tag": ["sparse-mxv"],
