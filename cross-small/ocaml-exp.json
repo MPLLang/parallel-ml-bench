@@ -57,7 +57,7 @@
       {
         "tag": ["linefit-accum"],
         "bench": ["linefit_accum"],
-        "args": ["-n 500000000"]
+        "args": ["-n 100000000"]
       },
       {
         "tag": ["mcss"],

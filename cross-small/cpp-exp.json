@@ -45,7 +45,7 @@
       {
         "tag": ["linefit"],
         "bench": ["linefit"],
-        "args": ["-n 500000000"]
+        "args": ["-n 100000000"]
       },
       {
         "tag": ["mcss"],
