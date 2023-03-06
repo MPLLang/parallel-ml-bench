@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+
+from report import *
+
+
+# doFullShootoutTime()
+#
+# printMLtonComparison('mlton', True)
+
+
+
+# speedupPlot("figures/mpl-speedups-1.pdf", groupA, groupATags, 0)
+# speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags, len(groupA))
+printFullShootoutTime()
+printFullShootoutSpace()

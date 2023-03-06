@@ -59,6 +59,9 @@ def lightgreen(s):
 def gray(s):
   return colortext(s, GRAY, bold=False)
 
+def bold(s):
+  return colortext(s, GRAY, bold = True)
+
 def json_careful_loads(s):
   try:
     return json.loads(s)
@@ -712,7 +715,7 @@ def keepTag(t):
     'msort-ints',
     'nearest-nbrs',
     'pfa-bst',
-    # 'primes',
+    'primes',
     'quant-synth',
     'quickhull',
     'range-query',
@@ -1217,6 +1220,160 @@ allShootoutTags = sorted([
   "wc-entangled"
 ], key=displayTag)
 
+
+
+def printFullShootoutTime():
+  # proc1TimeRats = dict()
+  maxPTimeRat = dict()
+  # proc1SpaceRats = dict()
+  # proc72SpaceRats = dict()
+
+  def putMaxPTimeRat(config, xx):
+    if xx is None:
+      return
+    if config not in maxPTimeRat:
+      maxPTimeRat[config] = []
+    maxPTimeRat[config].append(xx)
+
+
+
+  header = list(map (lambda x : '', list (range (0, 13))))
+  # headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'C', 'C/M', 'M', 'M/M', 'G', 'G/M','J', 'J/M', 'O', 'O/M']
+  rows = ["=", headers1, "="]
+  for tag in allShootoutTags:
+    # orp = spg(averageSpace(D, 'ocaml', tag, maxp))
+    # mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
+    # crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
+    # jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
+    # grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+
+    otp = tm(averageTime(D, 'ocaml', ocamlTags[tag], maxp))
+    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+    ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
+    jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
+    gtp = tm(averageTime(D, 'go', goTags[tag], maxp))
+
+    putMaxPTimeRat('ocaml', ovv(sd(otp, mtp)))
+    putMaxPTimeRat('cpp', ovv(sd(ctp, mtp)))
+    putMaxPTimeRat('java', ovv(sd(jtp, mtp)))
+    putMaxPTimeRat('go', ovv(sd(gtp, mtp)))
+
+    row = \
+      [ tag
+      , fmt(ctp)
+      , (fmt(ov(sd(ctp, mtp))))
+      , fmt(mtp)
+      , (fmt(ov(sd(mtp, mtp))))
+      , fmt(gtp)
+      , (fmt(ov(sd(gtp, mtp))))
+      , fmt(jtp)
+      , (fmt(ov(sd(jtp, mtp))))
+      , fmt(otp)
+      , (fmt(ov(sd(otp, mtp))))
+      ]
+    rows.append(row)
+    # output.write(" & ".join([displayTag(tag)] + row))
+    # output.write("  \\\\\n")
+
+    # output.write("\\midrule\n")
+  rows.append("-")
+  row = [
+    "geomean",
+    "", str((fmt(ov(geomean(maxPTimeRat.get('cpp')))))),
+    "", str((fmt(ov(1.0)))),
+    "", str((fmt(ov(geomean(maxPTimeRat.get('go')))))),
+    "", str((fmt(ov(geomean(maxPTimeRat.get('java')))))),
+    "", str((fmt(ov(geomean(maxPTimeRat.get('ocaml'))))))
+  ]
+  rows.append(row)
+    # output.write(" & ".join(["geomean"] + row))
+    # output.write("  \\\\\n")
+  print("\n Time comparison of MPL* v/s C, Go, Java, and Ocaml (similar to Figure 8)\n".format(maxp))
+  print(table(rows, defaultAlign))
+  # print("""\n
+  # EXPERIMENTS: Cross Language. Comparable to the time comparison in Figure 8 (part) in paper""")
+  # print("\n")
+  # print("[INFO] wrote to {}".format(fullShootoutTable))
+
+
+def printFullShootoutSpace():
+  maxPSpaceRat = dict()
+
+  def putMaxPSpaceRat(config, xx):
+    if xx is None:
+      return
+    if config not in maxPSpaceRat:
+      maxPSpaceRat[config] = []
+    maxPSpaceRat[config].append(xx)
+
+  headers = list(map (lambda x : '', list (range (0, 13))))
+  tp = 'T({})'.format(maxp)
+  spacep = 'R({})'.format(maxp)
+  bup = 'R({})/R(s)'.format(maxp)
+  entp = 'ε({})'.format(maxp)
+  headers[3] = 'Time (seconds)'
+  headers[9] = 'Space (GB)'
+  headers[-1] = '   Bytes Entangled'
+  # headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'C', 'C/M', 'M', 'M/M', 'G', 'G/M','J', 'J/M', 'O', 'O/M']
+  rows = [headers1, "="]
+  # fullShootoutTable = "figures/full-shootout-space.tex"
+  for tag in allShootoutTags:
+    orp = spg(averageSpace(D, 'ocaml', ocamlTags[tag], maxp))
+    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
+    crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
+    jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
+    grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+
+    # otp = tm(averageTime(D, 'ocaml', tag, maxp))
+    # mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+    # ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
+    # jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
+    # gtp = tm(averageTime(D, 'go', goTags[tag], maxp))
+
+    putMaxPSpaceRat('ocaml', ovv(sd(orp, mrp)))
+    putMaxPSpaceRat('cpp', ovv(sd(crp, mrp)))
+    putMaxPSpaceRat('java', ovv(sd(jrp, mrp)))
+    putMaxPSpaceRat('go', ovv(sd(grp, mrp)))
+
+    row = \
+      [
+      tag
+      , fmt(crp)
+      , (fmt(ov(sd(crp, mrp))))
+      , fmt(mrp)
+      , (fmt(ov(sd(mrp, mrp))))
+      , fmt(grp)
+      , (fmt(ov(sd(grp, mrp))))
+      , fmt(jrp)
+      , (fmt(ov(sd(jrp, mrp))))
+      , fmt(orp)
+      , (fmt(ov(sd(orp, mrp))))
+      ]
+    rows.append(row)
+    # output.write(" & ".join([displayTag(tag)] + row))
+    # output.write("  \\\\\n")
+
+  # output.write("\\midrule\n")
+  rows.append("-")
+  row = [
+    "geomean",
+    "", (fmt(ov(geomean(maxPSpaceRat.get('cpp'))))),
+    "", (fmt(ov(1.0))),
+    "", (fmt(ov(geomean(maxPSpaceRat.get('go'))))),
+    "", (fmt(ov(geomean(maxPSpaceRat.get('java'))))),
+    "", (fmt(ov(geomean(maxPSpaceRat.get('ocaml')))))
+  ]
+  rows.append(row)
+  print("\n Space comparison of MPL* v/s C, Go, Java, and Ocaml (similar to Figure 8)\n".format(maxp))
+  print(table(rows, defaultAlign))
+    # output.write(" & ".join(["geomean"] + row))
+    # output.write("  \\\\\n")
+  # print("[INFO] wrote to")
+
+
+
 def doFullShootoutTime():
   # proc1TimeRats = dict()
   maxPTimeRat = dict()
@@ -1633,6 +1790,85 @@ def toPctStr(a, b):
   except:
     return "--"
 
+
+
+def printMLtonComparison(mltonConfigName, includeEntanglement):
+  headers = list(map (lambda x : '', list (range (0, 13))))
+  tp = 'T({})'.format(maxp)
+  spacep = 'R({})'.format(maxp)
+  bup = 'R({})/R(s)'.format(maxp)
+  entp = 'ε({})'.format(maxp)
+  headers[3] = 'Time (seconds)'
+  headers[9] = 'Space (GB)'
+  headers[-1] = '   Bytes Entangled'
+  # headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'T(s)', 'T(1)', 'T(1)/T(s)', tp, '(' + tp+ '/T(s))', '|','R(s)', 'R(1)', 'R(1)/R(s)', spacep, bup,'|', entp]
+  print (len(headers1))
+  rows = [headers, '-', headers1, "="]
+
+  ovRats = []
+  suRats = []
+  bu1Rats = []
+  bupRats = []
+
+  def doTag(tag):
+    mltont = tm(averageTime(D, mltonConfigName, tag, 1))
+    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
+
+    mltonr = spg(averageSpace(D, mltonConfigName, tag, 1))
+    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
+
+    pin = pinnedEntangled(D, 'mpl-em', tag, maxp)
+    # pinW = pinnedEntangledWatermark(D, 'mpl-em', tag, maxp)
+    epPctStr = toPctStr(pin, averageSpace(D, 'mpl-em', tag, maxp))
+    # epwPctStr = toPctStr(pinW, averageSpace(D, 'mpl-em', tag, maxp))
+
+    ovRats.append(ovv(sd(mt1, mltont)))
+    suRats.append(ovv(sd(mltont, mtp)))
+    bu1Rats.append(ovv(sd(mr1, mltonr)))
+    bupRats.append(ovv(sd(mrp, mltonr)))
+
+    row = [
+      tag,
+      mltont,
+      mt1,
+      (str(fmt(ov(sd(mt1, mltont))))),
+      mtp,
+      (str(fmt(su(sd(mltont, mtp))))),
+      '|',
+      sfmt(mltonr),
+      sfmt(mr1),
+      (str(noLeadZero(fmt(bu(sd(mr1, mltonr)))))),
+      sfmt(mrp),
+      (str(noLeadZero(fmt(bu(sd(mrp, mltonr)))))),
+    ]
+
+    if includeEntanglement:
+      row += [
+        '|',
+        sp(pin),
+        # sp(pinW),
+        # epPctStr
+      ]
+
+    row = [ fmt(x) for x in row ]
+    return row
+
+  for tag in mltonCmpTags:
+    rows.append(doTag(tag))
+
+  row = [
+    "geomean", "", "", (fmt(ov(geomean(ovRats)))),
+    "",     (fmt(su(geomean(suRats)))),
+    "", "", "", (fmt(ov(geomean(bu1Rats)))),
+    "",     (fmt(ov(geomean(bupRats))))
+  ]
+  rows.append("-")
+  rows.append(row)
+  print(table(rows, defaultAlign))
+  # print("[INFO] wrote to {}".format(mltonCmpTable))
 
 def doMLtonComparison(mltonConfigName, includeEntanglement):
   ovRats = []
@@ -2067,7 +2303,7 @@ groupBTags = speedupTags[half:]
 groupA = sorted(groupATags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
 groupB = sorted(groupBTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
 
-# sortedBySpeedups = list(sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp))))
+sortedBySpeedups = list(sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp))))
 
 # groupA = sortedBySpeedups[::2]
 # groupB = sortedBySpeedups[1::2]
