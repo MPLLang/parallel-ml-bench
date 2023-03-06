@@ -12,11 +12,11 @@ rm -f $ROOT/mpl/bin/*.bin
 
 
 ( \
-  $GEN $@ $ROOT/cross-small/mpl-exp.json --max_procs_only; \
-  $GEN $@ $ROOT/cross-small/cpp-exp.json --max_procs_only; \
-  $GEN $@ $ROOT/cross-small/ocaml-exp.json --max_procs_only; \
-  $GEN $@ $ROOT/cross-small/java-exp.json --max_procs_only; \
-  $GEN $@ $ROOT/cross-small/go-exp.json --max_procs_only; \
+  $GEN $@ $ROOT/cross-small/mpl-exp.json --procs_max_only; \
+  $GEN $@ $ROOT/cross-small/cpp-exp.json --procs_max_only; \
+  $GEN $@ $ROOT/cross-small/ocaml-exp.json --procs_max_only; \
+  $GEN $@ $ROOT/cross-small/java-exp.json --procs_max_only; \
+  $GEN $@ $ROOT/cross-small/go-exp.json --procs_max_only; \
 ) \
 | $RUN --compile --output $RESULTS
 
