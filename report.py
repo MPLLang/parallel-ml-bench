@@ -2187,6 +2187,14 @@ from matplotlib.ticker import MultipleLocator
 usedFull = dict()
 usedNoc = dict()
 
+def getspeedup(tag, p):
+  baseline = averageTime(D, 'mlton', tag, 1)
+  try:
+    return baseline / averageTime(D, 'mpl-em', tag, p)
+  except Exception as e:
+    sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
+    return None
+
 def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
   plt.figure(figsize=(7,7))
   # markers = ['o','v','^','<','>','s','*','d','D','+','x','|','','','','','']
@@ -2287,14 +2295,6 @@ def plotSpeedUp():
     if (averageTime(D, 'mpl-em', tag, maxp) is not None)
     and tag not in sandmarkTags
   ], key=displayTag)
-
-  def getspeedup(tag, p):
-    baseline = averageTime(D, 'mlton', tag, 1)
-    try:
-      return baseline / averageTime(D, 'mpl-em', tag, p)
-    except Exception as e:
-      sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
-      return None
 
   half = int(len(speedupTags)/2)
   groupATags = speedupTags[:half]
