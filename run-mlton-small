@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+GEN=$ROOT/scripts/gencmds
+RUN=$ROOT/scripts/runcmds
+
+NOW=$(date '+%y%m%d-%H%M%S')
+mkdir -p $ROOT/mlton-small/results
+RESULTS=$ROOT/mlton-small/results/$NOW
+
+rm -f $ROOT/mpl/bin/*.bin
+
+
+( \
+  $GEN $@ $ROOT/mlton-small/exp.json --procs 1,4,8; \
+) \
+| $RUN --compile --output $RESULTS
+
+echo "[INFO] wrote results to $RESULTS"
