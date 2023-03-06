@@ -94,6 +94,10 @@ if __name__ == "__main__":
     action = 'store_true',
     dest = 'procs_skip_middle')
 
+  parser.add_argument ('--procs_max_only',
+    action = 'store_true',
+    dest = 'procs_max_only')
+
   parser.add_argument('spec', metavar='SPEC_FILE',
     help = "key/value assignments (json format)")
 
@@ -137,6 +141,9 @@ if __name__ == "__main__":
     small = procs[0]
     big = procs[-1]
     procs = [small, big]
+  elif args.procs_max_only:
+    big = procs[-1]
+    procs = [big]
 
   max_procs = procs[-1]
 
