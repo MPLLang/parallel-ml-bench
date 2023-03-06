@@ -9,7 +9,10 @@ printMLtonComparison('mlton', True)
 if not os.path.isdir("figures"):
   os.mkdir("figures")
 
+print("Plotting the speedups of MPL*. These are similar to Fig.6 and are discussed in Section 4.1 of the paper.")
+print("The results are saved in the files named below.\n\n")
 plotSpeedUp("figures/")
 
 
+print("[INFO] done reporting mlton-mpl comparison with file {}".format(timingsFile))
 

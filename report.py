@@ -1797,12 +1797,11 @@ def printMLtonComparison(mltonConfigName, includeEntanglement):
   spacep = 'R({})'.format(maxp)
   bup = 'R({})/R(s)'.format(maxp)
   entp = 'e({})'.format(maxp)
-  headers[3] = 'Time (seconds)'
+  headers[3] = 'Time (s)'
   headers[9] = 'Space (GB)'
   headers[-1] = '   Bytes Entangled'
   # headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
   headers1 = ['Benchmark', 'T(s)', 'T(1)', 'T(1)/T(s)', tp, '(' + tp+ '/T(s))', '|','R(s)', 'R(1)', 'R(1)/R(s)', spacep, bup,'|', entp]
-  print (len(headers1))
   rows = [headers, '-', headers1, "="]
 
   ovRats = []
@@ -1866,7 +1865,17 @@ def printMLtonComparison(mltonConfigName, includeEntanglement):
   ]
   rows.append("-")
   rows.append(row)
+  print("\n MPL* v/s MLton (similar to Figure 5 and Section 4.1)\n".format(maxp))
   print(table(rows, defaultAlign))
+  print("\n")
+  print("\t\tT(s) denotes MLton time and T(1)/T({}) denote time taken by MPL* on one core and {} cores respectively.".format(maxp, maxp))
+  print("\t\tR(s) denotes MLton space and R(1)/R({}) denote space consumed by MPL* on one core and {} cores respectively.".format(maxp, maxp))
+  print("\t\tPlease refer to Fig. 5 and Section 4.1 in the paper for details. ".format(maxp, maxp))
+
+  # and R(s) denote time and space taken by MLton to run the benchmark. T(1)/T({}) denote \
+        # time taken by MPL ")
+  print("\n \n\n")
+
   # print("[INFO] wrote to {}".format(mltonCmpTable))
 
 def doMLtonComparison(mltonConfigName, includeEntanglement):
@@ -2239,7 +2248,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
       color = colors[ci]
       marker = markers[mi]
       linestyle = linestyles[si]
-      print("tag {} is index {}: {} {} {}".format(tag, i, color, marker, linestyle))
+      # print("tag {} is index {}: {} {} {}".format(tag, i, color, marker, linestyle))
       lines.append(plt.plot(procs, speedups, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
     except Exception as e:
       sys.stderr.write('[WARN] error while plotting speedup for {}: {}\n'.format(tag, e))
@@ -2286,7 +2295,7 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
   ensureFigDir()
   # outputName = 'figures/mpl-speedups.pdf'
   plt.savefig(outputName, bbox_inches='tight')
-  sys.stdout.write("[INFO] output written to {}\n".format(outputName))
+  sys.stdout.write("[INFO] speedup plot saved to {}\n".format(outputName))
   plt.close()
 
 
@@ -2489,4 +2498,3 @@ def reportTangle(plotType):
 # ============================================================================
 # ============================================================================
 # ============================================================================
-print("[INFO] done reporting {}".format(timingsFile))
