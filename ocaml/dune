@@ -38,13 +38,13 @@
 
 (executable
  (name tokens)
- (libraries util cla benchmark readfile bytes tokenize)
+ (libraries util cla benchmark readfile tokenize)
  (modules tokens)
  (modes native))
 
 (executable
  (name wc_accum)
- (libraries util cla benchmark readfile bytes accumulate)
+ (libraries util cla benchmark readfile accumulate)
  (modules wc_accum)
  (modes native))
 
