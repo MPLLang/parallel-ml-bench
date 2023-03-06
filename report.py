@@ -2282,29 +2282,31 @@ def speedupPlot(outputName, tagsSortedBySpeedups, tagsSortedByName, offset):
   plt.close()
 
 
+def plotSpeedUp():
+  speedupTags = sorted([
+    tag for tag in mplOnlyTags
+    if (averageTime(D, 'mpl-em', tag, maxp) is not None)
+    and tag not in sandmarkTags
+  ], key=displayTag)
 
-speedupTags = sorted([
-  tag for tag in mplOnlyTags
-  if (averageTime(D, 'mpl-em', tag, maxp) is not None)
-  and tag not in sandmarkTags
-], key=displayTag)
+  def getspeedup(tag, p):
+    baseline = averageTime(D, 'mlton', tag, 1)
+    try:
+      return baseline / averageTime(D, 'mpl-em', tag, p)
+    except Exception as e:
+      sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
+      return None
 
-def getspeedup(tag, p):
-  baseline = averageTime(D, 'mlton', tag, 1)
-  try:
-    return baseline / averageTime(D, 'mpl-em', tag, p)
-  except Exception as e:
-    sys.stderr.write('[WARN] error while plotting speedup for {} at P={}: {}\n'.format(tag, p, e))
-    return None
+  half = int(len(speedupTags)/2)
+  groupATags = speedupTags[:half]
+  groupBTags = speedupTags[half:]
+  groupA = sorted(groupATags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
+  groupB = sorted(groupBTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
 
-half = int(len(speedupTags)/2)
-groupATags = speedupTags[:half]
-groupBTags = speedupTags[half:]
-groupA = sorted(groupATags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
-groupB = sorted(groupBTags, key=(lambda tag: 1.0/getspeedup(tag, maxp)))
+  sortedBySpeedups = list(sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp))))
 
-sortedBySpeedups = list(sorted(speedupTags, key=(lambda tag: 1.0/getspeedup(tag, maxp))))
-
+  speedupPlot("figures/mpl-speedups-1.pdf", groupA, groupATags, 0)
+  speedupPlot("figures/mpl-speedups-2.pdf", groupB, groupBTags, len(groupA))
 # groupA = sortedBySpeedups[::2]
 # groupB = sortedBySpeedups[1::2]
 
