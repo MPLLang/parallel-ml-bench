@@ -24,11 +24,11 @@
       "config": ["cpp"],
       "cwd": ["cpp"],
       "exp": ["time","space"],
-      "trials": ["1","10"]
+      "trials": ["1"]
     },
 
   "jqselect":
-    "(  (.exp == \"time\" and .trials == \"1\" and (.procs == \"1\" or .procs == $max_procs))  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs and .trials == \"10\")) )  )",
+    "(  (.exp == \"time\" and .trials == \"1\" and (.procs == \"1\" or .procs == $max_procs))  or  ( .exp == \"space\" and ((.procs == \"1\" and .trials == \"1\") or (.procs == $max_procs)) )  )",
 
   "specs":
     [
