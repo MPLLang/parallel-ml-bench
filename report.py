@@ -1307,24 +1307,23 @@ def printFullShootoutSpace():
       maxPSpaceRat[config] = []
     maxPSpaceRat[config].append(xx)
 
-  headers = list(map (lambda x : '', list (range (0, 13))))
-  tp = 'T({})'.format(maxp)
-  spacep = 'R({})'.format(maxp)
-  bup = 'R({})/R(s)'.format(maxp)
-  entp = 'ε({})'.format(maxp)
-  headers[3] = 'Time (seconds)'
-  headers[9] = 'Space (GB)'
-  headers[-1] = '   Bytes Entangled'
   # headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
   headers1 = ['Benchmark', 'C', 'C/M', 'M', 'M/M', 'G', 'G/M','J', 'J/M', 'O', 'O/M']
   rows = [headers1, "="]
+
+  def averageSpaceCustom(D, l, tag, p):
+    t = averageTime(D, l, tag, p)
+    if t is None:
+      return None
+    else:
+      return averageSpace(D, l, tag, p)
   # fullShootoutTable = "figures/full-shootout-space.tex"
   for tag in allShootoutTags:
-    orp = spg(averageSpace(D, 'ocaml', ocamlTags[tag], maxp))
-    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-    crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
-    jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
-    grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
+    orp = spg(averageSpaceCustom(D, 'ocaml', ocamlTags[tag], maxp))
+    mrp = spg(averageSpaceCustom(D, 'mpl-em', tag, maxp))
+    crp = spg(averageSpaceCustom(D, 'cpp', cppTags[tag], maxp))
+    jrp = spg(averageSpaceCustom(D, 'java', javaTags[tag], maxp))
+    grp = spg(averageSpaceCustom(D, 'go', goTags[tag], maxp))
 
     # otp = tm(averageTime(D, 'ocaml', tag, maxp))
     # mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
