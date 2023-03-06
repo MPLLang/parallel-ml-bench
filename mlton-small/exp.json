@@ -41,11 +41,6 @@
   "specs":
     [
       {
-        "tag": ["primes"],
-        "bench": ["primes"],
-        "args": ["-N 100000000"]
-      },
-      {
         "tag": ["msort-ints"],
         "bench": ["msort"],
         "args": ["-N 20000000"]
