@@ -674,15 +674,8 @@ def mostRecentResultsFile(suffix=""):
 if args.input_file:
   timingsFile = args.input_file
 else:
-  print("[INFO] no results file argument; finding most recent")
-  try:
-    mostRecent = mostRecentResultsFile()
-  except Exception as e:
-    print(e)
-    print("[ERR] could not find most recent results file\n " + \
-          "  check that these are formatted as 'YYMMSS-hhmmss'")
-    sys.exit(1)
-  timingsFile = os.path.join(ROOT, 'results', mostRecent)
+  print("[ERR] no results file given")
+  sys.exit(1)
 
 print("[INFO] reading {}\n".format(timingsFile))
 with open(timingsFile, 'r') as data:
