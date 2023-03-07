@@ -8,7 +8,7 @@ NOW=$(date '+%y%m%d-%H%M%S')
 RESULTS=$ROOT/mlton-small/results
 
 rm -f $ROOT/mpl/bin/*.bin
-
+rm -f $RESULTS
 
 ( \
   $GEN $@ $ROOT/mlton-small/exp.json --procs 1,4,8; \

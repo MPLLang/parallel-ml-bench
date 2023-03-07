@@ -7,8 +7,8 @@ RUN=$ROOT/scripts/runcmds
 NOW=$(date '+%y%m%d-%H%M%S')
 RESULTS=$ROOT/cross-full/results
 
-rm -f $ROOT/cross-full/results
 rm -f $ROOT/mpl/bin/*.bin
+rm -f $RESULTS
 
 
 ( \

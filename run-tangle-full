@@ -8,6 +8,7 @@ NOW=$(date '+%y%m%d-%H%M%S')
 RESULTS=$ROOT/tangle/results
 
 rm -f $ROOT/mpl/bin/*.bin
+rm -f $RESULTS
 
 
 ( \
