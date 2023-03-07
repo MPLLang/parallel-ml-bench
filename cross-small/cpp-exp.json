@@ -3,7 +3,7 @@
     [
       {
         "match": { "exp": "time", "config": "cpp", "procs": "(?!1$)" },
-        "template": "<procs?PARLAY_NUM_THREADS={}> /usr/bin/time -v numactl -i all -- bin/<bench>.<config>.bin <args?{}> <args1?{}> -repeat 20 -warmup 5"
+        "template": "<procs?PARLAY_NUM_THREADS={}> /usr/bin/time -v bin/<bench>.<config>.bin <args?{}> <args1?{}> -repeat 20 -warmup 5"
       },
       {
         "match": { "exp": "time", "config": "cpp" },
@@ -11,7 +11,7 @@
       },
       {
         "match": { "exp": "space", "config": "cpp", "procs": "(?!1$)" },
-        "template": "<procs?PARLAY_NUM_THREADS={}> /usr/bin/time -v numactl -i all -- bin/<bench>.<config>.bin <args?{}> <args1?{}> -repeat 20 -warmup 0"
+        "template": "<procs?PARLAY_NUM_THREADS={}> /usr/bin/time -v bin/<bench>.<config>.bin <args?{}> <args1?{}> -repeat 20 -warmup 0"
       },
       {
         "match": { "exp": "space", "config": "cpp" },
