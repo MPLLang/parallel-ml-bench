@@ -158,7 +158,6 @@ def renameTag(row):
   m = pat.search(row['args1'])
   if m:
     newTag = '{}-{}'.format(t, m.group(1))
-    print("found {}".format(newTag))
     return newTag
   return t
 
