@@ -1,10 +1,10 @@
 # parallel-ml-bench
 This folder contains two
 two benchmark suites for  evaluating the Parallel ML  [`mpl`](https://github.com/MPLLang/mpl) compiler.
-The first suite, which we call the `ML suite', contains 26 benchmarks
+The first suite, which we call the `ML suite1, contains 26 benchmarks
 that are written in MPL. The goal of this suite is to compare the performance of MPL to MLton,
 a sequential compiler for Standard ML.
-The second suite, which we call the `Cross Language suite', contains implementations of
+The second suite, which we call the `Cross Language suite`, contains implementations of
 eight benchmarks in four languages (other than MPL) : C++, Go, Java, and Multicore OCaml.
 Its goal is to show that MPL is can compete with/beat these languages.
 
