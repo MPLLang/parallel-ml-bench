@@ -1,17 +1,33 @@
 # parallel-ml-bench
-Parallel ML benchmark suite for the [`mpl`](https://github.com/MPLLang/mpl)
-compiler.
+This folder contains two
+two benchmark suites for  evaluating the Parallel ML  [`mpl`](https://github.com/MPLLang/mpl) compiler.
+The first suite, which we call the `ML suite', contains 26 benchmarks
+that are written in MPL. The goal of this suite is to compare the performance of MPL to MLton,
+a sequential compiler for Standard ML.
+The second suite, which we call the `Cross Language suite', contains implementations of
+eight benchmarks in four languages (other than MPL) : C++, Go, Java, and Multicore OCaml.
+Its goal is to show that MPL is can compete with/beat these languages.
 
-MaPLe (MPL) is an extension of the [MLton](http://mlton.org)
-compiler for Standard ML which implements support for
-nested (fork-join) parallelism. MPL generates executables with
-excellent multicore performance, utilizing a novel approach to
-memory management based on the theory of disentanglement
-[[1](#rmab16),[2](#gwraf18),[3](#wyfa20),[4](#awa21)].
-MPL is research software and is being actively developed.
+## ML suite
 
-This suite consists of sophisticated parallel benchmarks from various
-problem domains, including graphs, text processing, digital audio processing,
+Among the 26 benchmarks in this suite,
+thirteen of these are highly concurrent and entangled.
+These implement sophisticated parallel algorithms for
+- quantum circuit synthesis,
+- delaunay triangulation,
+- various graph analyses, including reachability/connectivity, $O(k)$-spanner, low-diameter decomposition
+boundaries, etc., and
+- deduplication via concurrent hashing.
+
+Some of these benchmarks---such as the quantum synthesis and delaunay
+triangulation---are complex and have taken multiple person-months of
+work (each) to implement.
+In addition, the entangled benchmarks include synthetic benchmarks that operate on
+concurrent data structures by mixing parallelizable work with updates
+and queries on the shared data structure(s).
+
+The other half of the benchmarks are from
+various problem domains, including graphs, text processing, digital audio processing,
 image analysis and manipulation, numerical algorithms, computational
 geometry, and others. These are ported to MPL from existing state-of-the-art
 parallel C/C++ benchmark suites and libraries including
@@ -19,41 +35,29 @@ parallel C/C++ benchmark suites and libraries including
 [ParlayLib](https://github.com/cmuparlay/parlaylib),
 [Ligra](https://github.com/jshun/ligra), and
 [PAM](https://github.com/cmuparlay/PAM).
-Even though these benchmarks were originally written in C/C++, all of them
-are naturally disentangled.
 
-All benchmarks are "problem-based", i.e., the input and output are
-well-specified, allowing us to do cross-language comparisons.
-This repo includes comparisons with Java, Go, Multicore OCaml, and C++.
-We also compare against MLton (on which MPL is based) to determine overall
-overheads and scalability.
 
 Please see also [`mpllib`](https://github.com/MPLLang/mpllib), which
 is a library of key data structures and algorithms used throughout the MPL
 benchmarks.
 
-## Sample of results
+## Cross Language suite
+This suite contains the implementations of
+eight benchmarks in four languages (other than \mplcc{}) : C++, Go, Java, and
+Multicore OCaml.
+%
+The C++ benchmarks come from
+PBBS~\cite{pbbs-2012,abdds-pbbsv2-2022,bfgs12-pbbs} and
+ParlayLib~\cite{bad+parlaylib-2020}.
+%
+We ported these to Go, Java, and OCaml, while re-using existing Java
+implementations of two benchmarks.
+%
+We selected these benchmarks for diversity (covering both disentanglement
+and entanglement, as well as both memory- and compute-intensive benchmarks),
+and for ease of implementation, as it takes significant work to implement each
+benchmark in multiple languages.
 
-### Java comparison
-Comparison with Java on a few benchmarks, with runtimes $T_p$ (in seconds) and
-space usage (maximum residency, in GB) $R_p$ on $p$ processors. Column $J/M$ is
-the overhead of Java relative to MPL; higher ratios are better for MPL.
-
-![Comparison between Java and MPL](img/java-cmp.png)
-
-### Go comparison
-Comparison with Go on a few benchmarks, with runtimes $T_p$ (in seconds) and
-space usage $R_p$ (in GB) on $p$ processors. Column $G/M$ is the overhead of
-Go relative to MPL; higher ratios are better for MPL.
-
-![Comparison between Go and MPL](img/go-cmp.png)
-
-### Speedups
-Speedup of MPL over MLton on up to 72 processors
-across 30 benchmarks. This is on a 72-core server (4x 2.4GHz Intel E7-8867 v4
-Xeons) with 1TB of memory.
-
-![Speedups of MPL over MLton on up to 72 processors](img/speedups.png)
 
 ## Requirements
 
@@ -75,81 +79,6 @@ Software requirements:
     - Java version 11
   * Go experiments only:
     - Go version 1.18
-
-## Setup
-
-First clone the repository:
-```
-$ git clone https://github.com/MPLLang/parallel-ml-bench
-$ cd parallel-ml-bench
-```
-
-Then, run the init script. This should take approximately 15 minutes. It
-installs all necessary  versions of `mpl` and generates inputs. Note that
-the generated inputs require approximately 5GB of disk space.
-```
-$ ./init
-```
-
-## Run experiments
-
-After completing the setup (described above), you can run all of the
-experiments by passing a comma-separated list of processors to the `run`
-script.
-
-For example, here we run on 1, 4, and 8 processors:
-```
-$ ./run --procs 1,4,8
-```
-
-This command begins by compiling all of the benchmarks, and then runs each
-one-by-one. **This will take a long time.** Depending on how many processors
-you use, it could take multiple hours.
-
-A progress indicator is printed at the beginning of each run which shows how
-many commands are left to run. For example, `[5/100]` means that this is the
-5th benchmark out of 100 total benchmarks to run.
-
-Results are written to a timestamped file in the `results/` directory. The
-timestamp format is `YYMMDD-HHMMSS`. Each line of a results file is a
-JSON object with the parameters and results from that run.
-
-You may terminate the `run` script early with `Ctrl-C`. All results obtained
-so far will still be available in the results file.
-
-## Generate report
-
-After using the `run` script as described above, you can run the following
-script to generate tables, speedup plots, etc. This will print out info at
-the command line, and also generate data in the `figures/` directory.
-```
-$ ./report
-```
-
-## TODO
-
-Infrastructure and benchmarks
-  * [x] update inputs (need words256, input graphs, etc.)
-  * [x] report script (speedup plots, summary table, etc.)
-  * [ ] benchmarks documentation
-  * [x] MPL: infrastructure
-  * [x] MPL: benchmarks
-  * [x] C++: infrastructure
-  * [x] C++: **more benchmarks**
-  * [x] Java: infrastructure
-  * [ ] Java: **more benchmarks**
-  * [x] OCaml: infrastructure
-  * [x] OCaml: **more benchmarks**
-  * [x] Go: infrastructure
-  * [x] Go: **more benchmarks**
-
-Performance optimization
-  * [ ] Try z-sort for nearest neighbors.
-  * [ ] Try leaf-based nearest neighbors. Would this improve performance
-  for neighbors component of Delaunay, too?
-  * [ ] Compare direction-optimizing BFS with C++ Ligra
-  * [x] Check delayed-seq performance vs hand-optimized for delayed-seq
-  benchmarks
 
 ## References
 
