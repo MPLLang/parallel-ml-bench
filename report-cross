@@ -2,6 +2,6 @@
 
 from report import *
 
-
 printFullShootoutTime()
 printFullShootoutSpace()
+print("\n\n The tables above are discussed in Section 4.5 of the paper (similar to Figure 8)\n".format(maxp))
