@@ -1,0 +1,18 @@
+#!/bin/bash
+
+ROOT=$(git rev-parse --show-toplevel)
+GEN=$ROOT/scripts/gencmds
+RUN=$ROOT/scripts/runcmds
+
+NOW=$(date '+%y%m%d-%H%M%S')
+RESULTS=$ROOT/run-tangle/results
+
+rm -f $ROOT/mpl/bin/*.bin
+
+
+( \
+  $GEN $@ $ROOT/tangle/tangle-exp.json --procs_max_only; \
+) \
+| $RUN --compile --output $RESULTS
+
+echo "[INFO] wrote results to $RESULTS"
