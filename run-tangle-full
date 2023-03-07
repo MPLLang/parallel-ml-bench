@@ -11,8 +11,8 @@ rm -f $ROOT/mpl/bin/*.bin
 
 
 ( \
-  $GEN $@ $ROOT/tangle/tangle-exp.json --procs_max_only; \
+  $GEN $@ $ROOT/tangle/tangle-exp.json --procs 1,72 --procs_max_only; \
 ) \
-| $RUN --compile --output --procs 1,72 $RESULTS
+| $RUN --compile --output $RESULTS
 
 echo "[INFO] wrote results to $RESULTS"
