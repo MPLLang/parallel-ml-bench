@@ -5,7 +5,7 @@ GEN=$ROOT/scripts/gencmds
 RUN=$ROOT/scripts/runcmds
 
 NOW=$(date '+%y%m%d-%H%M%S')
-RESULTS=$ROOT/run-tangle/results
+RESULTS=$ROOT/tangle/results
 
 rm -f $ROOT/mpl/bin/*.bin
 
@@ -13,6 +13,6 @@ rm -f $ROOT/mpl/bin/*.bin
 ( \
   $GEN $@ $ROOT/tangle/tangle-exp.json --procs_max_only; \
 ) \
-| $RUN --compile --output $RESULTS
+| $RUN --compile --output --procs 1,72 $RESULTS
 
 echo "[INFO] wrote results to $RESULTS"
