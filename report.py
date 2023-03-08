@@ -1252,7 +1252,7 @@ def printFullShootoutTime():
     putMaxPTimeRat('go', ovv(sd(gtp, mtp)))
 
     row = \
-      [ tag
+      [ displayTag(tag)
       , fmt(ctp)
       , (fmt(ov(sd(ctp, mtp))))
       , fmt(mtp)
@@ -1330,7 +1330,7 @@ def printFullShootoutSpace():
 
     row = \
       [
-      tag
+      displayTag(tag)
       , fmt(crp)
       , (fmt(ov(sd(crp, mrp))))
       , fmt(mrp)
