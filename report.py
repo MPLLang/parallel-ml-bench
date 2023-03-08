@@ -1821,7 +1821,7 @@ def printMLtonComparison(mltonConfigName, includeEntanglement):
     bupRats.append(ovv(sd(mrp, mltonr)))
 
     row = [
-      tag,
+      displayTag(tag),
       mltont,
       mt1,
       (str(fmt(ov(sd(mt1, mltont))))),
