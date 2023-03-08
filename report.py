@@ -2136,60 +2136,58 @@ def printRuntimeStatsSummary():
 # PDF: Speedup plot
 # ============================================================================
 
-def doMplComparison():
+def printMplComparison():
   proc1TimeDiffs = []
   proc72TimeDiffs = []
   proc1SpaceDiffs = []
   proc72SpaceDiffs = []
+  headers = ['Benchmark','T(1)', 'T*(1)', 'T(72)', 'T*(72)', 'R(1)', 'R*(1)', 'R(72)','R*(72)']
+  rows = [headers, "="]
+  for tag in sorted(mplCmpTags):
 
-  mplComparisonTable = "figures/mpl-space-time-comparison.tex"
-  with open(mplComparisonTable, 'w') as output:
-    for tag in sorted(mplCmpTags):
+    if tag in sandmarkTags:
+      continue
 
-      if tag in sandmarkTags:
-        continue
+    # mlton = spg(averageSpace(DS, 'mlton', tag, 1))
+    R_mpl1 = spg(averageSpace(D, 'mpl', tag, 1))
+    R_mplp = spg(averageSpace(D, 'mpl', tag, maxp))
+    R_mplcc1 = spg(averageSpace(D, 'mpl-em', tag, 1))
+    R_mplccp = spg(averageSpace(D, 'mpl-em', tag, maxp))
 
-      # mlton = spg(averageSpace(DS, 'mlton', tag, 1))
-      R_mpl1 = spg(averageSpace(D, 'mpl', tag, 1))
-      R_mplp = spg(averageSpace(D, 'mpl', tag, maxp))
-      R_mplcc1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      R_mplccp = spg(averageSpace(D, 'mpl-em', tag, maxp))
+    T_mpl1 = tm(averageTime(D, 'mpl', tag, 1))
+    T_mplp = tm(averageTime(D, 'mpl', tag, maxp))
+    T_mplcc1 = tm(averageTime(D, 'mpl-em', tag, 1))
+    T_mplccp = tm(averageTime(D, 'mpl-em', tag, maxp))
 
-      T_mpl1 = tm(averageTime(D, 'mpl', tag, 1))
-      T_mplp = tm(averageTime(D, 'mpl', tag, maxp))
-      T_mplcc1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      T_mplccp = tm(averageTime(D, 'mpl-em', tag, maxp))
+    proc1TimeDiffs.append(pcd(T_mplcc1, T_mpl1))
+    proc72TimeDiffs.append(pcd(T_mplccp, T_mplp))
+    proc1SpaceDiffs.append(pcd(R_mplcc1, R_mpl1))
+    proc72SpaceDiffs.append(pcd(R_mplccp, R_mplp))
 
-      proc1TimeDiffs.append(pcd(T_mplcc1, T_mpl1))
-      proc72TimeDiffs.append(pcd(T_mplccp, T_mplp))
-      proc1SpaceDiffs.append(pcd(R_mplcc1, R_mpl1))
-      proc72SpaceDiffs.append(pcd(R_mplccp, R_mplp))
+    row = \
+      [ displayTag(tag)
+      , fmt(T_mpl1)
+      , (latexpcd(T_mplcc1, T_mpl1, highlight=False))
+      , fmt(T_mplp)
+      , (latexpcd(T_mplccp, T_mplp, highlight=False))
+      , sfmt(R_mpl1)
+      , (latexpcd(R_mplcc1, R_mpl1, highlight=False))
+      , sfmt(R_mplp)
+      , (latexpcd(R_mplccp, R_mplp, highlight=False))
+      ]
 
-      row = \
-        [ fmt(T_mpl1)
-        , makeBold(latexpcd(T_mplcc1, T_mpl1, highlight=False))
-        , fmt(T_mplp)
-        , makeBold(latexpcd(T_mplccp, T_mplp, highlight=False))
-        , sfmt(R_mpl1)
-        , makeBold(latexpcd(R_mplcc1, R_mpl1, highlight=False))
-        , sfmt(R_mplp)
-        , makeBold(latexpcd(R_mplccp, R_mplp, highlight=False))
-        ]
+    rows.append(row)
 
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", makeBold(fmtpcd(average(proc1TimeDiffs), highlight=False)),
-      "", makeBold(fmtpcd(average(proc72TimeDiffs), highlight=False)),
-      "", makeBold(fmtpcd(average(proc1SpaceDiffs), highlight=False)),
-      "", makeBold(fmtpcd(average(proc72SpaceDiffs), highlight=False))
-    ]
-    output.write(" & ".join(["average"] + row))
-    output.write("  \\\\\n")
-
-  print("[INFO] wrote to {}".format(mplComparisonTable))
+  rows.append('-')
+  row = [
+    "geomean",
+    "", makeBold(fmtpcd(average(proc1TimeDiffs), highlight=False)),
+    "", makeBold(fmtpcd(average(proc72TimeDiffs), highlight=False)),
+    "", makeBold(fmtpcd(average(proc1SpaceDiffs), highlight=False)),
+    "", makeBold(fmtpcd(average(proc72SpaceDiffs), highlight=False))
+  ]
+  print(table(rows, defaultAlign))
+  print("[INFO] wrote mpl comparison")
 
 # doMplComparison()
 
