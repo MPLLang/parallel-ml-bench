@@ -48,19 +48,9 @@
         "args": ["-input ../inputs/words256.txt"]
       },
       {
-        "tag": ["sparse-mxv"],
-        "bench": ["SparseMxV"],
-        "args": ["-n 200000000"]
-      },
-      {
         "tag": ["dedup-strings"],
         "bench": ["DedupStrings"],
         "args": ["-input ../inputs/words256-shuffled.txt"]
-      },
-      {
-        "tag": ["wc-accum"],
-        "bench": ["WCAccum"],
-        "args": ["-input ../inputs/rmat-10M-symm"]
       }
     ]
 }
