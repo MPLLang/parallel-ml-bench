@@ -70,11 +70,16 @@ the arguments (under the field `args`) for each benchmark.
 
 You can pass any of these files to `scripts/gencmds` which produces "rows" of key-value
 pairs, where each row describes one experiment. Examples of keys include
-"config", "tag", etc. The config is the name of compiler configuration to
-use, the tag is a unique name for each benchmark, etc.
-As an example, if you run `./scripts/gencmds run-cross-small/cpp-exp.json` you will see
-the commands for running the benchmarks.
+"config", "tag", "cmd", etc. The "cmd" key is the most relevant
+as it maps to the commands for running benchmarks.
 
+As an example, suppose you want to run the `primes` benchmark with C++.
+For this, first go the `cpp` folder and run `make primes.cpp.bin`.
+<!--  -->
+If the compilation is successful, then you can run the benchmark.
+To run the benchmark, first run `./scripts/gencmds run-cross-small/cpp-exp.json | grep primes`.
+You will see rows of JSON objects printed out
+and the cmd key in them can be used to run the primes benchmark.
 
 ## Requirements
 
