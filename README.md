@@ -60,7 +60,7 @@ we provide a template command that can be used
 to run it with the appropriate inputs on the desired number of cores.
 <!--  -->
 
-In the `run-cross-small` folder, there is a JSON file for each language
+In the `cross-small` folder, there is a JSON file for each language
 which provides a template for running programs in that language
 and also provides the benchmark-specific arguments for the experiments.
 In the field "templates" of the JSON file,
@@ -72,7 +72,7 @@ You can pass any of these files to `scripts/gencmds` which produces "rows" of ke
 pairs, where each row describes one experiment. Examples of keys include
 "config", "tag", etc. The config is the name of compiler configuration to
 use, the tag is a unique name for each benchmark, etc.
-As an example, if you run `./scripts/gencmds run-cross-small/cpp-exp.json` you will see
+As an example, if you run `./scripts/gencmds cross-small/cpp-exp.json` you will see
 the commands for running the benchmarks.
 
 
