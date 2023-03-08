@@ -60,7 +60,7 @@ we provide a template command that can be used
 to run it with the appropriate inputs on the desired number of cores.
 <!--  -->
 
-In the `run-cross-small` folder, there is a JSON file for each language
+In the `cross-small` folder, there is a JSON file for each language
 which provides a template for running programs in that language
 and also provides the benchmark-specific arguments for the experiments.
 In the field "templates" of the JSON file,
