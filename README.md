@@ -45,18 +45,35 @@ benchmarks.
 This suite contains the implementations of
 eight benchmarks in four languages (other than \mplcc{}) : C++, Go, Java, and
 Multicore OCaml.
-%
 The C++ benchmarks come from
-PBBS~\cite{pbbs-2012,abdds-pbbsv2-2022,bfgs12-pbbs} and
-ParlayLib~\cite{bad+parlaylib-2020}.
-%
+PBBS and ParlayLib.
 We ported these to Go, Java, and OCaml, while re-using existing Java
 implementations of two benchmarks.
-%
 We selected these benchmarks for diversity (covering both disentanglement
 and entanglement, as well as both memory- and compute-intensive benchmarks),
 and for ease of implementation, as it takes significant work to implement each
 benchmark in multiple languages.
+
+## Command Line Arguments for each language and its benchmarks
+For each language and its benchmark,
+we provide a template command that can be used
+to run it with the appropriate inputs on the desired number of cores.
+<!--  -->
+
+In the `run-cross-small` folder, there is a JSON file for each language
+which provides a template for running programs in that language
+and also provides the benchmark-specific arguments for the experiments.
+In the field "templates" of the JSON file,
+there is a template field which shows how you can run a benchmark with some arguments.
+In the field "specs", an array of entries specifies
+the arguments (under the field `args`) for each benchmark.
+
+You can pass any of these files to `scripts/gencmds` which produces "rows" of key-value
+pairs, where each row describes one experiment. Examples of keys include
+"config", "tag", etc. The config is the name of compiler configuration to
+use, the tag is a unique name for each benchmark, etc.
+As an example, if you run `./scripts/gencmds run-cross-small/cpp-exp.json` you will see
+the commands for running the benchmarks.
 
 
 ## Requirements
@@ -79,6 +96,9 @@ Software requirements:
     - Java version 11
   * Go experiments only:
     - Go version 1.18
+
+
+
 
 ## References
 
