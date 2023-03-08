@@ -51,11 +51,6 @@
         "args": ["-input ../inputs/uniform-circle-1M"]
       },
       {
-        "tag": ["quickhull"],
-        "bench": ["quickhull"],
-        "args": ["-infile ../inputs/uniform-circle-20M"]
-      },
-      {
         "tag": ["reverb"],
         "bench": ["reverb"],
         "args": ["../inputs/mangore-waltz.wav"]
