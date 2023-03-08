@@ -10,9 +10,7 @@ Its goal is to show that MPL is can compete with/beat these languages.
 
 ## ML suite
 
-Among the 26 benchmarks in this suite,
-thirteen of these are highly concurrent and entangled.
-These implement sophisticated parallel algorithms for
+Among the 26 benchmarks in this suite, thirteen are highly concurrent and entangled. They implement sophisticated parallel algorithms for
 - quantum circuit synthesis,
 - delaunay triangulation,
 - various graph analyses, including reachability/connectivity, $O(k)$-spanner, low-diameter decomposition
