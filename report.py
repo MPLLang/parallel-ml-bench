@@ -2013,7 +2013,7 @@ def runtimeStats(procs):
 # LaTeX figure: GC and Runtime Stats, Summary
 # ============================================================================
 
-def runtimeStatsSummary():
+def printRuntimeStatsSummary():
   # ovRats = []
   # suRats = []
   # bu1Rats = []
@@ -2027,7 +2027,28 @@ def runtimeStatsSummary():
   totCr = [0]
   totLr = [0]
 
-  def doTag(tag, output):
+  headers1 = ['Benchmark','Work', 'GC Work', 'Leaf', 'Intern', 'Tot', 'Leaf', 'Intern','Tot', 'Leaf', 'Intern']
+  rows = [headers1, "="]
+
+  def toPctStr(a, b):
+    try:
+      eep = float(a)
+      rrp = float(b)
+      epPct = 100.0 * (eep / rrp)
+      if eep < 0.00001:
+        return ""
+      elif epPct > 99.999:
+        return "100%"
+      elif epPct > 99:
+        return ">99%"
+      elif epPct < 1:
+        return "<1%"
+      else:
+        return str(int(round(epPct))) + "%"
+    except:
+      return "--"
+
+  def doTag(tag):
     # r = averageSpace(D, 'mpl-em', tag, maxp)
     lc = lgcCount(D, 'mpl-em', tag, maxp)
     cc = cgcCount(D, 'mpl-em', tag, maxp)
@@ -2070,6 +2091,7 @@ def runtimeStatsSummary():
     # cgcRecThrough = sd(sd(cr, cgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
 
     row = [
+      displayTag(tag),
       approxWork,
       pctGCWork,
       avgLGCtimeMilli,
@@ -2083,34 +2105,31 @@ def runtimeStatsSummary():
     ]
 
     row = [ fmt(x) for x in row ]
-    output.write(" & ".join([displayTag(tag)] + row))
-    output.write("  \\\\\n")
+    rows.append(row)
+    # output.write(" & ".join([displayTag(tag)] + row))
+    # output.write("  \\\\\n")
 
-  ensureFigDir()
-  runtimeStatsTable = "figures/runtime-stats-summary.tex"
-  with open(runtimeStatsTable, 'w') as output:
     # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-    #   doTag(tag, output)
+    #   doTag(tag)
     # output.write("\\midrule\n")
     # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
-    #   doTag(tag, output)
+    #   doTag(tag)
 
-    for tag in mltonCmpTags:
-      doTag(tag, output)
+  for tag in mltonCmpTags:
+    doTag(tag)
 
-    output.write("\\midrule\n")
-    row = [
-      "", "", "", "", "", "", "", "",
-      # makeBold(fmt(ovToPctStr(geomean(gcRats)))),
-      # makeBold(fmt(ovToPctStr(geomean(gcLRecRats)))),
-      # makeBold(fmt(ovToPctStr(geomean(gcCRecRats))))
-      makeBold(fmt(toPctStr(totLr[0], totRec[0]))),
-      makeBold(fmt(toPctStr(totCr[0], totRec[0])))
-    ]
-    output.write(" & ".join(["total"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(runtimeStatsTable))
-
+  rows.append("-")
+  row = [
+    "geomean",
+    "", "", "", "", "", "", "", "",
+    # makeBold(fmt(ovToPctStr(geomean(gcRats)))),
+    # makeBold(fmt(ovToPctStr(geomean(gcLRecRats)))),
+    # makeBold(fmt(ovToPctStr(geomean(gcCRecRats))))
+    (fmt(toPctStr(totLr[0], totRec[0]))),
+    (fmt(toPctStr(totCr[0], totRec[0])))
+  ]
+  rows.append(row)
+  print(table(rows, defaultAlign))
 # runtimeStatsSummary()
 
 # ============================================================================
