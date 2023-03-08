@@ -90,7 +90,6 @@ Software requirements:
   * [mpl-switch](https://github.com/MPLLang/mpl-switch)
   * [smlpkg](https://github.com/diku-dk/smlpkg)
   * [jq](https://stedolan.github.io/jq/)
-  * [numactl](https://github.com/numactl/numactl) (for C++, Java, Go experiments)
   * OCaml experiments only:
     - OCaml version `5.0.0+trunk`
     - [`opam`](https://github.com/ocaml/opam) version `2.1.0`
