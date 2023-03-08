@@ -76,7 +76,7 @@ as it maps to the commands for running benchmarks.
 As an example, suppose you want to run the `primes` benchmark with C++.
 For this, first go the `cpp` folder and run `make primes.cpp.bin`.
 If the compilation is successful, then you can run the benchmark.
-To run the benchmark, first run `./scripts/gencmds run-cross-small/cpp-exp.json | grep primes`.
+To run the benchmark, first run `../scripts/gencmds ../cross-small/cpp-exp.json | grep primes`.
 You will see rows of JSON objects printed out
 and the cmd key in them can be used to run the primes benchmark.
 
