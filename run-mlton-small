@@ -11,7 +11,7 @@ rm -f $ROOT/mpl/bin/*.bin
 rm -f $RESULTS
 
 ( \
-  $GEN $@ $ROOT/mlton-small/exp.json --procs 1,4,8; \
+  $GEN $@ $ROOT/mlton-small/exp.json; \
 ) \
 | $RUN --compile --output $RESULTS
 
