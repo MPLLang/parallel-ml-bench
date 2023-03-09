@@ -1,0 +1,5 @@
+$ make mandelbrot-flat.{mpl,local-hb}.bin -j
+
+$ bin/mandelbrot-flat.mpl.bin @mpl procs 64 set-affinity -- -top 1.0 -bot 0.0 -left ~1.5 -right ~1.49999999 -resolution 10000000 -warmup 5 -repeat 20
+
+$ bin/mandelbrot-flat.local-hb.bin @mpl procs 64 set-affinity -- -top 1.0 -bot 0.0 -left ~1.5 -right ~1.49999999 -resolution 10000000 -warmup 5 -repeat 20
