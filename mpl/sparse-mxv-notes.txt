@@ -1,0 +1,5 @@
+$ make sparse-mxv-delayed-input-no-outer-grain.{mpl,local-hb}.bin -j
+
+$ bin/sparse-mxv-delayed-input-no-outer-grain.mpl.bin @mpl procs 64 set-affinity -- -n 50000000 -repeat 20 -warmup 5 -row-len 1
+
+$ bin/sparse-mxv-delayed-input-no-outer-grain.local-hb.bin @mpl procs 64 set-affinity -- -n 50000000 -repeat 20 -warmup 5 -row-len 1
