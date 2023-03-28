@@ -37,3 +37,13 @@ let tokens f b =
   in
   let result = Seq.full (Seqbasis.tabulate 1024 (0, n) token) in
   result
+
+let tokens' f b =
+  let (n, g) = tokenRanges f b in
+  let token i =
+    let (lo, hi) = g i in
+    (b, lo, hi)
+  in
+  let result = Seq.full (Seqbasis.tabulate 1024 (0, n) token) in
+  result
+
