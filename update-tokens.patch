@@ -1,0 +1,215 @@
+diff --git a/cpp/new-tokens.cpp b/cpp/new-tokens.cpp
+index b89aa73..7a19242 100644
+--- a/cpp/new-tokens.cpp
++++ b/cpp/new-tokens.cpp
+@@ -13,21 +13,23 @@ int main(int argc, char** argv) {
+     }
+   };
+ 
+-  size_t s;
++  auto result = parlay::sequence({input.cut(0, 0)});
+   pbbsBench::launch([&] {
+     auto ids = token_boundaries(input, is_space);
+     size_t count = ids.size() / 2;
+-    auto result = parlay::tabulate(count, [&] (size_t i) {
++    result = parlay::tabulate(count, [&] (size_t i) {
+       auto slice = input.cut(ids[2*i], ids[2*i+1]);
+-      auto str = std::string(slice.begin(), slice.end());
+-      return str;
++      /*auto str = std::string(slice.begin(), slice.end());*/
++      /*return str;*/
++      return slice;
+     });
+-    s = result.size();
+-    // for (size_t i = 0; i < std::min(s, (size_t)5); i++) {
+-    //   std::cout << result[i] << " ";
+-    // }
+-    // std::cout << "..." << std::endl;
+   });
+-  std::cout << "result " << s << std::endl;
++
++  std::cout << "num tokens " << result.size() << std::endl;
++  for (size_t i = 0; i < std::min(result.size(), (size_t)10); i++) {
++    std::cout << std::string(result[i].begin(), result[i].end()) << " ";
++  }
++  std::cout << "..." << std::endl;
++  
+   return 0;
+ }
+diff --git a/go/common/utils.go b/go/common/utils.go
+index dd5be86..f651009 100644
+--- a/go/common/utils.go
++++ b/go/common/utils.go
+@@ -161,7 +161,14 @@ func tokenGenerator(s []byte, isSpace func(byte) bool) (int, func(int)string) {
+ }
+ 
+ 
+-func tokens(s []byte, isSpace func(byte) bool) []string {
++type ByteSlice struct {
++  data []byte
++  start int
++  length int
++}
++
++
++func tokens(s []byte, isSpace func(byte) bool) []ByteSlice {
+ 	n := len(s)
+ 	check := func(i int) bool {
+ 		if i == n {
+@@ -179,19 +186,19 @@ func tokens(s []byte, isSpace func(byte) bool) []string {
+ 	ids := filter(5000, check, n+1, func (i int) int { return i })
+ 	count := len(ids) / 2
+ 
+-	result := make([]string, count)
++	result := make([]ByteSlice, count)
+ 	parallelRange(5000, 0, count, func (lo, hi int) {
+ 		for i := lo; i < hi; i++ {
+ 			start := ids[2*i]
+ 			stop := ids[2*i+1]
+ 
+-			result[i] = string(s[start:stop])
++			slice := ByteSlice {
++				data: s,
++				start: start,
++				length: stop-start,
++			}
+ 
+-			// str := make([]byte, stop-start)
+-			// for j := 0; j < stop-start; j++ {
+-			// 	str[j] = s[start+j]
+-			// }
+-			// result[i] = string(str)
++			result[i] = slice
+ 		}
+ 	})
+ 
+diff --git a/go/tokens/main.go b/go/tokens/main.go
+index f7f3962..5934e63 100644
+--- a/go/tokens/main.go
++++ b/go/tokens/main.go
+@@ -12,13 +12,14 @@ func main() {
+ 	tm := getTime(func() { contents = readFileContents(path) })
+ 	fmt.Printf("read file in %.3fs\n", tm);
+ 
+-  var result []string
++  var result []ByteSlice
+ 	benchmarkRun("tokens", func(){ result = tokens(contents, isSpace) })
+ 
+   fmt.Printf("number of tokens %d\n", len(result))
+ 	for i := 0; i < 10; i++ {
+ 		// result[i].Print()
+-    fmt.Printf("%s ", result[i])
++		x := result[i]
++    fmt.Printf("%s ", string(x.data[x.start : (x.start+x.length)]))
+   }
+   fmt.Printf("...\n")
+ }
+diff --git a/java/Tokenize.java b/java/Tokenize.java
+index 2530fdc..4e7dfeb 100644
+--- a/java/Tokenize.java
++++ b/java/Tokenize.java
+@@ -4,7 +4,13 @@ import java.util.stream.*;
+ 
+ class Tokenize {
+ 
+-  static String[] tokens(String input) {
++  static class StringSlice {
++    public String data;
++    public int start;
++    public int length;
++  }
++
++  static StringSlice[] tokens(String input) {
+     int n = input.length();
+     int[] ids = IntStream.range(0,n+1).parallel().filter(i -> {
+       if (i == n) {
+@@ -19,11 +25,16 @@ class Tokenize {
+     }).toArray();
+ 
+     int numTokens = ids.length / 2;
+-    String[] result = new String[numTokens];
++    StringSlice[] result = new StringSlice[numTokens];
+     IntStream.range(0, numTokens).parallel().forEach(i -> {
+       int start = ids[2*i];
+       int stop = ids[2*i+1];
+-      result[i] = input.substring(start, stop);
++      // result[i] = input.substring(start, stop);
++      StringSlice slice = new StringSlice();
++      slice.data = input;
++      slice.start = start;
++      slice.length = stop-start;
++      result[i] = slice;
+     });
+ 
+     return result;
+diff --git a/java/Tokens.java b/java/Tokens.java
+index 0ac8d0f..71f71c4 100644
+--- a/java/Tokens.java
++++ b/java/Tokens.java
+@@ -6,7 +6,7 @@ class Tokens {
+ 
+   static final long NPS = (1000L * 1000 * 1000);
+ 
+-  private static String[] result;
++  private static Tokenize.StringSlice[] result;
+ 
+   private static void compute(String input) {
+     result = Tokenize.tokens(input);
+@@ -23,7 +23,8 @@ class Tokens {
+     int n = result.length;
+     System.out.println("number of tokens " + Integer.toString(n));
+     for (int i = 0; i < Integer.min(n, 10); i++) {
+-      System.out.print(result[i] + " ");
++      Tokenize.StringSlice x = result[i];
++      System.out.print(x.data.substring(x.start, x.start+x.length) + " ");
+     }
+     System.out.println("...");
+ 
+diff --git a/ocaml/bench/tokens/tokens.ml b/ocaml/bench/tokens/tokens.ml
+index 7d50ea6..1860498 100644
+--- a/ocaml/bench/tokens/tokens.ml
++++ b/ocaml/bench/tokens/tokens.ml
+@@ -13,12 +13,14 @@ let _ = Printf.printf "read file in %.03fs\n" tm
+ let is_whitespace c =
+   c = ' ' || c = '\n' || c = '\r' || c = '\t' || c = '\x0C'
+ 
+-let bench () = Forkjoin.run (fun _ -> Tokenize.tokens is_whitespace contents)
++let bench () = Forkjoin.run (fun _ -> Tokenize.tokens' is_whitespace contents)
+ let result = Benchmark.run "tokens" bench
+ let _ = Printf.printf "tokens %d\n" (Seq.length result)
+ 
+ let _ =
+   if noOutput then () else
+   for i = 0 to Seq.length result - 1 do
+-    print_string (Seq.get result i ^ "\n")
++    let (data, lo, hi) = Seq.get result i in
++    let str = Bytes.sub_string data lo (hi-lo) in
++    print_string (str ^ "\n")
+   done
+diff --git a/ocaml/lib/Tokenize.ml b/ocaml/lib/Tokenize.ml
+index dc25a7d..f33274d 100644
+--- a/ocaml/lib/Tokenize.ml
++++ b/ocaml/lib/Tokenize.ml
+@@ -37,3 +37,13 @@ let tokens f b =
+   in
+   let result = Seq.full (Seqbasis.tabulate 1024 (0, n) token) in
+   result
++
++let tokens' f b =
++  let (n, g) = tokenRanges f b in
++  let token i =
++    let (lo, hi) = g i in
++    (b, lo, hi)
++  in
++  let result = Seq.full (Seqbasis.tabulate 1024 (0, n) token) in
++  result
++
+diff --git a/ocaml/lib/Tokenize.mli b/ocaml/lib/Tokenize.mli
+index d4a8280..a7353c6 100644
+--- a/ocaml/lib/Tokenize.mli
++++ b/ocaml/lib/Tokenize.mli
+@@ -1,3 +1,4 @@
+ val tokenRanges: (char -> bool) -> Bytes.t -> int * (int -> (int * int))
+ val tokensSeq: (char -> bool) -> Bytes.t -> (char Seq.t) Seq.t
+ val tokens: (char -> bool) -> Bytes.t -> string Seq.t
++val tokens': (char -> bool) -> Bytes.t -> (Bytes.t * int * int) Seq.t
