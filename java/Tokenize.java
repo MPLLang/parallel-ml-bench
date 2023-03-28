@@ -4,7 +4,13 @@ import java.util.stream.*;
 
 class Tokenize {
 
-  static String[] tokens(String input) {
+  static class StringSlice {
+    public String data;
+    public int start;
+    public int length;
+  }
+
+  static StringSlice[] tokens(String input) {
     int n = input.length();
     int[] ids = IntStream.range(0,n+1).parallel().filter(i -> {
       if (i == n) {
@@ -19,11 +25,16 @@ class Tokenize {
     }).toArray();
 
     int numTokens = ids.length / 2;
-    String[] result = new String[numTokens];
+    StringSlice[] result = new StringSlice[numTokens];
     IntStream.range(0, numTokens).parallel().forEach(i -> {
       int start = ids[2*i];
       int stop = ids[2*i+1];
-      result[i] = input.substring(start, stop);
+      // result[i] = input.substring(start, stop);
+      StringSlice slice = new StringSlice();
+      slice.data = input;
+      slice.start = start;
+      slice.length = stop-start;
+      result[i] = slice;
     });
 
     return result;

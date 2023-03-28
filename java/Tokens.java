@@ -6,7 +6,7 @@ class Tokens {
 
   static final long NPS = (1000L * 1000 * 1000);
 
-  private static String[] result;
+  private static Tokenize.StringSlice[] result;
 
   private static void compute(String input) {
     result = Tokenize.tokens(input);
@@ -23,7 +23,8 @@ class Tokens {
     int n = result.length;
     System.out.println("number of tokens " + Integer.toString(n));
     for (int i = 0; i < Integer.min(n, 10); i++) {
-      System.out.print(result[i] + " ");
+      Tokenize.StringSlice x = result[i];
+      System.out.print(x.data.substring(x.start, x.start+x.length) + " ");
     }
     System.out.println("...");
 
