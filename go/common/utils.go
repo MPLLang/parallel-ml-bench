@@ -161,7 +161,14 @@ func tokenGenerator(s []byte, isSpace func(byte) bool) (int, func(int)string) {
 }
 
 
-func tokens(s []byte, isSpace func(byte) bool) []string {
+type ByteSlice struct {
+  data []byte
+  start int
+  length int
+}
+
+
+func tokens(s []byte, isSpace func(byte) bool) []ByteSlice {
 	n := len(s)
 	check := func(i int) bool {
 		if i == n {
@@ -179,19 +186,19 @@ func tokens(s []byte, isSpace func(byte) bool) []string {
 	ids := filter(5000, check, n+1, func (i int) int { return i })
 	count := len(ids) / 2
 
-	result := make([]string, count)
+	result := make([]ByteSlice, count)
 	parallelRange(5000, 0, count, func (lo, hi int) {
 		for i := lo; i < hi; i++ {
 			start := ids[2*i]
 			stop := ids[2*i+1]
 
-			result[i] = string(s[start:stop])
+			slice := ByteSlice {
+				data: s,
+				start: start,
+				length: stop-start,
+			}
 
-			// str := make([]byte, stop-start)
-			// for j := 0; j < stop-start; j++ {
-			// 	str[j] = s[start+j]
-			// }
-			// result[i] = string(str)
+			result[i] = slice
 		}
 	})
 

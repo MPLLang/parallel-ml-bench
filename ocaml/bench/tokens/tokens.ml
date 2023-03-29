@@ -13,12 +13,14 @@ let _ = Printf.printf "read file in %.03fs\n" tm
 let is_whitespace c =
   c = ' ' || c = '\n' || c = '\r' || c = '\t' || c = '\x0C'
 
-let bench () = Forkjoin.run (fun _ -> Tokenize.tokens is_whitespace contents)
+let bench () = Forkjoin.run (fun _ -> Tokenize.tokens' is_whitespace contents)
 let result = Benchmark.run "tokens" bench
 let _ = Printf.printf "tokens %d\n" (Seq.length result)
 
 let _ =
   if noOutput then () else
   for i = 0 to Seq.length result - 1 do
-    print_string (Seq.get result i ^ "\n")
+    let (data, lo, hi) = Seq.get result i in
+    let str = Bytes.sub_string data lo (hi-lo) in
+    print_string (str ^ "\n")
   done
