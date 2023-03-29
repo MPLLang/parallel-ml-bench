@@ -38,17 +38,18 @@ class DedupStrings {
 
   static ConcurrentHashMap<String, Boolean> result;
 
-  public static void compute(String[] input) {
+  public static void compute(Tokenize.TokenGenerator input) {
 
     ConcurrentHashMap<String, Boolean> x =
-      new ConcurrentHashMap<String, Boolean>(input.length / 100);
+      new ConcurrentHashMap<String, Boolean>(input.numTokens() / 100);
 
     // IntStream.range(0, input.length).parallel().forEach(i -> {
     //   x.put(new HashObject(input[i]), true);
     // });
 
-    IntStream.range(0, input.length).parallel().forEach(i -> {
-      x.putIfAbsent(input[i], true);
+    IntStream.range(0, input.numTokens()).parallel().forEach(i -> {
+      String elem = input.generateToken(i);
+      x.putIfAbsent(elem, true);
     });
 
     result = x;
@@ -59,18 +60,11 @@ class DedupStrings {
     CommandLineArgs.initialize(args);
     String filename = CommandLineArgs.parseString("input", "");
     String contents = ReadFile.contents(filename);
-    String[] tokens = Tokenize.tokens(contents);
+    Tokenize.TokenGenerator tokens = Tokenize.tokenGenerator(contents);
 
-    // HString[] input = new HString[tokens.length];
-    // IntStream.range(0, tokens.length).parallel().forEach(i -> {
-    //   input[i] = new HString(tokens[i]);
-    // });
+    System.out.println("number of tokens " + Integer.toString(tokens.numTokens()));
 
-    String[] input = tokens;
-
-    System.out.println("number of tokens " + Integer.toString(input.length));
-
-    Benchmark.run((Void v) -> { compute(input); return null; });
+    Benchmark.run((Void v) -> { compute(tokens); return null; });
 
     long n = result.size();
     System.out.println("unique " + Long.toString(n));
