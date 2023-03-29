@@ -8,6 +8,10 @@ NOW=$(date '+%y%m%d-%H%M%S')
 RESULTS=$ROOT/cross-small/results
 
 rm -f $ROOT/mpl/bin/*.bin
+rm -f $ROOT/cpp/bin/*.bin
+rm -f $ROOT/go/bin/*.bin
+rm -f $ROOT/ocaml/bin/*.bin
+rm -f $ROOT/java/*.class
 rm -f $RESULTS
 
 
