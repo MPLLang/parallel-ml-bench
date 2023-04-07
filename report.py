@@ -682,7 +682,7 @@ with open(timingsFile, 'r') as data:
   resultsData = json_careful_readlines(data)
 D = [ parseStats(row) for row in resultsData ]
 P = sorted(list(foundProcs))
-maxp = max(p for p in foundProcs if p <= 72)
+maxp = max(p for p in foundProcs)
 orderedTags = sorted(list(foundTags), key=displayTag)
 
 foundProcs = set()
