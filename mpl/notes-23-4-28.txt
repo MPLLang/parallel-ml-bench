@@ -1,0 +1,49 @@
+
+
+measure:
+  - num steals
+  - num pars (this is just num spawns in eager)
+  - num heartbeats
+      - to give us spawns/heartbeat (or heartbeats/spawn)
+      - (how often do we skip a "heartbeat-try-spawn"?)
+  - span deviation???? this might be difficult...
+      - but we can show improvements (due to eagerness)
+        in end-to-end time on P processors, which is close enough
+  - stack walk sizes (at calls to primForkThread)
+      - to get a sense of whether an optimization could help here
+
+
+IF work of spawning is amortized:
+  - ideally, number of spawns ~ K * (number of steals) for small constant K
+
+ratio spawns / steals: indicator of excess parallelism?
+
+
+
+
+work W
+span 1
+idealized runtime = W/P
+actual runtime = (W + t1*(num spawns) + t2*(num steals) + ..)/P
+  ^ not quite right, because distribution of spawns, steals are not uniform
+
+W -> W + ....
+S -> S + ....
+
+W/P + S
+
+
+
+Evaluation:
+  - need better name than "simulated eager"
+  - compare vs "simulated eager"
+  - section 1: "fully parallel" benchmarks (no grain)
+      - result: much better performance than eager
+  - section 2: manual grain control
+      - result: similar performance as eager
+  - small comparison: our heartbeat algorithm vs original heartbeat
+      - ours vs naive pcall
+      - measure eagerness and spawn backoff
+      - and, do our optimizations matter?
+  - small comparison: MPL vs simulated eager
+      - this establishes overheads of compilation differences, etc.

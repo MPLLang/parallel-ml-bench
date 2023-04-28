@@ -1,5 +1,5 @@
 {
-  "compiler": "/home/ec2-user/proj/mpl/sam-heartbeat/build/bin/mpl",
+  "compiler": "/home/ec2-user/proj/mpl/sam-heartbeat-simulate-eager/build/bin/mpl",
   "flags": [
     "-disable-pass", "splitTypes1",
     "-disable-pass", "splitTypes2",
@@ -7,5 +7,5 @@
     "-mlb-path-var", "PICK_FJ greedy-work-amortized",
     "-mlb-path-var", "GRAINS small"
   ],
-  "compat": "mpl-hb"
+  "compat": "mpl-hb-eager"
 }

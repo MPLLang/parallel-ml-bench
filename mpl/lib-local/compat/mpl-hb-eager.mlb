@@ -1,0 +1,15 @@
+../../lib/github.com/mpllang/mpllib/sources.mpl.mlb
+
+local
+  $(SML_LIB)/basis/basis.mlb
+  $(SML_LIB)/basis/mlton.mlb
+  $(SML_LIB)/basis/mpl.mlb
+  $(SML_LIB)/basis/fork-join.mlb
+  Grains.$(GRAINS).sml
+  ForkJoinNG.sml
+  mpl-hb-eager.sml
+in
+  structure Grains
+  structure ForkJoinNG
+  structure RuntimeStats
+end
