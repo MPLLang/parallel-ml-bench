@@ -1,5 +1,9 @@
 {
   "compiler": "/usr0/home/swestric/installs/mlton-718f00279eb191deb6477e30a3aab2890d1b8b53/build/bin/mlton",
-  "flags": ["-codegen", "c", "-force-handles-signals", "true"],
+  "flags": [
+    "-codegen", "c",
+    "-force-handles-signals", "true",
+    "-mlb-path-var", "GRAINS small"
+  ],
   "compat": "mlton"
 }

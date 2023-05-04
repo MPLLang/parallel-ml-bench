@@ -1,5 +1,8 @@
 {
   "compiler": "mlton",
-  "flags": ["-codegen", "c"],
+  "flags": [
+    "-codegen", "c",
+    "-mlb-path-var", "GRAINS small"
+  ],
   "compat": "mlton"
 }

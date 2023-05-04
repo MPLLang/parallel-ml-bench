@@ -3,7 +3,8 @@
 local
   $(SML_LIB)/basis/basis.mlb
   $(SML_LIB)/basis/mlton.mlb
-  Grains.large.sml
+  Grains.$(GRAINS).sml
+  ForkJoinNG.sml
   mlton.sml
 in
   structure Grains
