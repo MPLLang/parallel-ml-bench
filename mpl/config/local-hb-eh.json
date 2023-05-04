@@ -1,0 +1,11 @@
+{
+  "compiler": "/home/ec2-user/proj/mpl/sam-heartbeat/build/bin/mpl",
+  "flags": [
+    "-disable-pass", "splitTypes1",
+    "-disable-pass", "splitTypes2",
+    "-detect-entanglement", "true",
+    "-mlb-path-var", "PICK_FJ eager-heuristic",
+    "-mlb-path-var", "GRAINS small"
+  ],
+  "compat": "mpl-hb"
+}
