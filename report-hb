@@ -134,6 +134,11 @@ statsPatterns = \
   , ("cgc-time", parseMillisecToSec, reCompile(r"^cgc time\(ms\): (\d+)$"))
   , ("work-time", parseMillisecToSec, reCompile(r"^work time\(ms\): (\d+)$"))
   , ("idle-time", parseMillisecToSec, reCompile(r"^idle time\(ms\): (\d+)$"))
+  , ("num-spawns", int, reCompile(r"^num spawns\s+(\d+)$"))
+  , ("num-spawns", int, reCompile(r"^num-spawns\s+(\d+)$"))
+  , ("num-heartbeats", int, reCompile(r"^num heartbeats\s+(\d+)$"))
+  , ("eager-spawn-pct", int, reCompile(r"^  eager\s+\d+ \((\d+)\%\)$"))
+  , ("num-steals", int, reCompile(r"^num steals\s+(\d+)$"))
   # , ("promo-time", int, reCompile(r"^promo time: (\d+)$"))
   # , ("root-reclaimed", parseBytesToKB, reCompile(r"^root cc reclaimed: (\d+)$"))
   # , ("internal-reclaimed", parseBytesToKB, reCompile(r"^internal cc reclaimed: (\d+)$"))
@@ -359,6 +364,38 @@ def cgcTime(data, config, tag, procs):
   ee = [ r['cgc-time'] for r in trials if 'cgc-time' in r ]
   try:
     return ee[-1] / 20.0
+  except:
+    return None
+
+def spawns(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'time']
+  ee = [ r['num-spawns'] for r in trials if 'num-spawns' in r ]
+  try:
+    return int(round(ee[-1] / 20.0))
+  except:
+    return None
+
+def heartbeats(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'time']
+  ee = [ r['num-heartbeats'] for r in trials if 'num-heartbeats' in r ]
+  try:
+    return int(round(ee[-1] / 20.0))
+  except:
+    return None
+
+def steals(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'time']
+  ee = [ r['num-steals'] for r in trials if 'num-steals' in r ]
+  try:
+    return int(round(ee[-1] / 20.0))
+  except:
+    return None
+
+def eagerness(data, config, tag, procs):
+  trials = [r for r in findTrials(data, config, tag, procs) if r['exp'] == 'time']
+  ee = [ r['eager-spawn-pct'] for r in trials if 'eager-spawn-pct' in r ]
+  try:
+    return ee[-1]
   except:
     return None
 
@@ -696,67 +733,10 @@ orderedTags = sorted(list(foundTags), key=displayTag)
 foundProcs = set()
 foundTags = set()
 
-# def keepTag(t):
-#   return t in [
-#     'bfs-find-hideg',
-#     'centrality',
-#     'connectivity',
-#     'dedup-strings',
-#     'delaunay-entangled',
-#     'grep',
-#     'harris-linked-list',
-#     'interval-tree',
-#     'linden-pq',
-#     'linefit-entangled',
-#     'low-d-decomp-boundary',
-#     'max-indep-set',
-#     'mcss',
-#     'ms-queue',
-#     'msort-ints',
-#     'nearest-nbrs',
-#     'pfa-bst',
-#     # 'primes',
-#     'quant-synth',
-#     'quickhull',
-#     'range-query',
-#     'reverb',
-#     'seam-carve',
-#     'spanner',
-#     'tokens',
-#     'triangle-count',
-#     'wc-entangled'
-#     # 'wc',
-#     # 'wc-accum',
-#     # 'linefit',
-#     # 'linefit-accum',
-#     # 'sort-longs'
-#   ]
-
 def keepTag(t):
   return True
 
-
-# nondetTags = [
-#   'bfs',
-#   'bfs-find-hideg',
-#   'centrality',
-#   'connectivity',
-#   'dedup-strings',
-#   'delaunay',
-#   'delaunay-entangled',
-#   'harris-linked-list',
-#   'linden-pq',
-#   'low-d-decomp',
-#   'low-d-decomp-boundary',
-#   'max-indep-set',
-#   'ms-queue',
-#   'pfa-bst',
-#   'sk-net',
-#   'spanner'
-# ]
-
 mplOnlyTags = [ t for t in orderedTags if keepTag(t) ]
-
 
 def isNGTag(tag):
   return "-ng" in tag
@@ -770,132 +750,6 @@ def isOtherTag(tag):
 ngTags = [t for t in orderedTags if isNGTag(t)]
 normalTags = [t for t in orderedTags if isNormalTag(t)]
 otherTags = [t for t in orderedTags if isOtherTag(t)]
-
-mplCmpTags = [
-  "primes",
-  "dense-matmul",
-  "raytracer",
-  "tinykaboom",
-  "msort-strings",
-  "msort-ints",
-  "nearest-nbrs",
-  "quickhull",
-  "reverb",
-  "seam-carve",
-  # "dedup-strings-entangled",
-  "suffix-array",
-  "grep",
-  "bfs",
-  # "bfs-find-hideg",
-  "centrality",
-  "low-d-decomp",
-  # "low-d-decomp-boundary",
-  "max-indep-set",
-  "palindrome",
-  "tokens",
-  "nqueens",
-  "triangle-count",
-  "range-query",
-  "delaunay",
-  # "delaunay-entangled",
-  "linefit",
-  # "linefit-entangled",
-  "linearrec",
-  "bignum-add",
-  "integrate",
-  "sparse-mxv",
-  "wc",
-  # "wc-entangled",
-  "mcss",
-  # "connectivity-entangled",
-  # "spanner-entangled",
-  # "ms-queue",
-  # "harris-linked-list",
-  # "linden-pq",
-  # "pfa-bst",
-  # "sk-net",
-  "interval-tree"
-]
-
-ocamlTags = {
-  "tokens": "tokens",
-  "msort-ints": "msort-ints",
-  "primes": "primes",
-  "raytracer": "raytracer",
-  "lu-decomp": "lu-decomp",
-  "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings",
-  "nbody": "nbody",
-  "game-of-life": "game-of-life",
-  "binarytrees5": "binarytrees5",
-  "sparse-mxv": "sparse-mxv",
-  "wc-entangled": "wc-accum",
-  "ms-queue": "ms-queue",
-  "wc": "",
-  "linefit": "",
-  "linefit-entangled": "linefit-accum",
-  "mcss": "mcss"
-}
-
-# map each MPL tag to the correct C++ tag for comparison
-cppTags = {
-  # "bfs": "bfs",
-  # "bignum-add": "bignum-add",
-  # "delaunay": "delaunay",
-  "grep": "grep",
-  # "integrate": "integrate",
-  # "linearrec": "linearrec",
-  "linefit": "linefit",
-  # "linefit-entangled": "linefit",
-  # "mcss": "mcss",
-  "msort-ints": "msort",
-  "nearest-nbrs": "nearest-nbrs",
-  "primes": "primes",
-  "quickhull": "quickhull",
-  # "sparse-mxv": "sparse-mxv",
-  "tokens": "tokens",
-  "wc": "wc",
-  # "wc-entangled": "wc",
-  # "dedup-strings": "dedup-strings",
-  # "ms-queue": "ms-queue"
-}
-
-javaTags = {
-  "primes": "primes",
-  "msort-ints": "sort-longs",
-  "tokens": "tokens",
-  "mcss": "mcss",
-  "linefit": "linefit",
-  "linefit-entangled": "linefit-accum",
-  "wc": "",
-  "wc-entangled": "wc-accum",
-  "sparse-mxv": "sparse-mxv",
-  "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings",
-  "ms-queue": "ms-queue"
-}
-
-goTags = {
-  "primes": "primes",
-  "msort-ints": "msort",
-  "tokens": "tokens",
-  "mcss": "mcss",
-  "linefit": "linefit",
-  "wc": "",
-  "linefit-entangled": "linefit-accum",
-  "wc-entangled": "wc-accum",
-  "sparse-mxv": "sparse-mxv",
-  "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings",
-  "ms-queue": "ms-queue"
-}
-
-sandmarkTags = [
-  "binarytrees5",
-  "game-of-life",
-  "nbody",
-  "lu-decomp"
-]
 
 # orderedTags = [ t for t in orderedTags if t not in sandmarkTags ]
 
@@ -953,296 +807,6 @@ def defaultAlign(i):
 
 
 # ============================================================================
-
-def doSortShootout():
-  sortShootout = [
-    ("C++", "cpp", "msort"),
-    ("MPL", "mpl-em", "msort-ints"),
-    ("Java", "java", "sort-longs"),
-    ("OCaml", "ocaml", "msort-ints"),
-    ("Go", "go", "msort")
-  ]
-
-  try:
-    sortShootoutBaseline = \
-      min(filterSome(
-        [tm(averageTime(D, config, tag, 1)) for name,config,tag in sortShootout]
-      ))
-  except:
-    sortShootoutBaseline = None
-
-  headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
-  tt = [headers1, "="]
-  for name, config, tag in sortShootout:
-    t1 = tm(averageTime(D, config, tag, 1))
-    tp = tm(averageTime(D, config, tag, maxp))
-    r1 = spg(averageSpace(D, config, tag, 1))
-    rp = spg(averageSpace(D, config, tag, maxp))
-    thisRow = [
-      t1,
-      tp,
-      su(sd(t1,tp)),
-      su(sd(sortShootoutBaseline, tp)),
-      r1,
-      rp
-    ]
-    thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("SORT SHOOTOUT")
-  print(table(tt, defaultAlign))
-  print("")
-
-# doSortShootout()
-
-# ============================================================================
-
-def doTokensShootout():
-  tokensShootout = [
-    ("C++", "cpp", "tokens"),
-    ("MPL", "mpl-em", "tokens"),
-    ("Java", "java", "tokens"),
-    ("OCaml", "ocaml", "tokens"),
-    ("Go", "go", "tokens")
-  ]
-
-  try:
-    tokensShootoutBaseline = \
-      min(filterSome(
-        [tm(averageTime(D, config, tag, 1)) for name,config,tag in tokensShootout]
-      ))
-  except:
-    tokensShootoutBaseline = None
-
-  headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
-  tt = [headers1, "="]
-  for name, config, tag in tokensShootout:
-    t1 = tm(averageTime(D, config, tag, 1))
-    tp = tm(averageTime(D, config, tag, maxp))
-    r1 = spg(averageSpace(D, config, tag, 1))
-    rp = spg(averageSpace(D, config, tag, maxp))
-    thisRow = [
-      t1,
-      tp,
-      su(sd(t1,tp)),
-      su(sd(tokensShootoutBaseline, tp)),
-      r1,
-      rp
-    ]
-    thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("TOKENS SHOOTOUT")
-  print(table(tt, defaultAlign))
-  print("")
-
-# doTokensShootout()
-
-# ============================================================================
-
-def doPrimesShootout():
-  primesShootout = [
-    ("C++", "cpp", "primes"),
-    ("MPL", "mpl-em", "primes"),
-    ("Java", "java", "primes"),
-    ("OCaml", "ocaml", "primes"),
-    ("Go", "go", "primes")
-  ]
-
-  try:
-    primesShootoutBaseline = \
-      min(filterSome(
-        [tm(averageTime(D, config, tag, 1)) for name,config,tag in primesShootout]
-      ))
-  except:
-    primesShootoutBaseline = None
-
-  headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
-  tt = [headers1, "="]
-  for name, config, tag in primesShootout:
-    t1 = tm(averageTime(D, config, tag, 1))
-    tp = tm(averageTime(D, config, tag, maxp))
-    r1 = spg(averageSpace(D, config, tag, 1))
-    rp = spg(averageSpace(D, config, tag, maxp))
-    thisRow = [
-      t1,
-      tp,
-      su(sd(t1,tp)),
-      su(sd(primesShootoutBaseline, tp)),
-      r1,
-      rp
-    ]
-    thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("PRIMES SHOOTOUT")
-  print(table(tt, defaultAlign))
-  print("")
-
-# doPrimesShootout()
-
-# ============================================================================
-
-def doOCamlCmp():
-  headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
-  headers1 = ['Benchmark', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M', 'O', 'M', 'O/M']
-  tt = [headers, "-", headers1, "="]
-  for tag in ocamlTags.keys():
-    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-    ot1 = tm(averageTime(D, 'ocaml', ocamlTags[tag], 1))
-    otp = tm(averageTime(D, 'ocaml', ocamlTags[tag], maxp))
-    or1 = spg(averageSpace(D, 'ocaml', ocamlTags[tag], 1))
-    orp = spg(averageSpace(D, 'ocaml', ocamlTags[tag], maxp))
-
-    thisRow = [
-      ot1,
-      mt1,
-      ov(sd(ot1,mt1)),
-      otp,
-      mtp,
-      ov(sd(otp,mtp)),
-      or1,
-      mr1,
-      ov(sd(or1,mr1)),
-      orp,
-      mrp,
-      ov(sd(orp,mrp))
-    ]
-    thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("OCAML COMPARISON")
-  print(table(tt, defaultAlign))
-  print("")
-
-# doOCamlCmp()
-
-# ============================================================================
-
-def doCppCmp(mplConfig):
-  headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
-  headers1 = ['Benchmark', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C', 'C', 'M', 'M/C']
-  tt = [headers, "-", headers1, "="]
-  for tag in sorted(cppTags.keys()):
-    mt1 = tm(averageTime(D, mplConfig, tag, 1))
-    mtp = tm(averageTime(D, mplConfig, tag, maxp))
-    mr1 = spg(averageSpace(D, mplConfig, tag, 1))
-    mrp = spg(averageSpace(D, mplConfig, tag, maxp))
-
-    ct1 = tm(averageTime(D, 'cpp', cppTags[tag], 1))
-    ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
-    cr1 = spg(averageSpace(D, 'cpp', cppTags[tag], 1))
-    crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
-
-    thisRow = [
-      ct1,
-      mt1,
-      ov(sd(mt1,ct1)),
-      ctp,
-      mtp,
-      ov(sd(mtp,ctp)),
-      cr1,
-      mr1,
-      ov(sd(mr1,cr1)),
-      crp,
-      mrp,
-      ov(sd(mrp,crp))
-    ]
-    thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("C++ COMPARISON VS MPL ({})".format(mplConfig))
-  print(table(tt, defaultAlign))
-  print("")
-
-# doCppCmp('mpl')
-# doCppCmp('mpl-em')
-
-# ============================================================================
-
-def doJavaCmp():
-  headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
-  headers1 = ['Benchmark', 'J', 'M', 'J/M', 'J', 'M', 'J/M', 'J', 'M', 'J/M', 'J', 'M', 'J/M']
-  tt = [headers, "-", headers1, "="]
-  for tag in sorted(javaTags.keys()):
-    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-    jt1 = tm(averageTime(D, 'java', javaTags[tag], 1))
-    jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
-    jr1 = spg(averageSpace(D, 'java', javaTags[tag], 1))
-    jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
-
-    thisRow = [
-      jt1,
-      mt1,
-      ov(sd(jt1, mt1)),
-      jtp,
-      mtp,
-      ov(sd(jtp, mtp)),
-      jr1,
-      mr1,
-      ov(sd(jr1, mr1)),
-      jrp,
-      mrp,
-      ov(sd(jrp, mrp))
-    ]
-    thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("JAVA COMPARISON")
-  print(table(tt, defaultAlign))
-  print("")
-
-# doJavaCmp()
-
-# ============================================================================
-
-def doGoCmp():
-  headers = ['', 'T(1)', None, None, 'T({})'.format(maxp), None, None, 'R(1)', None, None, 'R({})'.format(maxp), None, None]
-  headers1 = ['Benchmark', 'G', 'M', 'G/M', 'G', 'M', 'G/M', 'G', 'M', 'G/M', 'G', 'M', 'G/M']
-  tt = [headers, "-", headers1, "="]
-  for tag in sorted(goTags.keys()):
-    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-    jt1 = tm(averageTime(D, 'go', goTags[tag], 1))
-    jtp = tm(averageTime(D, 'go', goTags[tag], maxp))
-    jr1 = spg(averageSpace(D, 'go', goTags[tag], 1))
-    jrp = spg(averageSpace(D, 'go', goTags[tag], maxp))
-
-    thisRow = [
-      jt1,
-      mt1,
-      ov(sd(jt1, mt1)),
-      jtp,
-      mtp,
-      ov(sd(jtp, mtp)),
-      jr1,
-      mr1,
-      ov(sd(jr1, mr1)),
-      jrp,
-      mrp,
-      ov(sd(jrp, mrp))
-    ]
-    thisRow = [displayTag(tag)] + [str(x) if x is not None else "--" for x in thisRow]
-    tt.append(thisRow)
-
-  print("GO COMPARISON")
-  print(table(tt, defaultAlign))
-  print("")
-
-# doGoCmp()
-
-
 # ============================================================================
 
 def safestr(x):
@@ -1252,153 +816,36 @@ def safestr(x):
 
 # expects grain one of
 # ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
-def doHeartbeatTimeCmpPickGrain(grain):
-  headers = ['', 'Baseline', '|', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'Speedups', None]
-  headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB']
-  tt = [headers, "-", headers1, "="]
-
-  def doTag(tag):
-    ts = tm(averageTime(D, 'mlton', tag, 1))
-    mt1 = tm(averageTime(D, 'mpl-{}'.format(grain), tag, 1))
-    ht1 = tm(averageTime(D, 'local-hb-{}'.format(grain), tag, 1))
-    mtp = tm(averageTime(D, 'mpl-{}'.format(grain), tag, maxp))
-    htp = tm(averageTime(D, 'local-hb-{}'.format(grain), tag, maxp))
-
-    row = [
-      safestr(ts),
-      '|',
-      safestr(mt1),
-      safestr(ht1),
-      color_pcd(ht1, mt1),
-      '|',
-      safestr(mtp),
-      safestr(htp),
-      color_pcd(htp, mtp),
-      '|',
-      su(sd(ts, mtp)),
-      su(sd(ts, htp))
-    ]
-    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
-    tt.append(row)
-
-  # for tag in otherTags:
-  #   doTag(tag)
-
-  # tt.append("-")
-
-  # for tag in normalTags:
-  #   doTag(tag)
-  
-  # tt.append("-")
-
-  for tag in ngTags:
-    doTag(tag)
-
-  print("HEARTBEAT TIME COMPARISON (GRAIN = {})".format(grain))
-  print(table(tt, defaultAlign))
-  print("")
-
-
-doHeartbeatTimeCmpPickGrain('large-grain')
-doHeartbeatTimeCmpPickGrain('small-grain')
-doHeartbeatTimeCmpPickGrain('cilk-large-grain')
-doHeartbeatTimeCmpPickGrain('cilk-small-grain')
-
-# ============================================================================
-
-# expects grain one of
-# ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
-def doHeartbeatTimeCmpManualGrain():
-  headers = ['', 'Baseline', '|', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'Speedups', None]
-  headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB', 'HB/M', '|', 'MPL', 'HB']
-  tt = [headers, "-", headers1, "="]
-
-  # doesn't matter which grain config we pick, because grains are manually
-  # overridden in these benchmarks
-  mpl = 'mpl-large-grain' 
-  hb = 'local-hb-small-grain'
-
-  def doTag(tag):
-    ts = tm(averageTime(D, 'mlton', tag, 1))
-    mt1 = tm(averageTime(D, mpl, tag, 1))
-    ht1 = tm(averageTime(D, hb, tag, 1))
-    mtp = tm(averageTime(D, mpl, tag, maxp))
-    htp = tm(averageTime(D, hb, tag, maxp))
-
-    row = [
-      safestr(ts),
-      '|',
-      safestr(mt1),
-      safestr(ht1),
-      color_pcd(ht1, mt1),
-      '|',
-      safestr(mtp),
-      safestr(htp),
-      color_pcd(htp, mtp),
-      '|',
-      su(sd(ts, mtp)),
-      su(sd(ts, htp))
-    ]
-    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
-    tt.append(row)
-
-  # for tag in otherTags:
-  #   doTag(tag)
-
-  # tt.append("-")
-
-  for tag in normalTags:
-    doTag(tag)
-  
-  # tt.append("-")
-
-  # for tag in ngTags:
-  #   doTag(tag)
-
-  print("HEARTBEAT TIME COMPARISON (MANUAL GRAIN CONTROL)")
-  print(table(tt, defaultAlign))
-  print("")
-
-doHeartbeatTimeCmpManualGrain()
-
-# ============================================================================
-
 def doHeartbeatTimeCmp():
-  headers = ['', 'Baseline', None, '|', 'T(1)', None, None, None, None, '|', 'T({})'.format(maxp), None, None, None, None, '|', 'Overhead', None, '|', 'Speedup', None]
-  headers1 = ['Benchmark', 'MLton', 'MLton-FHS', '|', 'MPL', 'GWA', 'GWA/M', 'GWAN', 'GWAN/M', '|', 'MPL', 'GWA', 'GWA/M', 'GWAN', 'GWAN/M', '|', 'MPL', 'GWAN', '|', 'MPL', 'GWAN']
+  headers = ['', 'Baseline', '|', 'T(1)', None, None, None, '|', 'T({})'.format(maxp), None, None, None, '|', 'Speedups', None, None]
+  headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'E', 'HB', 'HB/E', '|', 'MPL', 'E', 'HB', 'HB/E', '|', 'MPL', 'E', 'HB']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
     ts = tm(averageTime(D, 'mlton', tag, 1))
-    tfhs = tm(averageTime(D, 'mlton-fhs', tag, 1))
     mt1 = tm(averageTime(D, 'mpl', tag, 1))
-    gwat1 = tm(averageTime(D, 'local-hb-gwa-new', tag, 1))
-    gwant1 = tm(averageTime(D, 'local-hb-gwa-newest', tag, 1))
+    et1 = tm(averageTime(D, 'local-hb-sim-eager', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb', tag, 1))
     mtp = tm(averageTime(D, 'mpl', tag, maxp))
-    gwatp = tm(averageTime(D, 'local-hb-gwa-new', tag, maxp))
-    gwantp = tm(averageTime(D, 'local-hb-gwa-newest', tag, maxp))
+    etp = tm(averageTime(D, 'local-hb-sim-eager', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb', tag, maxp))
 
     row = [
-      str(ts),
-      str(tfhs),
+      safestr(ts),
       '|',
-      str(mt1),
-      str(gwat1),
-      color_pcd(gwat1, mt1),
-      str(gwant1),
-      color_pcd(gwant1, mt1),
+      safestr(mt1),
+      safestr(et1),
+      safestr(ht1),
+      color_pcd(ht1, et1),
       '|',
-      str(mtp),
-      str(gwatp),
-      color_pcd(gwatp, mtp),
-      str(gwantp),
-      color_pcd(gwantp, mtp),
-      '|',
-      ov(sd(mt1, ts)),
-      ov(sd(gwant1, ts)),
+      safestr(mtp),
+      safestr(etp),
+      safestr(htp),
+      color_pcd(htp, etp),
       '|',
       su(sd(ts, mtp)),
-      su(sd(ts, gwantp))
+      su(sd(ts, etp)),
+      su(sd(ts, htp))
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
@@ -1419,6 +866,54 @@ def doHeartbeatTimeCmp():
   print("HEARTBEAT TIME COMPARISON")
   print(table(tt, defaultAlign))
   print("")
+
+
+doHeartbeatTimeCmp()
+
+# ============================================================================
+
+def doHeartbeatStats():
+  headers = ['', 'Heartbeats', 'Pars', 'Spawns', 'Eagerness', 'Steals', 'Spawns/Steal', 'Pars/Steal']
+  tt = [headers, "="]
+
+  def doTag(tag):
+    numSpawns = spawns(D, 'local-hb', tag, maxp)
+    numHeartbeats = heartbeats(D, 'local-hb', tag, maxp)
+    pctEagerness = eagerness(D, 'local-hb', tag, maxp)
+    numSteals = steals(D, 'local-hb', tag, maxp)
+
+    numPars = spawns(D, 'local-hb-sim-eager', tag, maxp)
+
+    row = [
+      safestr(numHeartbeats),
+      safestr(numPars),
+      safestr(numSpawns),
+      safestr(pctEagerness) + "%",
+      safestr(numSteals),
+      safestr(sd(numSpawns, numSteals)),
+      safestr(sd(numPars, numSteals))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in otherTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  for tag in normalTags:
+    doTag(tag)
+  
+  tt.append("-")
+
+  for tag in ngTags:
+    doTag(tag)
+
+  print("HEARTBEAT STATS")
+  print(table(tt, defaultAlign))
+  print("")
+
+doHeartbeatStats()
 
 # ============================================================================
 
@@ -1640,744 +1135,6 @@ def doHeartbeatPolicyCmp():
 # doHeartbeatPolicyNums()
 
 # ============================================================================
-# LaTeX figure: Language shootout (time comparison)
-# ============================================================================
-
-allShootoutTags = sorted([
-  "primes",
-  "msort-ints",
-  "tokens",
-  "mcss",
-  "linefit-entangled",
-  "sparse-mxv",
-  "dedup-strings",
-  "wc-entangled"
-], key=displayTag)
-
-def doFullShootoutTime():
-  # proc1TimeRats = dict()
-  maxPTimeRat = dict()
-  # proc1SpaceRats = dict()
-  # proc72SpaceRats = dict()
-
-  def putMaxPTimeRat(config, xx):
-    if xx is None:
-      return
-    if config not in maxPTimeRat:
-      maxPTimeRat[config] = []
-    maxPTimeRat[config].append(xx)
-
-  ensureFigDir()
-  fullShootoutTable = "figures/full-shootout.tex"
-  with open(fullShootoutTable, 'w') as output:
-    for tag in allShootoutTags:
-      # orp = spg(averageSpace(D, 'ocaml', tag, maxp))
-      # mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-      # crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
-      # jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
-      # grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
-
-      otp = tm(averageTime(D, 'ocaml', ocamlTags[tag], maxp))
-      mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-      ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
-      jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
-      gtp = tm(averageTime(D, 'go', goTags[tag], maxp))
-
-      putMaxPTimeRat('ocaml', ovv(sd(otp, mtp)))
-      putMaxPTimeRat('cpp', ovv(sd(ctp, mtp)))
-      putMaxPTimeRat('java', ovv(sd(jtp, mtp)))
-      putMaxPTimeRat('go', ovv(sd(gtp, mtp)))
-
-      row = \
-        [ fmt(ctp)
-        , makeBold(fmt(ov(sd(ctp, mtp))))
-        , fmt(mtp)
-        , makeBold(fmt(ov(sd(mtp, mtp))))
-        , fmt(gtp)
-        , makeBold(fmt(ov(sd(gtp, mtp))))
-        , fmt(jtp)
-        , makeBold(fmt(ov(sd(jtp, mtp))))
-        , fmt(otp)
-        , makeBold(fmt(ov(sd(otp, mtp))))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['cpp'])))),
-      "", makeBold(fmt(ov(1.0))),
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['go'])))),
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['java'])))),
-      "", makeBold(fmt(ov(geomean(maxPTimeRat['ocaml']))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(fullShootoutTable))
-
-# doFullShootoutTime()
-
-# ============================================================================
-# LaTeX figure: Language shootout (space comparison)
-# ============================================================================
-
-def doFullShootoutSpace():
-  maxPSpaceRat = dict()
-
-  def putMaxPSpaceRat(config, xx):
-    if xx is None:
-      return
-    if config not in maxPSpaceRat:
-      maxPSpaceRat[config] = []
-    maxPSpaceRat[config].append(xx)
-
-  ensureFigDir()
-  fullShootoutTable = "figures/full-shootout-space.tex"
-  with open(fullShootoutTable, 'w') as output:
-    for tag in allShootoutTags:
-      orp = spg(averageSpace(D, 'ocaml', ocamlTags[tag], maxp))
-      mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-      crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
-      jrp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
-      grp = spg(averageSpace(D, 'go', goTags[tag], maxp))
-
-      # otp = tm(averageTime(D, 'ocaml', tag, maxp))
-      # mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-      # ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
-      # jtp = tm(averageTime(D, 'java', javaTags[tag], maxp))
-      # gtp = tm(averageTime(D, 'go', goTags[tag], maxp))
-
-      putMaxPSpaceRat('ocaml', ovv(sd(orp, mrp)))
-      putMaxPSpaceRat('cpp', ovv(sd(crp, mrp)))
-      putMaxPSpaceRat('java', ovv(sd(jrp, mrp)))
-      putMaxPSpaceRat('go', ovv(sd(grp, mrp)))
-
-      row = \
-        [ fmt(crp)
-        , makeBold(fmt(ov(sd(crp, mrp))))
-        , fmt(mrp)
-        , makeBold(fmt(ov(sd(mrp, mrp))))
-        , fmt(grp)
-        , makeBold(fmt(ov(sd(grp, mrp))))
-        , fmt(jrp)
-        , makeBold(fmt(ov(sd(jrp, mrp))))
-        , fmt(orp)
-        , makeBold(fmt(ov(sd(orp, mrp))))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['cpp'])))),
-      "", makeBold(fmt(ov(1.0))),
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['go'])))),
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['java'])))),
-      "", makeBold(fmt(ov(geomean(maxPSpaceRat['ocaml']))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(fullShootoutTable))
-
-# doFullShootoutSpace()
-
-# ============================================================================
-# LaTeX figure: OCaml comparison
-# ============================================================================
-
-def doOCamlComparison():
-  proc1TimeRats = []
-  proc72TimeRats = []
-  proc1SpaceRats = []
-  proc72SpaceRats = []
-
-  ensureFigDir()
-  ocamlComparisonTable = "figures/ocaml-space-time-comparison.tex"
-  with open(ocamlComparisonTable, 'w') as output:
-    for tag in ocamlTags.keys():
-      or1 = spg(averageSpace(D, 'ocaml', tag, 1))
-      orp = spg(averageSpace(D, 'ocaml', tag, maxp))
-      mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-      ot1 = tm(averageTime(D, 'ocaml', tag, 1))
-      otp = tm(averageTime(D, 'ocaml', tag, maxp))
-      mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-
-      proc1TimeRats.append(ovv(sd(ot1, mt1)))
-      proc72TimeRats.append(ovv(sd(otp, mtp)))
-      proc1SpaceRats.append(ovv(sd(or1, mr1)))
-      proc72SpaceRats.append(ovv(sd(orp, mrp)))
-
-      row = \
-        [ fmt(ot1)
-        , fmt(mt1)
-        , makeBold(fmt(ov(sd(ot1, mt1))))
-        , fmt(otp)
-        , fmt(mtp)
-        , makeBold(fmt(ov(sd(otp, mtp))))
-        , sfmt(or1)
-        , sfmt(mr1)
-        , makeBold(fmt(ov(sd(or1, mr1))))
-        , sfmt(orp)
-        , sfmt(mrp)
-        , makeBold(fmt(ov(sd(orp, mrp))))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(ocamlComparisonTable))
-
-# doOCamlComparison()
-
-# ============================================================================
-# LaTeX figure: Java comparison
-# ============================================================================
-
-def doJavaComparison():
-  proc1TimeRats = []
-  proc72TimeRats = []
-  proc1SpaceRats = []
-  proc72SpaceRats = []
-
-  ensureFigDir()
-  javaComparisonTable = "figures/java-space-time-comparison.tex"
-  with open(javaComparisonTable, 'w') as output:
-    for tag in sorted(javaTags.keys()):
-      or1 = spg(averageSpace(D, 'java', javaTags[tag], 1))
-      orp = spg(averageSpace(D, 'java', javaTags[tag], maxp))
-      mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-      ot1 = tm(averageTime(D, 'java', javaTags[tag], 1))
-      otp = tm(averageTime(D, 'java', javaTags[tag], maxp))
-      mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-
-      proc1TimeRats.append(ovv(sd(ot1, mt1)))
-      proc72TimeRats.append(ovv(sd(otp, mtp)))
-      proc1SpaceRats.append(ovv(sd(or1, mr1)))
-      proc72SpaceRats.append(ovv(sd(orp, mrp)))
-
-      row = \
-        [ fmt(ot1)
-        , fmt(mt1)
-        , makeBold(fmt(ov(sd(ot1, mt1))))
-        , fmt(otp)
-        , fmt(mtp)
-        , makeBold(fmt(ov(sd(otp, mtp))))
-        , sfmt(or1)
-        , sfmt(mr1)
-        , makeBold(fmt(ov(sd(or1, mr1))))
-        , sfmt(orp)
-        , sfmt(mrp)
-        , makeBold(fmt(ov(sd(orp, mrp))))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(javaComparisonTable))
-
-# doJavaComparison()
-
-# ============================================================================
-# LaTeX figure: Go comparison
-# ============================================================================
-
-def doGoComparison():
-  proc1TimeRats = []
-  proc72TimeRats = []
-  proc1SpaceRats = []
-  proc72SpaceRats = []
-
-  ensureFigDir()
-  goComparisonTable = "figures/go-space-time-comparison.tex"
-  with open(goComparisonTable, 'w') as output:
-    for tag in sorted(goTags.keys()):
-      or1 = spg(averageSpace(D, 'go', goTags[tag], 1))
-      orp = spg(averageSpace(D, 'go', goTags[tag], maxp))
-      mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-      ot1 = tm(averageTime(D, 'go', goTags[tag], 1))
-      otp = tm(averageTime(D, 'go', goTags[tag], maxp))
-      mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-
-      proc1TimeRats.append(ovv(sd(ot1, mt1)))
-      proc72TimeRats.append(ovv(sd(otp, mtp)))
-      proc1SpaceRats.append(ovv(sd(or1, mr1)))
-      proc72SpaceRats.append(ovv(sd(orp, mrp)))
-
-      row = \
-        [ fmt(ot1)
-        , fmt(mt1)
-        , makeBold(fmt(ov(sd(ot1, mt1))))
-        , fmt(otp)
-        , fmt(mtp)
-        , makeBold(fmt(ov(sd(otp, mtp))))
-        , sfmt(or1)
-        , sfmt(mr1)
-        , makeBold(fmt(ov(sd(or1, mr1))))
-        , sfmt(orp)
-        , sfmt(mrp)
-        , makeBold(fmt(ov(sd(orp, mrp))))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(goComparisonTable))
-
-# doGoComparison()
-
-# ============================================================================
-# LaTeX figure: C++ comparison
-# ============================================================================
-
-def doCppComparison():
-  proc1TimeRats = []
-  proc72TimeRats = []
-  proc1SpaceRats = []
-  proc72SpaceRats = []
-  # multiTimeRats = []
-
-  ensureFigDir()
-  cppComparisonTable = "figures/cpp-space-time-comparison.tex"
-  with open(cppComparisonTable, 'w') as output:
-    for tag in sorted(cppTags.keys()):
-      cr1 = spg(averageSpace(D, 'cpp', cppTags[tag], 1))
-      crp = spg(averageSpace(D, 'cpp', cppTags[tag], maxp))
-      mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-      ct1 = tm(averageTime(D, 'cpp', cppTags[tag], 1))
-      ctp = tm(averageTime(D, 'cpp', cppTags[tag], maxp))
-      mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-
-      proc1TimeRats.append(ovv(sd(mt1, ct1)))
-      proc72TimeRats.append(ovv(sd(mtp, ctp)))
-      proc1SpaceRats.append(ovv(sd(mr1, cr1)))
-      proc72SpaceRats.append(ovv(sd(mrp, crp)))
-
-      row = \
-        [ fmt(ct1)
-        , fmt(mt1)
-        , makeBold(fmt(ov(sd(mt1, ct1))))
-        , fmt(ctp)
-        , fmt(mtp)
-        , makeBold(fmt(ov(sd(mtp, ctp))))
-        , sfmt(cr1)
-        , sfmt(mr1)
-        , makeBold(fmt(ov(sd(mr1, cr1))))
-        , sfmt(crp)
-        , sfmt(mrp)
-        , makeBold(fmt(ov(sd(mrp, crp))))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", "", makeBold(fmt(ov(geomean(proc1TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72TimeRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc1SpaceRats)))),
-      "", "", makeBold(fmt(ov(geomean(proc72SpaceRats))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(cppComparisonTable))
-
-# doCppComparison()
-
-# ============================================================================
-# LaTeX figure: MLton comparison
-# ============================================================================
-
-mltonCmpTags = sorted([
-  tag for tag in mplOnlyTags
-  if (averageTime(D, 'mpl-em', tag, maxp) is not None)
-  and tag not in sandmarkTags
-  and keepTag(tag)
-], key=displayTag)
-
-
-def ovToPctStr(x):
-  try:
-    epPct = 100.0 * x
-    if x < 0.00001:
-      return ""
-    elif epPct > 99.999:
-      return "100\\%"
-    elif epPct > 99:
-      return ">99\\%"
-    elif epPct < 1:
-      return "<1\\%"
-    else:
-      return str(int(round(epPct))) + "\\%"
-  except:
-    return "--"
-
-def toPctStr(a, b):
-  try:
-    eep = float(a)
-    rrp = float(b)
-    epPct = 100.0 * (eep / rrp)
-    if eep < 0.00001:
-      return ""
-    elif epPct > 99.999:
-      return "100\\%"
-    elif epPct > 99:
-      return ">99\\%"
-    elif epPct < 1:
-      return "<1\\%"
-    else:
-      return str(int(round(epPct))) + "\\%"
-  except:
-    return "--"
-
-
-def doMLtonComparison(mltonConfigName, includeEntanglement):
-  ovRats = []
-  suRats = []
-  bu1Rats = []
-  bupRats = []
-
-  def doTag(tag, output):
-    mltont = tm(averageTime(D, mltonConfigName, tag, 1))
-    mt1 = tm(averageTime(D, 'mpl-em', tag, 1))
-    mtp = tm(averageTime(D, 'mpl-em', tag, maxp))
-
-    mltonr = spg(averageSpace(D, mltonConfigName, tag, 1))
-    mr1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-    mrp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-    pin = pinnedEntangled(D, 'mpl-em', tag, maxp)
-    # pinW = pinnedEntangledWatermark(D, 'mpl-em', tag, maxp)
-    epPctStr = toPctStr(pin, averageSpace(D, 'mpl-em', tag, maxp))
-    # epwPctStr = toPctStr(pinW, averageSpace(D, 'mpl-em', tag, maxp))
-
-    ovRats.append(ovv(sd(mt1, mltont)))
-    suRats.append(ovv(sd(mltont, mtp)))
-    bu1Rats.append(ovv(sd(mr1, mltonr)))
-    bupRats.append(ovv(sd(mrp, mltonr)))
-
-    row = [
-      mltont,
-      mt1,
-      makeBold(fmt(ov(sd(mt1, mltont)))),
-      mtp,
-      makeBold(fmt(su(sd(mltont, mtp)))),
-      sfmt(mltonr),
-      sfmt(mr1),
-      makeBold(noLeadZero(fmt(bu(sd(mr1, mltonr))))),
-      sfmt(mrp),
-      makeBold(noLeadZero(fmt(bu(sd(mrp, mltonr))))),
-    ]
-
-    if includeEntanglement:
-      row += [
-        sp(pin),
-        # sp(pinW),
-        # epPctStr
-      ]
-
-    row = [ fmt(x) for x in row ]
-    output.write(" & ".join([displayTag(tag)] + row))
-    output.write("  \\\\\n")
-
-
-  ensureFigDir()
-  mltonCmpTable = "figures/{}-comparison.tex".format(mltonConfigName)
-  with open(mltonCmpTable, 'w') as output:
-    # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-    #   doTag(tag, output)
-    # output.write("\\midrule\n")
-    # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
-    #   doTag(tag, output)
-
-    for tag in mltonCmpTags:
-      doTag(tag, output)
-
-    output.write("\\midrule\n")
-    row = [
-      "", "", makeBold(fmt(ov(geomean(ovRats)))),
-      "",     makeBold(fmt(su(geomean(suRats)))),
-      "", "", makeBold(fmt(ov(geomean(bu1Rats)))),
-      "",     makeBold(fmt(ov(geomean(bupRats))))
-    ]
-    output.write(" & ".join(["geomean"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(mltonCmpTable))
-
-# doMLtonComparison('mlton', True)
-# doMLtonComparison('mlton-tight', False)
-
-# ============================================================================
-# LaTeX figure: GC and Runtime Stats
-# ============================================================================
-
-def runtimeStats(procs):
-  # ovRats = []
-  # suRats = []
-  # bu1Rats = []
-  # bupRats = []
-
-  def doTag(tag, output):
-    r = averageSpace(D, 'mpl-em', tag, procs)
-    lc = lgcCount(D, 'mpl-em', tag, procs)
-    cc = cgcCount(D, 'mpl-em', tag, procs)
-    lt = tm(lgcTime(D, 'mpl-em', tag, procs))
-    ct = tm(cgcTime(D, 'mpl-em', tag, procs))
-    lr = lgcReclaimed(D, 'mpl-em', tag, procs)
-    cr = cgcReclaimed(D, 'mpl-em', tag, procs)
-    ls = lgcScope(D, 'mpl-em', tag, procs)
-    cs = cgcScope(D, 'mpl-em', tag, procs)
-
-    row = [
-      sp(r),
-      lc,
-      lt,
-      sp(ls),
-      sp(lr),
-      cc,
-      ct,
-      sp(cs),
-      sp(cr)
-    ]
-
-    row = [ fmt(x) for x in row ]
-    output.write(" & ".join([displayTag(tag)] + row))
-    output.write("  \\\\\n")
-
-  ensureFigDir()
-  runtimeStatsTable = "figures/runtime-stats-{}.tex".format(procs)
-  with open(runtimeStatsTable, 'w') as output:
-    # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-    #   doTag(tag, output)
-    # output.write("\\midrule\n")
-    # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
-    #   doTag(tag, output)
-    
-    for tag in mltonCmpTags:
-      doTag(tag, output)
-
-    # output.write("\\midrule\n")
-    # row = [
-    #   "", "", makeBold(fmt(ov(geomean(ovRats)))),
-    #   "",     makeBold(fmt(su(geomean(suRats)))),
-    #   "", "", makeBold(fmt(ov(geomean(bu1Rats)))),
-    #   "",     makeBold(fmt(ov(geomean(bupRats))))
-    # ]
-    # output.write(" & ".join(["geomean"] + row))
-    # output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(runtimeStatsTable))
-
-# runtimeStats(1)
-# runtimeStats(maxp)
-
-# ============================================================================
-# LaTeX figure: GC and Runtime Stats, Summary
-# ============================================================================
-
-def runtimeStatsSummary():
-  # ovRats = []
-  # suRats = []
-  # bu1Rats = []
-  # bupRats = []
-
-  gcRats = []
-  gcLRecRats = []
-  gcCRecRats = []
-
-  totRec = [0]
-  totCr = [0]
-  totLr = [0]
-
-  def doTag(tag, output):
-    # r = averageSpace(D, 'mpl-em', tag, maxp)
-    lc = lgcCount(D, 'mpl-em', tag, maxp)
-    cc = cgcCount(D, 'mpl-em', tag, maxp)
-    # lt = tm(lgcTime(D, 'mpl-em', tag, maxp))
-    # ct = tm(cgcTime(D, 'mpl-em', tag, maxp))
-    lr = lgcReclaimed(D, 'mpl-em', tag, maxp)
-    cr = cgcReclaimed(D, 'mpl-em', tag, maxp)
-    # ls = lgcScope(D, 'mpl-em', tag, maxp)
-    # cs = cgcScope(D, 'mpl-em', tag, maxp)
-
-    totCount = lc + cc
-    lgcCountPct = toPctStr(lc, totCount)
-    cgcCountPct = toPctStr(cc, totCount)
-
-    gcLRecRats.append(sd(lr, lr+cr))
-    gcCRecRats.append(sd(cr, lr+cr))
-
-    totRec[0] += lr+cr
-    totCr[0] += cr
-    totLr[0] += lr
-
-    try:
-      totGC1 = lgcTime(D, 'mpl-em', tag, 1) + cgcTime(D, 'mpl-em', tag, 1)
-      approxWork = tm(averageTime(D, 'mpl-em', tag, 1) - totGC1)
-    except:
-      approxWork = None
-
-    try:
-      totGCp = lgcTime(D, 'mpl-em', tag, maxp) + cgcTime(D, 'mpl-em', tag, maxp)
-      pctGCWork = toPctStr(totGCp, approxWork)
-      gcRats.append(sd(totGCp, approxWork))
-    except:
-      pctGCWork = None
-
-    avgLGCtimeMilli = 1000.0 * lgcTime(D, 'mpl-em', tag, maxp) / lc
-    avgCGCtimeMilli = 1000.0 * cgcTime(D, 'mpl-em', tag, maxp) / cc
-
-    # throughput = gb/sec
-    # lgcRecThrough = sd(sd(lr, lgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
-    # cgcRecThrough = sd(sd(cr, cgcTime(D, 'mpl-em', tag, maxp)), 1000000.0)
-
-    row = [
-      approxWork,
-      pctGCWork,
-      avgLGCtimeMilli,
-      avgCGCtimeMilli,
-      totCount,
-      lgcCountPct,
-      cgcCountPct,
-      sd(lr+cr, 1000.0),
-      toPctStr(lr, lr+cr),
-      toPctStr(cr, lr+cr)
-    ]
-
-    row = [ fmt(x) for x in row ]
-    output.write(" & ".join([displayTag(tag)] + row))
-    output.write("  \\\\\n")
-
-  ensureFigDir()
-  runtimeStatsTable = "figures/runtime-stats-summary.tex"
-  with open(runtimeStatsTable, 'w') as output:
-    # for tag in (tag for tag in mltonCmpTags if tag not in nondetTags):
-    #   doTag(tag, output)
-    # output.write("\\midrule\n")
-    # for tag in (tag for tag in mltonCmpTags if tag in nondetTags):
-    #   doTag(tag, output)
-
-    for tag in mltonCmpTags:
-      doTag(tag, output)
-
-    output.write("\\midrule\n")
-    row = [
-      "", "", "", "", "", "", "", "",
-      # makeBold(fmt(ovToPctStr(geomean(gcRats)))),
-      # makeBold(fmt(ovToPctStr(geomean(gcLRecRats)))),
-      # makeBold(fmt(ovToPctStr(geomean(gcCRecRats))))
-      makeBold(fmt(toPctStr(totLr[0], totRec[0]))),
-      makeBold(fmt(toPctStr(totCr[0], totRec[0])))
-    ]
-    output.write(" & ".join(["total"] + row))
-    output.write("  \\\\\n")
-  print("[INFO] wrote to {}".format(runtimeStatsTable))
-
-# runtimeStatsSummary()
-
-# ============================================================================
-# PDF: Speedup plot
-# ============================================================================
-
-def doMplComparison():
-  proc1TimeDiffs = []
-  proc72TimeDiffs = []
-  proc1SpaceDiffs = []
-  proc72SpaceDiffs = []
-
-  mplComparisonTable = "figures/mpl-space-time-comparison.tex"
-  with open(mplComparisonTable, 'w') as output:
-    for tag in sorted(mplCmpTags):
-
-      if tag in sandmarkTags:
-        continue
-
-      # mlton = spg(averageSpace(DS, 'mlton', tag, 1))
-      R_mpl1 = spg(averageSpace(D, 'mpl', tag, 1))
-      R_mplp = spg(averageSpace(D, 'mpl', tag, maxp))
-      R_mplcc1 = spg(averageSpace(D, 'mpl-em', tag, 1))
-      R_mplccp = spg(averageSpace(D, 'mpl-em', tag, maxp))
-
-      T_mpl1 = tm(averageTime(D, 'mpl', tag, 1))
-      T_mplp = tm(averageTime(D, 'mpl', tag, maxp))
-      T_mplcc1 = tm(averageTime(D, 'mpl-em', tag, 1))
-      T_mplccp = tm(averageTime(D, 'mpl-em', tag, maxp))
-
-      proc1TimeDiffs.append(pcd(T_mplcc1, T_mpl1))
-      proc72TimeDiffs.append(pcd(T_mplccp, T_mplp))
-      proc1SpaceDiffs.append(pcd(R_mplcc1, R_mpl1))
-      proc72SpaceDiffs.append(pcd(R_mplccp, R_mplp))
-
-      row = \
-        [ fmt(T_mpl1)
-        , makeBold(latexpcd(T_mplcc1, T_mpl1, highlight=False))
-        , fmt(T_mplp)
-        , makeBold(latexpcd(T_mplccp, T_mplp, highlight=False))
-        , sfmt(R_mpl1)
-        , makeBold(latexpcd(R_mplcc1, R_mpl1, highlight=False))
-        , sfmt(R_mplp)
-        , makeBold(latexpcd(R_mplccp, R_mplp, highlight=False))
-        ]
-
-      output.write(" & ".join([displayTag(tag)] + row))
-      output.write("  \\\\\n")
-
-    output.write("\\midrule\n")
-    row = [
-      "", makeBold(fmtpcd(average(proc1TimeDiffs), highlight=False)),
-      "", makeBold(fmtpcd(average(proc72TimeDiffs), highlight=False)),
-      "", makeBold(fmtpcd(average(proc1SpaceDiffs), highlight=False)),
-      "", makeBold(fmtpcd(average(proc72SpaceDiffs), highlight=False))
-    ]
-    output.write(" & ".join(["average"] + row))
-    output.write("  \\\\\n")
-
-  print("[INFO] wrote to {}".format(mplComparisonTable))
-
-# doMplComparison()
-
-# ============================================================================
-# PDF: Speedup plot
-# ============================================================================
 
 import matplotlib
 matplotlib.use('Agg')
@@ -2519,173 +1276,6 @@ def doSpeedups(outputName, config, tags):
 # doSpeedups('mpl-speedups-normal', 'mpl', normalTags)
 # doSpeedups('local-hb-gwa-speedups-ng', 'local-hb-gwa', ngTags)
 # doSpeedups('local-hb-gwa-speedups-normal', 'local-hb-gwa', normalTags)
-
-# ============================================================================
-# PDF: Tangle plot
-# ============================================================================
-
-
-
-def reportTangle(plotType):
-  plt.figure(figsize=(7,7))
-  ax = plt.axes()
-  colors = ['darkviolet', 'darkturquoise', 'goldenrod', 'darkgreen', 'red', 'blue', 'dimgrey', 'brown']
-  markers = ['o','v','^','<','>','s','d']
-  linestyles = ['solid', 'dashed','dashdot']
-  fontSize = 28
-  legendFontSize = 12
-  markerSize = 15
-  
-  params = [
-    '0.01','0.02','0.03','0.04','0.05','0.06','0.07','0.08','0.09',
-    '0.1','0.13','0.15','0.2','0.25',
-    '0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
-
-  def ratEntangled(tag):
-    try:
-      pin = pinnedEntangledSingle(D, 'mpl-em', tag, maxp)
-      return pin / averageSpaceSingle(D, 'mpl-em', tag, maxp)
-    except Exception as e:
-      # sys.stderr.write('[WARN] error on tangle ratEntangled({}): {}\n'.format(tag, e))
-      return None
-
-  def thisOverhead(a, b):
-    try:
-      baseline = averageTime(D, 'mpl-em', b, maxp)
-      tm = averageTime(D, 'mpl-em', a, maxp)
-      return tm / baseline
-    except Exception as e:
-      # sys.stderr.write('[WARN] error on tangle thisOverhead({}, {}): {}\n'.format(a, b, e))
-      return None
-  
-  def tagger(version, p):
-    return 'tangle{}-{}'.format(version, p)
-
-  def doPlotting(ax):
-    lines = []
-    legendNames = []
-    for i, version in enumerate(['-small3']):
-      theseParams = [p for p in params if (ratEntangled(tagger(version, p)) is not None) and (thisOverhead(tagger(version, p), tagger(version, '0.0')) is not None)]
-      if version == '-small':
-        theseParams = list(filter(lambda p: p not in ["0.02", "0.05"], theseParams))
-      X = [ratEntangled(tagger(version, p)) for p in theseParams]
-      Y = [thisOverhead(tagger(version, p), tagger(version, '0.0')) for p in theseParams]
-      ci = i % len(colors)
-      mi = i % len(markers)
-      si = i % len(linestyles)
-      color = colors[ci]
-      marker = markers[mi]
-      linestyle = linestyles[si]
-      lines.append(ax.plot(X, Y, linestyle=linestyle, marker=marker, markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color=color, alpha=0.8))
-      # lines.append(plt.scatter(X, Y, marker=marker, color=color, alpha=0.8))
-      legendNames.append('config{}'.format(i))
-    return lines, legendNames
-
-  lines, legendNames = doPlotting(ax)
-
-  # bigX = [ratEntangled('tangle-{}'.format(p)) for p in params]
-  # smallX = [ratEntangled('tangle-small-{}'.format(p)) for p in params]
-
-  # bigY = [thisOverhead('tangle-{}'.format(p), 'tangle-0.0') for p in params]
-  # smallY = [thisOverhead('tangle-small-{}'.format(p), 'tangle-small-0.0') for p in params]
-
-  # lines = []
-  # lines.append(plt.plot(bigX, bigY, linestyle='solid', marker='o', markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color='darkturquoise', alpha=0.8))
-  # lines.append(plt.plot(smallX, smallY, linestyle='solid', marker='v', markersize=markerSize, mec='black', mew=0.0, linewidth=1.3, color='darkviolet', alpha=0.8))
-  # legendNames = ['total size = 1.6 GB', 'total size = 800 MB']
-
-  font = {
-    'size': legendFontSize,
-    #'family' : 'normal',
-    #'weight' : 'bold',
-  }
-  matplotlib.rc('font', **font)
-
-  # make sure to use truetype fonts
-  matplotlib.rcParams['pdf.fonttype'] = 42
-  matplotlib.rcParams['ps.fonttype'] = 42
-
-  # set legend position
-  matplotlib.rcParams['legend.loc'] = 'upper left'
-
-  
-  if plotType == 'log':
-    xticks = [0.005 * (2.0 ** i) for i in range(0,8)] + [1.0]
-    xlabels = [str(2**(i-1)) + '%' for i in range(0,8)] + ['100%']
-    plt.gca().set_xscale('log', base=2)
-    plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
-    plt.xlim(0.004, 1.0)
-  elif plotType == 'linear':
-    xticks = np.arange(0.0, 1.1, 0.25)
-    xlabels = [str(int(i*25)) + '%' for i in range(0, 5)]
-    plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
-    plt.xlim(0, 1)
-  elif plotType == 'linear-zoom':
-    xticks = np.arange(0.0, 0.25, 0.05)
-    xlabels = [str(int(i*5)) + '%' for i in range(0, 5)]
-    plt.ylim(0.9, 1.5)
-    plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
-    plt.xlim(0, 0.2)
-  else:
-    print('[ERR] unknown plot type {}'.format(plotType))
-    return
-
-  yticks = np.arange(1.0, 3.0, 0.25)
-  ylabels = ["%.2f" % x for x in yticks]
-  
-  plt.xlabel('Fraction of Memory Entangled', fontsize=fontSize)
-  plt.ylabel('Overhead', fontsize=fontSize)
-  plt.yticks(yticks, labels=ylabels, fontsize=fontSize)
-  # plt.xticks(xticks, labels=xlabels, fontsize=fontSize)
-  # plt.xlim(0.009, 1.0)
-  # plt.ylim(0, 0.2)
-  # ax.yaxis.set_major_locator(MultipleLocator(0.25))
-  # ax.yaxis.set_minor_locator(MultipleLocator(0.1))
-  plt.gca().grid(axis='both', which='major', linestyle='dotted')
-  plt.gca().grid(axis='y', which='minor', visible=False)
-  # ax.yaxis.grid(True, which='minor')
-  plt.gca().set_axisbelow(True)
-  # plt.margins(y=10)
-
-  # if True:
-  #   ax.legend(
-  #     [b[0] for b in lines],
-  #     # lines,
-  #     legendNames,
-  #     # bbox_to_anchor=(-0.16,1.05),
-  #     # loc='upper right',
-  #     bbox_to_anchor=(-0.1,1.01),
-  #     loc='lower left',
-  #     ncol=3
-  #   )
-
-  # if plotType == "linear":
-  #   zx1 = 0.0
-  #   zx2 = 0.11
-  #   zy1 = 0.98
-  #   zy2 = 1.22
-  #   axins = zoomed_inset_axes(ax, 3, loc='lower right') # zoom = 3
-  #   doPlotting(axins)
-  #   axins.set_xlim(zx1, zx2)
-  #   axins.set_ylim(zy1, zy2)
-  #   # plt.xticks(visible=False)
-  #   plt.xticks([0.0,0.1], visible=False)
-  #   plt.yticks([1.0,1.2], visible=False)
-  #   ax.yaxis.set_major_locator(MultipleLocator(0.2))
-  #   ax.yaxis.set_minor_locator(MultipleLocator(0.1))
-  #   plt.gca().grid(axis='both', which='major', linestyle='dotted')
-  #   plt.gca().grid(axis='y', which='minor', visible=False)
-  #   # plt.gca().set_axisbelow(False)
-  #   mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
-
-  ensureFigDir()
-  outputName = 'figures/tangle-{}.pdf'.format(plotType)
-  plt.savefig(outputName, bbox_inches='tight')
-  sys.stdout.write("[INFO] output written to {}\n".format(outputName))
-  plt.close()
-
-
-# reportTangle('linear')
 
 # ============================================================================
 # ============================================================================
