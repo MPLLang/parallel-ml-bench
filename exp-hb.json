@@ -83,14 +83,15 @@
       "mlton",
       "mpl",
       "local-hb",
-      "local-hb-sim-eager"
+      "local-hb-sim-eager",
+      "local-hb-npc",
+      "local-hb-eh"
     ],
     "cwd": [
       "mpl"
     ],
     "exp": [
-      "time",
-      "space"
+      "time"
     ],
     "trials": [
       "1",
