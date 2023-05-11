@@ -46,6 +46,22 @@
     },
     {
       "match": {
+        "config": "mlton-exnpar$",
+        "exp": "time",
+        "procs": "1$"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 5"
+    },
+    {
+      "match": {
+        "config": "mlton-exnpar$",
+        "exp": "space",
+        "procs": "1$"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin <args?{} ><args1?{}> -repeat 20 -warmup 0"
+    },
+    {
+      "match": {
         "config": "mlton-fhs$",
         "exp": "time",
         "procs": "1$"
@@ -81,6 +97,7 @@
   "globals": {
     "config": [
       "mlton",
+      "mlton-exnpar",
       "mpl",
       "local-hb",
       "local-hb-sim-eager",
@@ -236,24 +253,24 @@
     },
     {
       "tag": [
-        "sparse-mxv-ng"
+        "sparse-mxv-csr-ng"
       ],
       "bench": [
-        "sparse-mxv-ng"
+        "sparse-mxv-csr-ng"
       ],
       "args": [
-        "-n 500000000"
+        "-n 250000000"
       ]
     },
     {
       "tag": [
-        "sparse-mxv"
+        "sparse-mxv-csr"
       ],
       "bench": [
-        "sparse-mxv-opt"
+        "sparse-mxv-csr"
       ],
       "args": [
-        "-n 500000000"
+        "-n 250000000"
       ]
     },
     {

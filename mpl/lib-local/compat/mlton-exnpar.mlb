@@ -5,7 +5,7 @@ local
   $(SML_LIB)/basis/mlton.mlb
   Grains.$(GRAINS).sml
   ForkJoinNG.sml
-  mlton.sml
+  mlton-exnpar.sml
 in
   structure Grains
   structure ForkJoin

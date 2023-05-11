@@ -7,6 +7,9 @@ struct
 end
 
  *)
+
+structure ForkJoin = ForkJoin
+
 structure RuntimeStats:
 sig
   type t
