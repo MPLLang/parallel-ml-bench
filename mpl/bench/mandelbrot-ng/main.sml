@@ -62,23 +62,29 @@ fun mark x y =
 
 fun packByte y (xlo, xhi) =
   let
-    fun loop byte x =
-      if x >= xhi then
-        byte
-      else
-        let
-          val byte =
-            if mark x y then Word.orb (Word.<< (byte, 0w1), 0wx01)
-            else Word.<< (byte, 0w1)
-        in
-          loop byte (x + 1)
-        end
+    fun doOne x =
+      if mark x y then Word.<< (0w1, Word.fromInt (7 - (x - xlo))) else 0w0
 
-    val byte = loop 0w0 xlo
+    val byte = SeqBasisNG.reduce Word.orb 0w0 (xlo, xhi) doOne
 
-    val byte =
-      if xhi - xlo = 8 then byte
-      else Word.<< (byte, Word.fromInt (8 - (xhi - xlo)))
+  (* 
+      fun loop byte x =
+        if x >= xhi then
+          byte
+        else
+          let
+            val byte =
+              if mark x y then Word.orb (Word.<< (byte, 0w1), 0wx01)
+              else Word.<< (byte, 0w1)
+          in
+            loop byte (x + 1)
+          end
+  
+      val byte = loop 0w0 xlo
+  
+      val byte =
+        if xhi - xlo = 8 then byte
+        else Word.<< (byte, Word.fromInt (8 - (xhi - xlo))) *)
   in
     byte
   end

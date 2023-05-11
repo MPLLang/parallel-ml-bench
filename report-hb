@@ -814,6 +814,68 @@ def safestr(x):
     return "--"
   return str(x)
 
+# ============================================================================
+# ============================================================================
+
+# expects grain one of
+# ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
+def doOverheadsAndSpeedups():
+  headers = ['', 'Baseline', '|', 'T(1)', None, '|', 'Overhead', None, '|', 'T({})'.format(maxp), None, '|', 'Speedup', None]
+  headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'HB', '|', 'MPL', 'HB', '|', 'MPL', 'HB', '|', 'MPL', 'HB']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    ts = tm(averageTime(D, 'mlton', tag, 1))
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb', tag, maxp))
+
+    winner1 = (ht1 < mt1)
+    winnerp = (htp < mtp)
+
+    def cc(b, x):
+      return (green(x) if b else x)
+    def ccm1(x):
+      return cc(mt1 <= ht1, x)
+    def ccmp(x):
+      return cc(mtp <= htp, x)
+    def cch1(x):
+      return cc(ht1 <= mt1, x)
+    def cchp(x):
+      return cc(htp <= mtp, x)
+
+    row = [
+      safestr(ts),
+      '|',
+      ccm1(safestr(mt1)),
+      cch1(safestr(ht1)),
+      '|',
+      ccm1(ov(sd(mt1, ts))),
+      cch1(ov(sd(ht1, ts))),
+      '|',
+      ccmp(safestr(mtp)),
+      cchp(safestr(htp)),
+      '|',
+      ccmp(su(sd(ts, mtp))),
+      cchp(su(sd(ts, htp)))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in ngTags:
+    doTag(tag)
+
+  print("OVERHEADS AND SPEEDUPS")
+  print(table(tt, defaultAlign))
+  print("")
+
+
+doOverheadsAndSpeedups()
+
+# ============================================================================
+# ============================================================================
+
 # expects grain one of
 # ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
 def doHeartbeatTimeCmp():
