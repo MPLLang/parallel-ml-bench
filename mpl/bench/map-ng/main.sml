@@ -28,7 +28,7 @@ fun doLight () =
   let
     val input = SeqNG.tabulate (fn i => i) n
     val result = Benchmark.run "map light" (fn _ =>
-      SeqNG.map (fn x => iteratedHash 10 x mod n) input)
+      SeqNG.map (fn x => x + 1) input)
   in
     print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")
   end

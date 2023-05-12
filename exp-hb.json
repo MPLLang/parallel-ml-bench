@@ -187,50 +187,6 @@
     },
     {
       "tag": [
-        "msort-strings-ng"
-      ],
-      "bench": [
-        "msort-strings-ng"
-      ],
-      "args": [
-        "../inputs/words64.txt"
-      ]
-    },
-    {
-      "tag": [
-        "msort-strings"
-      ],
-      "bench": [
-        "msort-strings"
-      ],
-      "args": [
-        "../inputs/words64.txt"
-      ]
-    },
-    {
-      "tag": [
-        "msort-long-strings-ng"
-      ],
-      "bench": [
-        "msort-strings-ng"
-      ],
-      "args": [
-        "../inputs/words64.txt --long"
-      ]
-    },
-    {
-      "tag": [
-        "msort-long-strings"
-      ],
-      "bench": [
-        "msort-strings"
-      ],
-      "args": [
-        "../inputs/words64.txt --long"
-      ]
-    },
-    {
-      "tag": [
         "primes-ng"
       ],
       "bench": [
@@ -297,7 +253,7 @@
     },
     {
       "tag": [
-        "map-ng-heavy"
+        "map-heavy-ng"
       ],
       "bench": [
         "map-ng"
@@ -308,13 +264,13 @@
     },
     {
       "tag": [
-        "map-ng-light"
+        "map-light-ng"
       ],
       "bench": [
         "map-ng"
       ],
       "args": [
-        "-n 50000000 -fn-cost light"
+        "-n 200000000 -fn-cost light"
       ]
     },
     {
@@ -336,7 +292,7 @@
         "map"
       ],
       "args": [
-        "-n 50000000 -fn-cost light"
+        "-n 200000000 -fn-cost light"
       ]
     },
     {
@@ -347,7 +303,7 @@
         "mandelbrot"
       ],
       "args": [
-        ""
+        "-resolution 2500 -top 2 -bot ~2 -left ~3 -right 1 -diverge-thresh 2 -max-iter 30"
       ]
     },
     {
@@ -358,8 +314,28 @@
         "mandelbrot-ng"
       ],
       "args": [
-        ""
+        "-resolution 2500 -top 2 -bot ~2 -left ~3 -right 1 -diverge-thresh 2 -max-iter 30"
       ]
+    },
+    {
+      "tag": ["linefit-ng"],
+      "bench": ["linefit-ng"],
+      "args": ["-n 100000000"]
+    },
+    {
+      "tag": ["linefit"],
+      "bench": ["linefit-opt"],
+      "args": ["-n 100000000"]
+    },
+    {
+      "tag": ["wc-ng"],
+      "bench": ["wc-ng"],
+      "args": ["-infile ../inputs/words256.txt"]
+    },
+    {
+      "tag": ["wc"],
+      "bench": ["wc-opt"],
+      "args": ["-infile ../inputs/words256.txt"]
     },
     {
       "tag": [
