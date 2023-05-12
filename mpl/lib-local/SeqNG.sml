@@ -232,7 +232,7 @@ struct
       val total = offset (length s)
       val result = alloc total
 
-      val blockSize = Grains.block total
+      val blockSize = Grains.block
       val numBlocks = Util.ceilDiv total blockSize
     in
       parfor (0, numBlocks) (fn blockIdx =>

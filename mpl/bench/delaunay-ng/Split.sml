@@ -16,7 +16,7 @@ struct
   fun split s flags =
     let
       val n = DS.length s
-      val blockSize = Grains.block n
+      val blockSize = Grains.block
       val numBlocks = 1 + (n - 1) div blockSize
 
       (* the later scan(s) appears to be faster when split into two separate

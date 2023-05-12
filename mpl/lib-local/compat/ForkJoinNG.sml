@@ -9,12 +9,12 @@ struct
 
 
   fun for (wlo, whi) f =
-    if wlo >= whi then () else (f (Word64.toIntX wlo); for (wlo + 0w1, whi) f)
+    if wlo >= whi then () else (f (w2i wlo); for (wlo + 0w1, whi) f)
 
 
   fun parfor (lo, hi) f =
     let
-      val grain = Grains.parfor (hi - lo)
+      val grain = Grains.parfor
       val wgrain = i2w grain
 
       fun loopCheck lo hi =

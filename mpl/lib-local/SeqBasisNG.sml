@@ -71,7 +71,7 @@ struct
 
   fun reduce g b (lo, hi) f =
     let
-      val grain = Grains.parfor (hi - lo)
+      val grain = Grains.parfor
       val wgrain = i2w grain
 
       fun loopCheck lo hi =
@@ -93,7 +93,7 @@ struct
 
 
   fun scan g b (lo, hi) (f: int -> 'a) =
-    if hi - lo <= Grains.block (hi - lo) then
+    if hi - lo <= Grains.block then
       let
         val n = hi - lo
         val result = allocate (n + 1)
@@ -107,7 +107,7 @@ struct
     else
       let
         val n = hi - lo
-        val k = Grains.block n
+        val k = Grains.block
         val m = 1 + (n - 1) div k (* number of blocks *)
         val sums = tabulate (0, m) (fn i =>
           let val start = lo + i * k
@@ -134,7 +134,7 @@ struct
   fun filter (lo, hi) f g =
     let
       val n = hi - lo
-      val k = Grains.block n
+      val k = Grains.block
       val m = 1 + (n - 1) div k (* number of blocks *)
       fun count (i, j) c =
         if i >= j then c
@@ -162,7 +162,7 @@ struct
   fun tabFilter (lo, hi) (f: int -> 'a option) =
     let
       val n = hi - lo
-      val k = Grains.block n
+      val k = Grains.block
       val m = 1 + (n - 1) div k (* number of blocks *)
       val tmp = allocate n
 
