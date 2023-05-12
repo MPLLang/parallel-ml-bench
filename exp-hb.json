@@ -338,6 +338,16 @@
       "args": ["-infile ../inputs/words256.txt"]
     },
     {
+      "tag": ["nqueens-ng"],
+      "bench": ["nqueens-ng"],
+      "args": ["-N 13"]
+    },
+    {
+      "tag": ["nqueens"],
+      "bench": ["nqueens"],
+      "args": ["-N 13"]
+    },
+    {
       "tag": [
         "fork-stress"
       ],
