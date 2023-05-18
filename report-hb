@@ -898,6 +898,41 @@ doOverheadsAndSpeedups()
 # ============================================================================
 # ============================================================================
 
+def doGreedyImprovement():
+  headers = ['', 'T(1)', '|', 'T({})'.format(maxp)]
+  headers1 = ['Benchmark', 'Improvement', '|', 'Improvement']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    t1 = tm(averageTime(D, 'local-hb', tag, 1))
+    nt1 = tm(averageTime(D, 'local-hb-npc', tag, 1))
+    tp = tm(averageTime(D, 'local-hb', tag, maxp))
+    ntp = tm(averageTime(D, 'local-hb-npc', tag, maxp))
+
+    row = [
+      # safestr(nt1),
+      # safestr(t1),
+      ov(sd(nt1, t1)),
+      '|',
+      # safestr(ntp),
+      # safestr(tp),
+      ov(sd(ntp, tp))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in ngTags:
+    doTag(tag)
+
+  print("IMPROVEMENT DUE TO GREEDINESS")
+  print(table(tt, defaultAlign))
+  print("")
+
+doGreedyImprovement()
+
+# ============================================================================
+# ============================================================================
+
 def doClosenessToManualGrain():
   headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None]
   headers1 = ['Benchmark', 'Man', 'NG', 'Overhead', '|', 'Man', 'NG', 'Overhead']

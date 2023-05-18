@@ -1,0 +1,12 @@
+../../lib.mlb
+../quickhull/ParseFile.sml
+../quickhull/TreeSeq.sml
+
+local
+  ../quickhull/MkPurishSplit.sml
+in
+  functor MkSplit = MkPurishSplit
+end
+../quickhull/MkQuickhull.sml
+
+main.sml

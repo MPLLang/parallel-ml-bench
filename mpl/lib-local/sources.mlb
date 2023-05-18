@@ -10,3 +10,6 @@ QuicksortNG.sml
 MergeNG.sml
 MergesortNG.sml
 NearestNeighborsNG.sml
+
+FindFirstNG.sml
+OldDelayedSeqNG.sml

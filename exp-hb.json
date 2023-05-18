@@ -357,6 +357,16 @@
       "args": [
         "-width 1000 -length 5000"
       ]
+    },
+    {
+      "tag": ["grep"],
+      "bench": ["grep"],
+      "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
+    },
+    {
+      "tag": ["grep-ng"],
+      "bench": ["grep-ng"],
+      "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
     }
   ]
 }
