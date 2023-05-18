@@ -21,28 +21,36 @@ val _ = print ("n " ^ Int.toString n ^ "\n")
 val _ = print ("fn-cost " ^ fnCost ^ "\n")
 
 
-fun mapG grain f s =
-  ArraySlice.full (SeqBasis.tabulate grain (0, Seq.length s) (f o Seq.nth s))
+fun modifyG grain f s =
+  ForkJoin.parfor grain (0, Seq.length s) (fn i =>
+    ArraySlice.update (s, i, f (i, Seq.nth s i)))
+
+(* fun mapG grain f s =
+  ArraySlice.full (SeqBasis.tabulate grain (0, Seq.length s) (f o Seq.nth s)) *)
 
 fun iteratedHash k x =
   if k = 0 then x else iteratedHash (k - 1) (Util.hash x)
 
 fun doLight () =
   let
-    val input = SeqNG.tabulate (fn i => i) n
-    val result = Benchmark.run "map light" (fn _ =>
-      mapG 5000 (fn x => iteratedHash 10 x mod n) input)
+    val data = Seq.tabulate (fn i => i) n
+    val () = Benchmark.run "map light" (fn _ =>
+      ( modifyG 5000 (fn (i, _) => i) data
+      ; modifyG 5000 (fn (_, x) => x + 1) data
+      ))
   in
-    print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")
+    print (Util.summarizeArraySlice 8 Int.toString data ^ "\n")
   end
 
 fun doHeavy () =
   let
-    val input = SeqNG.tabulate (fn i => i) n
-    val result = Benchmark.run "map heavy" (fn _ =>
-      mapG 1 (fn x => iteratedHash 100000 x mod n) input)
+    val data = Seq.tabulate (fn i => i) n
+    val () = Benchmark.run "map heavy" (fn _ =>
+      ( modifyG 5000 (fn (i, _) => i) data
+      ; modifyG 1 (fn (_, x) => iteratedHash 100000 x mod n) data
+      ))
   in
-    print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")
+    print (Util.summarizeArraySlice 8 Int.toString data ^ "\n")
   end
 
 val _ =

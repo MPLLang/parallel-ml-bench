@@ -20,26 +20,31 @@ val _ = checkInput ()
 val _ = print ("n " ^ Int.toString n ^ "\n")
 val _ = print ("fn-cost " ^ fnCost ^ "\n")
 
+fun modify f s =
+  ForkJoinNG.parfor (0, Seq.length s) (fn i =>
+    ArraySlice.update (s, i, f (i, Seq.nth s i)))
 
 fun iteratedHash k x =
   if k = 0 then x else iteratedHash (k - 1) (Util.hash x)
 
 fun doLight () =
   let
-    val input = SeqNG.tabulate (fn i => i) n
-    val result = Benchmark.run "map light" (fn _ =>
-      SeqNG.map (fn x => x + 1) input)
+    val data = SeqNG.tabulate (fn i => i) n
+    val () = Benchmark.run "map light" (fn _ =>
+      (modify (fn (i, _) => i) data; modify (fn (_, x) => x + 1) data))
   in
-    print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")
+    print (Util.summarizeArraySlice 8 Int.toString data ^ "\n")
   end
 
 fun doHeavy () =
   let
-    val input = SeqNG.tabulate (fn i => i) n
-    val result = Benchmark.run "map heavy" (fn _ =>
-      SeqNG.map (fn x => iteratedHash 100000 x mod n) input)
+    val data = SeqNG.tabulate (fn i => i) n
+    val () = Benchmark.run "map heavy" (fn _ =>
+      ( modify (fn (i, _) => i) data
+      ; modify (fn (_, x) => iteratedHash 100000 x mod n) data
+      ))
   in
-    print (Util.summarizeArraySlice 8 Int.toString result ^ "\n")
+    print (Util.summarizeArraySlice 8 Int.toString data ^ "\n")
   end
 
 val _ =

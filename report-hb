@@ -817,8 +817,6 @@ def safestr(x):
 # ============================================================================
 # ============================================================================
 
-# expects grain one of
-# ['large-grain', 'small-grain', 'cilk-large-grain', 'cilk-small-grain']
 def doOverheadsAndSpeedups():
   headers = ['', 'Baseline', '|', 'T(1)', None, '|', 'Overhead', None, '|', 'T({})'.format(maxp), None, '|', 'Speedup', None]
   headers1 = ['Benchmark', 'MLton', '|', 'MPL', 'HB', '|', 'MPL', 'HB', '|', 'MPL', 'HB', '|', 'MPL', 'HB']
@@ -866,12 +864,71 @@ def doOverheadsAndSpeedups():
   for tag in ngTags:
     doTag(tag)
 
+  tt.append("-")
+
+  mpl_overheads = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'mpl', tag, 1)), tm(averageTime(D, 'mlton', tag, 1))))
+      for tag in ngTags)
+  hb_overheads = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'local-hb', tag, 1)), tm(averageTime(D, 'mlton', tag, 1))))
+      for tag in ngTags)
+
+  mpl_speedups = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'mlton', tag, 1)), tm(averageTime(D, 'mpl', tag, maxp))))
+      for tag in ngTags)
+  hb_speedups = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'mlton', tag, 1)), tm(averageTime(D, 'local-hb', tag, maxp))))
+      for tag in ngTags)
+
+  tt.append(["min", "", "", "", "", "", ov(min(mpl_overheads)), ov(min(hb_overheads)), "", "", "", "", su(min(mpl_speedups)), su(min(hb_speedups))])
+  tt.append(["geomean", "", "", "", "", "", ov(geomean(mpl_overheads)), ov(geomean(hb_overheads)), "", "", "", "", su(geomean(mpl_speedups)), su(geomean(hb_speedups))])
+  tt.append(["max", "", "", "", "", "", ov(max(mpl_overheads)), ov(max(hb_overheads)), "", "", "", "", su(max(mpl_speedups)), su(max(hb_speedups))])
+
   print("OVERHEADS AND SPEEDUPS")
   print(table(tt, defaultAlign))
   print("")
 
 
 doOverheadsAndSpeedups()
+
+# ============================================================================
+# ============================================================================
+
+def doClosenessToManualGrain():
+  headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'Man', 'NG', 'Overhead', '|', 'Man', 'NG', 'Overhead']
+  tt = [headers, "-", headers1, "="]
+
+  def doCmp(tag, ngtag):
+    t1 = tm(averageTime(D, 'local-hb', tag, 1))
+    ngt1 = tm(averageTime(D, 'local-hb', ngtag, 1))
+    tp = tm(averageTime(D, 'local-hb', tag, maxp))
+    ngtp = tm(averageTime(D, 'local-hb', ngtag, maxp))
+
+    row = [
+      safestr(t1),
+      safestr(ngt1),
+      ov(sd(ngt1, t1)),
+      '|',
+      safestr(tp),
+      safestr(ngtp),
+      ov(sd(ngtp, tp))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in normalTags:
+    doCmp(tag, tag + '-ng')
+
+  print("MANUAL VS NO-GRAIN PERFORMANCE")
+  print(table(tt, defaultAlign))
+  print("")
+
+doClosenessToManualGrain()
 
 # ============================================================================
 # ============================================================================
@@ -930,7 +987,7 @@ def doHeartbeatTimeCmp():
   print("")
 
 
-doHeartbeatTimeCmp()
+# doHeartbeatTimeCmp()
 
 # ============================================================================
 
@@ -975,7 +1032,7 @@ def doHeartbeatStats():
   print(table(tt, defaultAlign))
   print("")
 
-doHeartbeatStats()
+# doHeartbeatStats()
 
 # ============================================================================
 
