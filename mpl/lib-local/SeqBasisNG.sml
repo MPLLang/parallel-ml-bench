@@ -111,7 +111,7 @@ struct
         val m = 1 + (n - 1) div k (* number of blocks *)
         val sums = tabulate (0, m) (fn i =>
           let val start = lo + i * k
-          in foldl g b (start, Int.min (start + k, hi)) f
+          in reduce g b (start, Int.min (start + k, hi)) f
           end)
         val partials = scan g b (0, m) (nth sums)
         val result = allocate (n + 1)
@@ -136,13 +136,16 @@ struct
       val n = hi - lo
       val k = Grains.block
       val m = 1 + (n - 1) div k (* number of blocks *)
-      fun count (i, j) c =
+      (* fun count (i, j) c =
         if i >= j then c
         else if g i then count (i + 1, j) (c + 1)
-        else count (i + 1, j) c
+        else count (i + 1, j) c *)
       val counts = tabulate (0, m) (fn i =>
-        let val start = lo + i * k
-        in count (start, Int.min (start + k, hi)) 0
+        let
+          val start = lo + i * k
+        in (*count (start, Int.min (start + k, hi)) 0*)
+          reduce op+ 0 (start, Int.min (start + k, hi)) (fn j =>
+            if g j then 1 else 0)
         end)
       val offsets = scan op+ 0 (0, m) (nth counts)
       val result = allocate (nth offsets m)
@@ -193,7 +196,7 @@ struct
           val doff = A.sub (outOff, i)
           val size = A.sub (outOff, i + 1) - doff
         in
-          Util.for (0, size) (fn j =>
+          parfor (0, size) (fn j =>
             A.update (result, doff + j, A.sub (tmp, soff + j)))
         end);
       result

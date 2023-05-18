@@ -367,6 +367,16 @@
       "tag": ["grep-ng"],
       "bench": ["grep-ng"],
       "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
+    },
+    {
+      "tag": ["bignum-add"],
+      "bench": ["bignum-add"],
+      "args": ["-n 100000000"]
+    },
+    {
+      "tag": ["bignum-add-ng"],
+      "bench": ["bignum-add-ng"],
+      "args": ["-n 100000000"]
     }
   ]
 }

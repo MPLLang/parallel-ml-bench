@@ -547,7 +547,7 @@ struct
           val doff = A.sub (outOff, i)
           val size = A.sub (outOff, i + 1) - doff
         in
-          Util.for (0, size) (fn j =>
+          parfor (0, size) (fn j =>
             A.update (result, doff + j, A.sub (results, soff + j)))
         end);
 
@@ -616,7 +616,7 @@ struct
           val blockStart = i + blockIdx * blockSize
           val blockEnd = Int.min (j, blockStart + blockSize)
         in
-          SeqBasisNG.foldl g b (blockStart, blockEnd) f
+          SeqBasisNG.reduce g b (blockStart, blockEnd) f
         end)
 
       val partials = SeqBasisNG.scan g b (0, nb) (A.nth blockSums)
@@ -646,7 +646,7 @@ struct
           val blockStart = i + blockIdx * blockSize
           val blockEnd = Int.min (j, blockStart + blockSize)
         in
-          SeqBasisNG.foldl g b (blockStart, blockEnd) f
+          SeqBasisNG.reduce g b (blockStart, blockEnd) f
         end)
 
       val partials = SeqBasisNG.scan g b (0, nb) (A.nth blockSums)
