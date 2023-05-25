@@ -898,9 +898,9 @@ doOverheadsAndSpeedups()
 # ============================================================================
 # ============================================================================
 
-def doGreedyImprovement():
+def doEagernessImprovement():
   headers = ['', 'T(1)', '|', 'T({})'.format(maxp)]
-  headers1 = ['Benchmark', 'Improvement', '|', 'Improvement']
+  headers1 = ['Benchmark', 'Improvement', '|', 'Improvement', 'Eagerness']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
@@ -909,6 +909,8 @@ def doGreedyImprovement():
     tp = tm(averageTime(D, 'local-hb', tag, maxp))
     ntp = tm(averageTime(D, 'local-hb-npc', tag, maxp))
 
+    pctEagerness = eagerness(D, 'local-hb', tag, maxp)
+
     row = [
       # safestr(nt1),
       # safestr(t1),
@@ -916,7 +918,8 @@ def doGreedyImprovement():
       '|',
       # safestr(ntp),
       # safestr(tp),
-      ov(sd(ntp, tp))
+      ov(sd(ntp, tp)),
+      safestr(pctEagerness) + "%"
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
@@ -924,11 +927,11 @@ def doGreedyImprovement():
   for tag in ngTags:
     doTag(tag)
 
-  print("IMPROVEMENT DUE TO GREEDINESS")
+  print("IMPROVEMENT DUE TO EAGERNESS")
   print(table(tt, defaultAlign))
   print("")
 
-doGreedyImprovement()
+doEagernessImprovement()
 
 # ============================================================================
 # ============================================================================
@@ -1044,21 +1047,21 @@ def doHeartbeatStats():
       safestr(numSpawns),
       safestr(pctEagerness) + "%",
       safestr(numSteals),
-      safestr(sd(numSpawns, numSteals)),
+      safestr(round(sd(numSpawns, numSteals), 1)),
       safestr(sd(numPars, numSteals))
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
 
-  for tag in otherTags:
-    doTag(tag)
+  # for tag in otherTags:
+  #   doTag(tag)
 
-  tt.append("-")
+  # tt.append("-")
 
-  for tag in normalTags:
-    doTag(tag)
+  # for tag in normalTags:
+  #   doTag(tag)
   
-  tt.append("-")
+  # tt.append("-")
 
   for tag in ngTags:
     doTag(tag)
@@ -1067,7 +1070,7 @@ def doHeartbeatStats():
   print(table(tt, defaultAlign))
   print("")
 
-# doHeartbeatStats()
+doHeartbeatStats()
 
 # ============================================================================
 
