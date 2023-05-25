@@ -377,6 +377,16 @@
       "tag": ["bignum-add-ng"],
       "bench": ["bignum-add-ng"],
       "args": ["-n 100000000"]
+    },
+    {
+      "tag": ["suffix-array"],
+      "bench": ["suffix-array"],
+      "args": ["--benchmark -N 10000000"]
+    },
+    {
+      "tag": ["suffix-array-ng"],
+      "bench": ["suffix-array-ng"],
+      "args": ["--benchmark -N 10000000"]
     }
   ]
 }

@@ -1,0 +1,5 @@
+../../lib.mlb
+../suffix-array/AS.sml
+../suffix-array/BruteForce.sml
+PrefixDoubling.sml
+main.sml
