@@ -387,6 +387,16 @@
       "tag": ["suffix-array-ng"],
       "bench": ["suffix-array-ng"],
       "args": ["--benchmark -N 10000000"]
+    },
+    {
+      "tag": ["triangle-count"],
+      "bench": ["triangle-count"],
+      "args": ["../inputs/rmat-1M-symm-bin"]
+    },
+    {
+      "tag": ["triangle-count-ng"],
+      "bench": ["triangle-count-ng"],
+      "args": ["../inputs/rmat-1M-symm-bin"]
     }
   ]
 }
