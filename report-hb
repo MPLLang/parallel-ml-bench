@@ -893,7 +893,59 @@ def doOverheadsAndSpeedups():
   print("")
 
 
-doOverheadsAndSpeedups()
+# doOverheadsAndSpeedups()
+
+# ============================================================================
+# ============================================================================
+
+def doSimpleOverheadsAndSpeedups():
+  headers = ['', 'Baseline', '|', 'T(1)', 'Overhead', '|', 'T({})'.format(maxp), 'Speedup']
+  headers1 = ['Benchmark', 'MLton', '|', 'HB', 'HB/MLton', '|', 'HB', 'MLton/HB']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    ts = tm(averageTime(D, 'mlton', tag, 1))
+    # mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+    # mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb', tag, maxp))
+
+    row = [
+      safestr(ts),
+      '|',
+      safestr(ht1),
+      ov(sd(ht1, ts)),
+      '|',
+      safestr(htp),
+      su(sd(ts, htp))
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in ngTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  hb_overheads = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'local-hb', tag, 1)), tm(averageTime(D, 'mlton', tag, 1))))
+      for tag in ngTags)
+  hb_speedups = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'mlton', tag, 1)), tm(averageTime(D, 'local-hb', tag, maxp))))
+      for tag in ngTags)
+
+  tt.append(["min", "", "", "", ov(min(hb_overheads)), "", "", su(min(hb_speedups))])
+  tt.append(["geomean", "", "", "", ov(geomean(hb_overheads)), "", "", su(geomean(hb_speedups))])
+  tt.append(["max", "", "", "", ov(max(hb_overheads)), "", "", su(max(hb_speedups))])
+
+  print("OVERHEADS AND SPEEDUPS")
+  print(table(tt, defaultAlign))
+  print("")
+
+
+doSimpleOverheadsAndSpeedups()
 
 # ============================================================================
 # ============================================================================
