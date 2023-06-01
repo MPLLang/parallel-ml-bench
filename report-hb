@@ -898,9 +898,77 @@ doOverheadsAndSpeedups()
 # ============================================================================
 # ============================================================================
 
+def doMplCmp():
+  headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None]
+  headers1 = ['Benchmark', 'MPL', 'HB', 'MPL/HB', '|', 'MPL', 'HB', 'MPL/HB']
+  tt = [headers, "-", headers1, "="]
+
+  def doTag(tag):
+    # ts = tm(averageTime(D, 'mlton', tag, 1))
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb', tag, maxp))
+
+    winner1 = (ht1 < mt1)
+    winnerp = (htp < mtp)
+
+    def cc(b, x):
+      return (green(x) if b else x)
+    def ccm1(x):
+      return cc(mt1 <= ht1, x)
+    def ccmp(x):
+      return cc(mtp <= htp, x)
+    def cch1(x):
+      return cc(ht1 <= mt1, x)
+    def cchp(x):
+      return cc(htp <= mtp, x)
+
+    row = [
+      # safestr(ts),
+      # '|',
+      safestr(mt1),
+      safestr(ht1),
+      cch1(ov(sd(mt1, ht1))),
+      '|',
+      safestr(mtp),
+      safestr(htp),
+      cchp(ov(sd(mtp, htp))),
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in ngTags:
+    doTag(tag)
+
+  tt.append("-")
+
+  rats1 = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'mpl', tag, 1)), tm(averageTime(D, 'local-hb', tag, 1))))
+      for tag in ngTags)
+  ratsp = \
+    filterSome(
+      ovv(sd(tm(averageTime(D, 'mpl', tag, maxp)), tm(averageTime(D, 'local-hb', tag, maxp))))
+      for tag in ngTags)
+
+  tt.append(["min", "", "", ov(min(rats1)), "", "", ov(min(ratsp))])
+  tt.append(["geomean", "", "", ov(geomean(rats1)), "", "", ov(geomean(ratsp))])
+  tt.append(["max", "", "", ov(max(rats1)), "", "", ov(max(ratsp))])
+
+  print("MPL COMPARISON")
+  print(table(tt, defaultAlign))
+  print("")
+
+
+doMplCmp()
+
+# ============================================================================
+# ============================================================================
+
 def doEagernessImprovement():
   headers = ['', 'T(1)', '|', 'T({})'.format(maxp)]
-  headers1 = ['Benchmark', 'Improvement', '|', 'Improvement', 'Eagerness']
+  headers1 = ['Benchmark', 'Improvement', '|', 'Improvement']
   tt = [headers, "-", headers1, "="]
 
   def doTag(tag):
@@ -909,7 +977,7 @@ def doEagernessImprovement():
     tp = tm(averageTime(D, 'local-hb', tag, maxp))
     ntp = tm(averageTime(D, 'local-hb-npc', tag, maxp))
 
-    pctEagerness = eagerness(D, 'local-hb', tag, maxp)
+    # pctEagerness = eagerness(D, 'local-hb', tag, maxp)
 
     row = [
       # safestr(nt1),
@@ -918,8 +986,8 @@ def doEagernessImprovement():
       '|',
       # safestr(ntp),
       # safestr(tp),
-      ov(sd(ntp, tp)),
-      safestr(pctEagerness) + "%"
+      ov(sd(ntp, tp))
+      # safestr(pctEagerness) + "%"
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
@@ -1431,7 +1499,7 @@ def doSpeedups(outputName, config, tags):
 
 # doSpeedups('mpl-speedups-ng', 'mpl', ngTags)
 # doSpeedups('mpl-speedups-normal', 'mpl', normalTags)
-# doSpeedups('local-hb-gwa-speedups-ng', 'local-hb-gwa', ngTags)
+doSpeedups('local-hb-ng', 'local-hb', ngTags)
 # doSpeedups('local-hb-gwa-speedups-normal', 'local-hb-gwa', normalTags)
 
 # ============================================================================
