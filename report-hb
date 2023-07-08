@@ -194,8 +194,15 @@ def renameTag(row):
 #     return "find-influencers"
 #   return t
 
+
+def removeEnd(s, x):
+  if s.endswith(x):
+    return s[:-len(x)]
+  return s
+
+
 def displayTag(t):
-  return t
+  return removeEnd(t, "-ng")
 
 
 foundTags = set()
@@ -1410,6 +1417,67 @@ def doHeartbeatPolicyCmp():
 # doHeartbeatSpaceCmp()
 # doHeartbeatPolicyCmp()
 # doHeartbeatPolicyNums()
+
+# ============================================================================
+# ============================================================================
+
+def doMplCmpTex():
+  ensureFigDir()
+  mplComparisonTable = "figures/mpl-cmp.tex"
+  with open(mplComparisonTable, 'w') as output:
+
+    def doTag(tag):
+      # ts = tm(averageTime(D, 'mlton', tag, 1))
+      mt1 = tm(averageTime(D, 'mpl', tag, 1))
+      ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+      mtp = tm(averageTime(D, 'mpl', tag, maxp))
+      htp = tm(averageTime(D, 'local-hb', tag, maxp))
+
+
+      numSpawns = spawns(D, 'local-hb', tag, maxp)
+      # numHeartbeats = heartbeats(D, 'local-hb', tag, maxp)
+      # pctEagerness = eagerness(D, 'local-hb', tag, maxp)
+      # numSteals = steals(D, 'local-hb', tag, maxp)
+      numPars = spawns(D, 'local-hb-sim-eager', tag, maxp)
+
+
+      row = \
+        [ fmt(mt1)
+        , fmt(ht1)
+        , makeBold(fmt(ov(sd(mt1, ht1))))
+        , fmt(mtp)
+        , fmt(htp)
+        , makeBold(fmt(ov(sd(mtp, htp))))
+        , str(numPars)
+        , str(numSpawns)
+        , fmt(sd(numPars, numSpawns))
+        ]
+
+      output.write(" & ".join([displayTag(tag)] + row))
+      output.write("  \\\\\n")
+
+    for tag in ngTags:
+      doTag(tag)
+
+    rats1 = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'mpl', tag, 1)), tm(averageTime(D, 'local-hb', tag, 1))))
+        for tag in ngTags)
+    ratsp = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'mpl', tag, maxp)), tm(averageTime(D, 'local-hb', tag, maxp))))
+        for tag in ngTags)
+
+    output.write("\\midrule\n")
+    for name, func in [("min", min), ("geomean", geomean), ("max", max)]:
+      row = [name, "", "", makeBold(fmt(ov(func(rats1)))), "", "", makeBold(fmt(ov(func(ratsp))))]
+      output.write(" & ".join(row))
+      output.write("  \\\\\n")
+    
+    print("[INFO] wrote to {}".format(mplComparisonTable))
+
+
+doMplCmpTex()
 
 # ============================================================================
 
