@@ -503,6 +503,25 @@ def sp(kb):
     num = num / 1000
   return noLeadZero("%1.1f %s" % (num, 'T'))
 
+
+def fmtBigCount(x):
+  if x is None:
+    return None
+  if x < 0.001:
+    return "0"
+  num = x
+  for unit in ['K','M','B']:
+    if num < 100:
+      if num < 1:
+        return noLeadZero("%0.2f %s" % (num, unit))
+      if num < 10:
+        return noLeadZero("%1.1f %s" % (num, unit))
+      return "%d %s" % (round(num), unit)
+      # return "%d %s" % (int(round(num,-1)), unit)
+    num = num / 1000
+  return noLeadZero("%1.1f %s" % (num, 'T'))
+
+
 def sfmt(xx):
   if xx is None:
     return "--"
@@ -1448,9 +1467,10 @@ def doMplCmpTex():
         , fmt(mtp)
         , fmt(htp)
         , makeBold(fmt(ov(sd(mtp, htp))))
-        , str(numPars)
-        , str(numSpawns)
+        , fmtBigCount(numPars)
+        , fmtBigCount(numSpawns)
         , fmt(sd(numPars, numSpawns))
+        , str(int(round(safemul(1000000.0, sd(ht1, numSpawns)))))
         ]
 
       output.write(" & ".join([displayTag(tag)] + row))
