@@ -1499,6 +1499,96 @@ def doMplCmpTex():
 
 doMplCmpTex()
 
+
+# ============================================================================
+# ============================================================================
+
+
+def doEagernessImprovementTex():
+  ensureFigDir()
+  eagerAlgoCmp = "figures/eager-algo-cmp.tex"
+  with open(eagerAlgoCmp, 'w') as output:
+    def doTag(tag):
+      t1 = tm(averageTime(D, 'local-hb', tag, 1))
+      nt1 = tm(averageTime(D, 'local-hb-npc', tag, 1))
+      tp = tm(averageTime(D, 'local-hb', tag, maxp))
+      ntp = tm(averageTime(D, 'local-hb-npc', tag, maxp))
+
+      # pctEagerness = eagerness(D, 'local-hb', tag, maxp)
+
+      row = [
+        fmt(ov(sd(nt1, t1))),
+        fmt(ov(sd(ntp, tp)))
+      ]
+      output.write(" & ".join([displayTag(tag)] + row))
+      output.write("  \\\\\n")
+
+    for tag in ngTags:
+      doTag(tag)
+
+    rats1 = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'local-hb-npc', tag, 1)), tm(averageTime(D, 'local-hb', tag, 1))))
+        for tag in ngTags)
+    ratsp = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'local-hb-npc', tag, maxp)), tm(averageTime(D, 'local-hb', tag, maxp))))
+        for tag in ngTags)
+
+    output.write("\\midrule\n")
+    for name, func in [("min", min), ("geomean", geomean), ("max", max)]:
+      row = [name, fmt(ov(func(rats1))), fmt(ov(func(ratsp)))]
+      output.write(" & ".join(row))
+      output.write("  \\\\\n")
+
+    print("[INFO] wrote to {}".format(eagerAlgoCmp))
+
+doEagernessImprovementTex()
+
+# ============================================================================
+# ============================================================================
+
+def doSimpleOverheadsAndSpeedupsTex():
+  ensureFigDir()
+  mltonCmp = "figures/mlton-cmp.tex"
+  with open(mltonCmp, 'w') as output:
+    def doTag(tag):
+      ts = tm(averageTime(D, 'mlton', tag, 1))
+      ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+      htp = tm(averageTime(D, 'local-hb', tag, maxp))
+
+      row = [
+        fmt(ts),
+        # fmt(ht1),
+        makeBold(fmt(ov(sd(ht1, ts)))),
+        # fmt(htp),
+        makeBold(fmt(su(sd(ts, htp))))
+      ]
+      output.write(" & ".join([displayTag(tag)] + row))
+      output.write("  \\\\\n")
+
+    for tag in ngTags:
+      doTag(tag)
+
+    rats1 = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'local-hb', tag, 1)), tm(averageTime(D, 'mlton', tag, 1))))
+        for tag in ngTags)
+    ratsp = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'mlton', tag, 1)), tm(averageTime(D, 'local-hb', tag, maxp))))
+        for tag in ngTags)
+
+    output.write("\\midrule\n")
+    for name, func in [("min", min), ("geomean", geomean), ("max", max)]:
+      row = [name, "", makeBold(fmt(ov(func(rats1)))), makeBold(fmt(su(func(ratsp))))]
+      output.write(" & ".join(row))
+      output.write("  \\\\\n")
+    
+    print("[INFO] wrote to {}".format(mltonCmp))
+
+doSimpleOverheadsAndSpeedupsTex()
+
 # ============================================================================
 
 import matplotlib
