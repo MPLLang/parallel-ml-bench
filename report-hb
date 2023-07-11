@@ -509,7 +509,7 @@ def fmtBigCount(x):
     return None
   if x < 0.001:
     return "0"
-  num = x
+  num = x / 1000
   for unit in ['K','M','B']:
     if num < 100:
       if num < 1:
