@@ -1082,9 +1082,9 @@ doEagernessImprovement()
 # ============================================================================
 # ============================================================================
 
-def doClosenessToManualGrain():
-  headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None]
-  headers1 = ['Benchmark', 'Man', 'NG', 'Overhead', '|', 'Man', 'NG', 'Overhead']
+def doClosenessToManualGrainWithSpeedups():
+  headers = ['', 'T(1)', None, None, '|', 'T({})'.format(maxp), None, None, '|', 'SU', None]
+  headers1 = ['Benchmark', 'Man', 'NG', 'Overhead', '|', 'Man', 'NG', 'Overhead', '|', 'NG', 'Man']
   tt = [headers, "-", headers1, "="]
 
   def doCmp(tag, ngtag):
@@ -1093,6 +1093,9 @@ def doClosenessToManualGrain():
     tp = tm(averageTime(D, 'local-hb', tag, maxp))
     ngtp = tm(averageTime(D, 'local-hb', ngtag, maxp))
 
+    base = tm(averageTime(D, 'mlton', tag, 1))
+    ngbase = tm(averageTime(D, 'mlton', ngtag, 1))
+
     row = [
       safestr(t1),
       safestr(ngt1),
@@ -1100,7 +1103,10 @@ def doClosenessToManualGrain():
       '|',
       safestr(tp),
       safestr(ngtp),
-      ov(sd(ngtp, tp))
+      ov(sd(ngtp, tp)),
+      '|',
+      su(sd(ngbase, ngtp)),
+      su(sd(base, tp))
     ]
     row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
     tt.append(row)
@@ -1109,6 +1115,53 @@ def doClosenessToManualGrain():
     doCmp(tag, tag + '-ng')
 
   print("MANUAL VS NO-GRAIN PERFORMANCE")
+  print(table(tt, defaultAlign))
+  print("")
+
+# doClosenessToManualGrainWithSpeedups()
+
+# ============================================================================
+# ============================================================================
+
+def doClosenessToManualGrain():
+  headers = ['', 'T(1)', None, None, None, None, None, '|', 'T({})'.format(maxp), None, None, None, None, None]
+  headers1 = ['', 'Manual', None, 'Fully-Par', None, 'Overhead', None, '|', 'Manual', None, 'Fully-Par', None, 'Overhead', None]
+  headers2 = ['Benchmark', 'MPL', 'Ours', 'MPL', 'Ours', 'MPL', 'Ours', '|', 'MPL', 'Ours', 'MPL', 'Ours', 'MPL', 'Ours']
+  tt = [headers, "-", headers1, "-", headers2, "="]
+
+  def doCmp(tag, ngtag):
+    mt1 = tm(averageTime(D, 'mpl', tag, 1))
+    ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+    mngt1 = tm(averageTime(D, 'mpl', ngtag, 1))
+    hngt1 = tm(averageTime(D, 'local-hb', ngtag, 1))
+
+    mtp = tm(averageTime(D, 'mpl', tag, maxp))
+    htp = tm(averageTime(D, 'local-hb', tag, maxp))
+    mngtp = tm(averageTime(D, 'mpl', ngtag, maxp))
+    hngtp = tm(averageTime(D, 'local-hb', ngtag, maxp))
+
+    row = [
+      safestr(mt1),
+      safestr(ht1),
+      safestr(mngt1),
+      safestr(hngt1),
+      ov(sd(mngt1, mt1)),
+      ov(sd(hngt1, ht1)),
+      '|',
+      safestr(mtp),
+      safestr(htp),
+      safestr(mngtp),
+      safestr(hngtp),
+      ov(sd(mngtp, mtp)),
+      ov(sd(hngtp, htp)),
+    ]
+    row = [displayTag(tag)] + [x if x is not None else "--" for x in row]
+    tt.append(row)
+
+  for tag in normalTags:
+    doCmp(tag, tag + '-ng')
+
+  print("MANUAL VS FULLY-PARALLEL PERFORMANCE")
   print(table(tt, defaultAlign))
   print("")
 
