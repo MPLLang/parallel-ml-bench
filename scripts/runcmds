@@ -1,22 +1,25 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
-import sys, signal, socket, time, threading, subprocess, multiprocessing
+import sys, signal, socket, time, threading, subprocess, multiprocessing, os
 from datetime import datetime
 
 NCPU = multiprocessing.cpu_count()
 
 def getGitRoot():
   return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
-    stdout=subprocess.PIPE).communicate()[0].rstrip()
+    stdout=subprocess.PIPE, text=True).communicate()[0].rstrip()
 
 _currentChildren = []
 
-def _signalHandler(signal, frame):
+def _signalHandler(signum, frame):
   global _currentChildren
   sys.stderr.write("[ERR] Interrupted.\n")
   if _currentChildren:
     for child in _currentChildren:
-      child.kill()
+      try:
+        os.killpg(os.getpgid(child.pid), signal.SIGKILL)
+      except Exception as e:
+        sys.stderr.write("[WARN] Error while trying to kill process {}: {}\n".format(child.pid, str(e)))
   sys.exit(1)
 signal.signal(signal.SIGINT, _signalHandler)
 
@@ -25,7 +28,7 @@ def _killer():
   if _currentChildren:
     for child in _currentChildren:
       try:
-        child.kill()
+        os.killpg(os.getpgid(child.pid), signal.SIGKILL)
       except Exception as e:
         sys.stderr.write("[WARN] Error while trying to kill process {}: {}\n".format(child.pid, str(e)))
 
@@ -36,7 +39,7 @@ def runcmds(rows, timeout=600.0, silent=False):
 
   for row in rows:
     ntrials = int(row.get('trials', '1'))
-    for _ in xrange(0, ntrials):
+    for _ in range(0, ntrials):
       row = row.copy()
       cmdNum += 1
       row['host'] = socket.gethostname()
@@ -54,9 +57,9 @@ def runcmds(rows, timeout=600.0, silent=False):
 
       for i in range(0, numToSpawn):
         if 'cwd' in row:
-          subproc = subprocess.Popen(row['cmd'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=row['cwd'])
+          subproc = subprocess.Popen(row['cmd'], shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid, cwd=row['cwd'])
         else:
-          subproc = subprocess.Popen(row['cmd'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+          subproc = subprocess.Popen(row['cmd'], shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
         _currentChildren.append(subproc)
 
       timer = threading.Timer(timeout, _killer)
@@ -114,8 +117,8 @@ if __name__ == "__main__":
     places = set(prefix for (prefix, _) in binsToMake)
 
     for place in places:
-      binsToMakeHere = filter(lambda (prefix, _): prefix == place, binsToMake)
-      binsToMakeHere = map(lambda (_, b): b, binsToMakeHere)
+      binsToMakeHere = list(filter(lambda arg: arg[0] == place, binsToMake))
+      binsToMakeHere = list(map(lambda arg: arg[1], binsToMakeHere))
       if len(binsToMakeHere) == 0:
         continue
 
@@ -123,14 +126,14 @@ if __name__ == "__main__":
       for b in binsToMakeHere:
         sys.stderr.write("  " + b + "\n")
 
-      jobs = max(4, NCPU/2)
+      jobs = int(max(4, NCPU/2))
       cmd = "make -C {} -j {} ".format(place, jobs) + (" ".join(binsToMakeHere))
       sys.stderr.write("[INFO] " + cmd + "\n")
 
       output = None
       shouldQuit = False
       try:
-        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, text=True)
       except subprocess.CalledProcessError as e:
         output = e.output
         shouldQuit = True
