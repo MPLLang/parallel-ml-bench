@@ -1643,6 +1643,78 @@ def doSimpleOverheadsAndSpeedupsTex():
 doSimpleOverheadsAndSpeedupsTex()
 
 # ============================================================================
+# ============================================================================
+
+def doManualVsFullyParTex():
+  ensureFigDir()
+  manual_vs_full_par_table = "figures/manual-vs-fully-par.tex"
+  with open(manual_vs_full_par_table, 'w') as output:
+    def doTag(tag, ngtag):
+      mt1 = tm(averageTime(D, 'mpl', tag, 1))
+      ht1 = tm(averageTime(D, 'local-hb', tag, 1))
+      mngt1 = tm(averageTime(D, 'mpl', ngtag, 1))
+      hngt1 = tm(averageTime(D, 'local-hb', ngtag, 1))
+
+      mtp = tm(averageTime(D, 'mpl', tag, maxp))
+      htp = tm(averageTime(D, 'local-hb', tag, maxp))
+      mngtp = tm(averageTime(D, 'mpl', ngtag, maxp))
+      hngtp = tm(averageTime(D, 'local-hb', ngtag, maxp))
+
+      row = [
+        fmt(mt1),
+        fmt(ht1),
+        fmt(ov(sd(mngt1, mt1))),
+        fmt(ov(sd(hngt1, ht1))),
+        fmt(mtp),
+        fmt(htp),
+        fmt(ov(sd(mngtp, mtp))),
+        fmt(ov(sd(hngtp, htp)))
+      ]
+
+      output.write(" & ".join([displayTag(tag)] + row))
+      output.write("  \\\\\n")
+
+    for tag in normalTags:
+      doTag(tag, tag + '-ng')
+    output.write("\\midrule\n")
+
+    m_rats1 = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'mpl', tag + '-ng', 1)), tm(averageTime(D, 'mpl', tag, 1))))
+        for tag in normalTags)
+    m_ratsp = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'mpl', tag + '-ng', maxp)), tm(averageTime(D, 'mpl', tag, maxp))))
+        for tag in normalTags)
+    h_rats1 = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'local-hb', tag + '-ng', 1)), tm(averageTime(D, 'local-hb', tag, 1))))
+        for tag in normalTags)
+    h_ratsp = \
+      filterSome(
+        ovv(sd(tm(averageTime(D, 'local-hb', tag + '-ng', maxp)), tm(averageTime(D, 'local-hb', tag, maxp))))
+        for tag in normalTags)
+
+    for name, func in [("min", min), ("geomean", geomean), ("max", max)]:
+      row = [
+        name,
+        "",
+        "",
+        makeBold(fmt(ov(func(m_rats1)))), makeBold(fmt(ov(func(h_rats1)))),
+        "",
+        "",
+        makeBold(fmt(ov(func(m_ratsp)))), makeBold(fmt(ov(func(h_ratsp))))
+      ]
+      output.write(" & ".join(row))
+      output.write("  \\\\\n")
+
+  print("[INFO] wrote to {}".format(manual_vs_full_par_table))
+
+doManualVsFullyParTex()
+
+# ============================================================================
+# ============================================================================
+# ============================================================================
 
 import matplotlib
 matplotlib.use('Agg')
@@ -1757,11 +1829,11 @@ def speedupPlot(outputName, config, tagsSortedBySpeedups, tagsSortedByName, offs
 
 
 
-speedupTags = sorted([
-  tag for tag in mplOnlyTags
-  if (averageTime(D, 'local-hb-eh1', tag, maxp) is not None)
-  and tag not in sandmarkTags
-], key=displayTag)
+#speedupTags = sorted([
+#  tag for tag in mplOnlyTags
+#  if (averageTime(D, 'local-hb-eh1', tag, maxp) is not None)
+#  and tag not in sandmarkTags
+#], key=displayTag)
 
 
 

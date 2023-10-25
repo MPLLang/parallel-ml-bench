@@ -97,12 +97,10 @@
   "globals": {
     "config": [
       "mlton",
-      "mlton-exnpar",
       "mpl",
       "local-hb",
       "local-hb-sim-eager",
-      "local-hb-npc",
-      "local-hb-eh"
+      "local-hb-npc"
     ],
     "cwd": [
       "mpl"
