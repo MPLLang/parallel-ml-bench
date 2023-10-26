@@ -1663,12 +1663,12 @@ def doManualVsFullyParTex():
       row = [
         fmt(mt1),
         fmt(ht1),
-        fmt(ov(sd(mngt1, mt1))),
-        fmt(ov(sd(hngt1, ht1))),
+        makeBold(fmt(ov(sd(mngt1, mt1)))),
+        makeBold(fmt(ov(sd(hngt1, ht1)))),
         fmt(mtp),
         fmt(htp),
-        fmt(ov(sd(mngtp, mtp))),
-        fmt(ov(sd(hngtp, htp)))
+        makeBold(fmt(ov(sd(mngtp, mtp)))),
+        makeBold(fmt(ov(sd(hngtp, htp))))
       ]
 
       output.write(" & ".join([displayTag(tag)] + row))
@@ -1744,7 +1744,7 @@ def speedupPlot(outputName, config, tagsSortedBySpeedups, tagsSortedByName, offs
   procs = P
 
   fontSize = 18
-  legendFontSize = 16
+  legendFontSize = 14
   markerSize = 14
 
   usedFull = dict()
@@ -1816,9 +1816,10 @@ def speedupPlot(outputName, config, tagsSortedBySpeedups, tagsSortedByName, offs
       map(displayTag, tagsSortedByName),
       # bbox_to_anchor=(-0.16,1.05),
       # loc='upper right',
-      bbox_to_anchor=(-0.16,1.01),
-      loc='upper right',
-      ncol=1
+      bbox_to_anchor=(-0.175,1.01),
+      # loc='upper right',
+      loc='lower left',
+      ncol=3
     )
 
   ensureFigDir()
