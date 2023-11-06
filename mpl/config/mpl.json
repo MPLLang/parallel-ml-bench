@@ -1,6 +1,6 @@
 {
   "compiler": "mpl",
-  "mpl-switch-commit": "v0.3",
-  "flags": ["-disable-pass", "splitTypes1", "-disable-pass", "splitTypes2"],
+  "mpl-switch-commit": "v0.4",
+  "flags": [],
   "compat": "mpl"
 }
