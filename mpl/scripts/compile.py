@@ -1,10 +1,10 @@
-#!/usr/bin/python2
+#!/usr/bin/env python3
 
 import argparse, sys, os, json, subprocess, errno
 
 def getGitRoot():
   return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
-    stdout=subprocess.PIPE).communicate()[0].rstrip()
+    stdout=subprocess.PIPE, text=True).communicate()[0].rstrip()
 
 def ensureDirs(path):
   d = os.path.dirname(path)
