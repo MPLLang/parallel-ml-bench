@@ -130,7 +130,7 @@ if __name__ == "__main__":
   vprint(cmdStr)
 
   compileProcess = \
-    subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
   out, err = compileProcess.communicate()
 
   if compileProcess.returncode == 0:
