@@ -1,5 +1,3 @@
-structure CLA = CommandLineArgs
-
 val par = ForkJoin.par
 
 (* compute the sum of f(lo), f(lo+1), ..., f(hi-1) *)
@@ -17,7 +15,6 @@ fun sum (lo, hi, f) =
       left+right
     end
 
-
 (* queens at positions (row, col) *)
 type locations = (int * int) list
 
@@ -29,22 +26,67 @@ fun queen_is_threatened (i, j) (other_queens: locations) =
 fun nqueens_count_solutions n =
   let
     fun search i queens =
-      if i >= n then 1 else
-      sum (0, n, fn j =>
-        if queen_is_threatened (i, j) queens then
-          0
-        else
-          search (i+1) ((i,j) :: queens))
+      if i >= n then 1
+      else
+        let
+          fun do_column j =
+            if queen_is_threatened (i, j) queens then
+              0
+            else
+              search (i+1) ((i,j) :: queens)
+        in
+          sum (0, n, do_column)
+        end
   in
     search 0 []
   end
 
+(* ==========================================================================
+ * version with manual granularity control
+ *)
+
+
+(* sequential alternative *)
+fun sum_serial (lo, hi, f) =
+  Util.loop (lo, hi) 0 (fn (acc, i) => acc + f(i))
+
+
+fun nqueens_count_solutions_manual_gran_control n =
+  let
+    fun search i queens =
+      if i >= n then 1 else
+      let
+        fun do_column j =
+          if queen_is_threatened (i, j) queens then
+            0
+          else
+            search (i+1) ((i,j) :: queens)
+      in
+        if i >= 3 then
+          sum_serial (0, n, do_column)
+        else
+          sum (0, n, do_column)
+      end
+  in
+    search 0 []
+  end
+
+(* ==========================================================================
+ * main part: parse command-line arguments and run
+ *)
+
 val n = CommandLineArgs.parseInt "N" 13
+val do_gran_control = CommandLineArgs.parseFlag "do-gran-control"
 val _ = print ("N " ^ Int.toString n ^ "\n")
+val _ = print ("do-gran-control? " ^ (if do_gran_control then "yes" else "no") ^ "\n")
 
 val msg =
   "counting number of " ^ Int.toString n ^ "x" ^ Int.toString n ^ " solutions"
 
-val result = Benchmark.run msg (fn _ => nqueens_count_solutions n)
+val result = Benchmark.run msg (fn _ =>
+  if do_gran_control then
+    nqueens_count_solutions_manual_gran_control n
+  else
+    nqueens_count_solutions n)
 
 val _ = print ("result " ^ Int.toString result ^ "\n")
