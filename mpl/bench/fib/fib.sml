@@ -14,10 +14,19 @@ fun fib n =
       x + y
     end
 
+fun fully_par_fib n =
+  if n < 2 then n
+  else op+ (ForkJoin.par (fn _ => fully_par_fib (n-1), fn _ => fully_par_fib (n-2)))
+
+val no_gran_control = CLA.parseFlag "no-gran-control"
 val n = CLA.parseInt "N" 39
 val _ = print ("N " ^ Int.toString n ^ "\n")
 
-val result = Benchmark.run "running fib" (fn _ => fib n)
+val result = Benchmark.run "running fib" (fn _ => 
+  if no_gran_control then
+    fully_par_fib n
+  else
+    fib n)
 
 val _ = print ("result " ^ Int.toString result ^ "\n")
 
