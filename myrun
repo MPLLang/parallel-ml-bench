@@ -1,0 +1,35 @@
+#!/bin/bash
+
+./filter-exps.py spork-exp-hb.json filtered-exp-hb.json exps_to_run.txt
+
+ROOT=$(git rev-parse --show-toplevel)
+GEN=scripts/gencmds
+RUN=scripts/runcmds
+
+NOW=$(date '+%y%m%d-%H%M%S')
+# NOW="230217-050444"
+mkdir -p $ROOT/results
+RESULTS=$ROOT/results/$NOW
+
+rm -f $ROOT/mpl/bin/*.bin
+# rm -f $ROOT/cpp/bin/*.bin
+# rm -f $ROOT/ocaml/bin/*.bin
+# rm -f $ROOT/java/*.class
+# rm -f $ROOT/go/bin/*.bin
+
+## NOTE: when filtering with jq, remember to pass -c
+## (compact output, ensures each line is a single json object)
+##
+## For example:
+##   ... | jq -c 'select(.config == "mpl")'
+
+# | jq -c 'select (.tag == "sparse-mxv" or .tag == "sparse-mxv-ng")' \
+
+( \
+  $GEN $@ $ROOT/filtered-exp-hb.json \
+) \
+| $RUN --compile --output $RESULTS
+
+echo "[INFO] wrote results to $RESULTS"
+
+./report-shootout.py
