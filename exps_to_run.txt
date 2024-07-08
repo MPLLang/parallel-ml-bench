@@ -1,0 +1,14 @@
+bfs-ng 
+bignum-add-ng 
+delaunay-ng 
+grep-ng
+linefit-ng 
+mandelbrot-ng 
+msort-ng 
+nearest-nbrs-ng 
+nqueens-ng
+primes-ng 
+sparse-mxv-csr-ng 
+suffix-array-ng 
+triangle-count-ng 
+wc-ng

@@ -4,7 +4,9 @@ sig
 end =
 struct
 
-  val w2i = Word64.toIntX
+  fun parfor (lo, hi) f = Parfor.parfor (lo, hi) f
+
+  (*val w2i = Word64.toIntX
   val i2w = Word64.fromInt
 
 
@@ -31,6 +33,6 @@ struct
     in
       if hi - lo <= grain then Util.for (lo, hi) f
       else loopSplit (i2w lo) (i2w hi)
-    end
+    end*)
 
 end

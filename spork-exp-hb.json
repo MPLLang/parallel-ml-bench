@@ -2,6 +2,27 @@
   "templates": [
     {
       "match": {
+        "config": "mpl-spork-2way",
+        "exp": "time"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-base 12 -- <args?{} ><args1?{}> -repeat 2 -warmup 1"
+    },
+    {
+      "match": {
+        "config": "mpl-spork-3way",
+        "exp": "time"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-base 12 -- <args?{} ><args1?{}> -repeat 2 -warmup 1"
+    },
+    {
+      "match": {
+        "config": "mpl-spork-alt",
+        "exp": "time"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-base 12 -- <args?{} ><args1?{}> -repeat 2 -warmup 1"
+    },
+    {
+      "match": {
         "config": "mpl",
         "exp": "time"
       },
@@ -14,6 +35,7 @@
       },
       "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity -- <args?{} ><args1?{}> -repeat 20 -warmup 0"
     },
+
     {
       "match": {
         "config": "local-hb",
@@ -96,11 +118,8 @@
 
   "globals": {
     "config": [
-      "mlton",
-      "mpl",
-      "local-hb",
-      "local-hb-sim-eager",
-      "local-hb-npc"
+      "mpl-spork-2way",
+      "mpl-spork-3way"
     ],
     "cwd": [
       "mpl"
@@ -110,7 +129,7 @@
     ],
     "trials": [
       "1",
-      "10"
+      "8"
     ]
   },
 

@@ -7,9 +7,11 @@ local
   $(SML_LIB)/basis/fork-join.mlb
   Grains.$(GRAINS).sml
   ForkJoinNG.sml
+  ParFor.$(PARFOR).sml
   mpl.sml
 in
   structure Grains
-  structure ForkJoinNG
+  structure Parfor
+  (*structure ForkJoinNG*)
   structure RuntimeStats
 end

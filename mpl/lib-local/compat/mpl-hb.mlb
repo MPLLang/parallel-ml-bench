@@ -6,10 +6,13 @@ local
   $(SML_LIB)/basis/mpl.mlb
   $(SML_LIB)/basis/fork-join.mlb
   Grains.$(GRAINS).sml
+  PARFOR.sig
+  Parfor.$(PARFOR).sml
   ForkJoinNG.sml
   mpl-hb.sml
 in
   structure Grains
   structure ForkJoinNG
+  structure Parfor
   structure RuntimeStats
 end

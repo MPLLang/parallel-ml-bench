@@ -31,7 +31,7 @@ struct
   fun upd a i x = A.update (a, i, x)
   fun nth a i = A.sub (a, i)
 
-  val parfor = ForkJoinNG.parfor
+  val parfor = Parfor.parfor
   val par = ForkJoin.par
   val allocate = ForkJoin.alloc
 
@@ -65,35 +65,36 @@ struct
       end
 
 
-  val w2i = Word64.toIntX
-  val i2w = Word64.fromInt
+  (* val w2i = Word64.toIntX *)
+  (* val i2w = Word64.fromInt *)
 
 
   fun reduce g b (lo, hi) f =
-    let
-      val grain = Grains.parfor
-      val wgrain = i2w grain
+    Parfor.pareduce (lo, hi) b f g
+    (* let *)
+    (*   val grain = Grains.parfor *)
+    (*   val wgrain = i2w grain *)
 
-      fun loopCheck lo hi =
-        if hi - lo <= wgrain then foldl g (f (w2i lo)) (1 + w2i lo, w2i hi) f
-        else loopSplit lo hi
+    (*   fun loopCheck lo hi = *)
+    (*     if hi - lo <= wgrain then foldl g (f (w2i lo)) (1 + w2i lo, w2i hi) f *)
+    (*     else loopSplit lo hi *)
 
-      and loopSplit lo hi =
-        let
-          val half = Word64.>> (hi - lo, 0w1)
-          val mid = lo + half
-        in
-          g (ForkJoin.par (fn _ => loopCheck lo mid, fn _ => loopCheck mid hi))
-        end
-    in
-      if hi - lo <= 0 then b
-      else if hi - lo <= grain then foldl g (f lo) (lo + 1, hi) f
-      else loopSplit (i2w lo) (i2w hi)
-    end
+    (*   and loopSplit lo hi = *)
+    (*     let *)
+    (*       val half = Word64.>> (hi - lo, 0w1) *)
+    (*       val mid = lo + half *)
+    (*     in *)
+    (*       g (ForkJoin.par (fn _ => loopCheck lo mid, fn _ => loopCheck mid hi)) *)
+    (*     end *)
+    (* in *)
+    (*   if hi - lo <= 0 then b *)
+    (*   else if hi - lo <= grain then foldl g (f lo) (lo + 1, hi) f *)
+    (*   else loopSplit (i2w lo) (i2w hi) *)
+    (* end *)
 
 
-  fun scan g b (lo, hi) (f: int -> 'a) =
-    if hi - lo <= Grains.block then
+  fun scan' grain g b (lo, hi) (f: int -> 'a) =
+    if hi - lo <= grain then
       let
         val n = hi - lo
         val result = allocate (n + 1)
@@ -107,13 +108,13 @@ struct
     else
       let
         val n = hi - lo
-        val k = Grains.block
+        val k = grain
         val m = 1 + (n - 1) div k (* number of blocks *)
         val sums = tabulate (0, m) (fn i =>
           let val start = lo + i * k
           in reduce g b (start, Int.min (start + k, hi)) f
           end)
-        val partials = scan g b (0, m) (nth sums)
+        val partials = scan' grain g b (0, m) (nth sums)
         val result = allocate (n + 1)
       in
         parfor (0, m) (fn i =>
@@ -130,6 +131,8 @@ struct
         result
       end
 
+  fun scan g b (lo, hi) (f: int -> 'a) =
+      scan' (if Grains.block = 1 then 100 else Grains.block) g b (lo, hi) f
 
   fun filter (lo, hi) f g =
     let
