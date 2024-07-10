@@ -5,21 +5,28 @@
         "config": "mpl-spork-2way",
         "exp": "time"
       },
-      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-base 12 -- <args?{} ><args1?{}> -repeat 2 -warmup 1"
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-stride 2 affinity-base 0 -- <args?{} ><args1?{}> -repeat 5 -warmup 5"
     },
     {
       "match": {
         "config": "mpl-spork-3way",
         "exp": "time"
       },
-      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-base 12 -- <args?{} ><args1?{}> -repeat 2 -warmup 1"
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-stride 2 affinity-base 0 -- <args?{} ><args1?{}> -repeat 5 -warmup 5"
+    },
+      {
+      "match": {
+        "config": "mpl-hb",
+        "exp": "time"
+      },
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-stride 2 affinity-base 0 -- <args?{} ><args1?{}> -repeat 5 -warmup 5"
     },
     {
       "match": {
         "config": "mpl-spork-alt",
         "exp": "time"
       },
-      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-base 12 -- <args?{} ><args1?{}> -repeat 2 -warmup 1"
+      "template": "/usr/bin/time -v bin/<bench>.<config>.bin @mpl <procs?procs {}> set-affinity affinity-stride 2 affinity-base 0 -- <args?{} ><args1?{}> -repeat 5 -warmup 5"
     },
     {
       "match": {
@@ -119,7 +126,9 @@
   "globals": {
     "config": [
       "mpl-spork-2way",
-      "mpl-spork-3way"
+      "mpl-spork-3way",
+      "mpl-hb",
+      "mpl-spork-alt"
     ],
     "cwd": [
       "mpl"

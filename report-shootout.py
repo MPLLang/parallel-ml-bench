@@ -690,214 +690,11 @@ P = sorted(list(foundProcs))
 maxp = max(p for p in foundProcs if p <= 72)
 orderedTags = sorted(list(foundTags), key=displayTag)
 
-foundProcs = set()
-foundTags = set()
-
-def keepTag(t):
-  return t in [
-    'bfs-find-hideg',
-    'centrality',
-    'connectivity',
-    'dedup-strings',
-    'delaunay-entangled',
-    'grep',
-    'harris-linked-list',
-    'interval-tree',
-    'linden-pq',
-    'linefit-entangled',
-    'low-d-decomp-boundary',
-    'max-indep-set',
-    'mcss',
-    'ms-queue',
-    'msort-ints',
-    'nearest-nbrs',
-    'pfa-bst',
-    # 'primes',
-    'quant-synth',
-    'quickhull',
-    'range-query',
-    'reverb',
-    'seam-carve',
-    'spanner',
-    'tokens',
-    'triangle-count',
-    'wc-entangled'
-    # 'wc',
-    # 'wc-accum',
-    # 'linefit',
-    # 'linefit-accum',
-    # 'sort-longs'
-  ]
-
-
-# nondetTags = [
-#   'bfs',
-#   'bfs-find-hideg',
-#   'centrality',
-#   'connectivity',
-#   'dedup-strings',
-#   'delaunay',
-#   'delaunay-entangled',
-#   'harris-linked-list',
-#   'linden-pq',
-#   'low-d-decomp',
-#   'low-d-decomp-boundary',
-#   'max-indep-set',
-#   'ms-queue',
-#   'pfa-bst',
-#   'sk-net',
-#   'spanner'
-# ]
-
-mplOnlyTags = [ t for t in orderedTags if keepTag(t) ]
-
-
-mplCmpTags = [
-  "primes",
-  "dense-matmul",
-  "raytracer",
-  "tinykaboom",
-  "msort-strings",
-  "msort-ints",
-  "nearest-nbrs",
-  "quickhull",
-  "reverb",
-  "seam-carve",
-  # "dedup-strings-entangled",
-  "suffix-array",
-  "grep",
-  "bfs",
-  # "bfs-find-hideg",
-  "centrality",
-  "low-d-decomp",
-  # "low-d-decomp-boundary",
-  "max-indep-set",
-  "palindrome",
-  "tokens",
-  "nqueens",
-  "triangle-count",
-  "range-query",
-  "delaunay",
-  # "delaunay-entangled",
-  "linefit",
-  # "linefit-entangled",
-  "linearrec",
-  "bignum-add",
-  "integrate",
-  "sparse-mxv",
-  "wc",
-  # "wc-entangled",
-  "mcss",
-  # "connectivity-entangled",
-  # "spanner-entangled",
-  # "ms-queue",
-  # "harris-linked-list",
-  # "linden-pq",
-  # "pfa-bst",
-  # "sk-net",
-  "interval-tree"
-]
-
-ocamlTags = {
-  "tokens": "tokens",
-  "msort-ints": "msort-ints",
-  "primes": "primes",
-  "raytracer": "raytracer",
-  "lu-decomp": "lu-decomp",
-  "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings",
-  "nbody": "nbody",
-  "game-of-life": "game-of-life",
-  "binarytrees5": "binarytrees5",
-  "sparse-mxv": "sparse-mxv",
-  "wc-entangled": "wc-accum",
-  "ms-queue": "ms-queue",
-  "wc": "",
-  "linefit": "",
-  "linefit-entangled": "linefit-accum",
-  "mcss": "mcss"
-}
-
-# map each MPL tag to the correct C++ tag for comparison
-cppTags = {
-  "bfs": "bfs",
-  "bignum-add": "bignum-add",
-  "delaunay": "delaunay",
-  "grep": "grep",
-  "integrate": "integrate",
-  "linearrec": "linearrec",
-  "linefit": "",
-  "linefit-entangled": "linefit",
-  "mcss": "mcss",
-  "msort-ints": "msort",
-  "nearest-nbrs": "nearest-nbrs",
-  "primes": "primes",
-  "quickhull": "quickhull",
-  "sparse-mxv": "sparse-mxv",
-  "tokens": "tokens",
-  "wc": "",
-  "wc-entangled": "wc",
-  "dedup-strings": "dedup-strings",
-  "ms-queue": "ms-queue"
-}
-
-javaTags = {
-  "primes": "primes",
-  "msort-ints": "sort-longs",
-  "tokens": "tokens",
-  "mcss": "mcss",
-  "linefit": "linefit",
-  "linefit-entangled": "linefit-accum",
-  "wc": "",
-  "wc-entangled": "wc-accum",
-  "sparse-mxv": "sparse-mxv",
-  "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings",
-  "ms-queue": "ms-queue"
-}
-
-goTags = {
-  "primes": "primes",
-  "msort-ints": "msort",
-  "tokens": "tokens",
-  "mcss": "mcss",
-  "linefit": "linefit",
-  "wc": "",
-  "linefit-entangled": "linefit-accum",
-  "wc-entangled": "wc-accum",
-  "sparse-mxv": "sparse-mxv",
-  "msort-strings": "msort-strings",
-  "dedup-strings": "dedup-strings",
-  "ms-queue": "ms-queue"
-}
-
-sandmarkTags = [
-  "binarytrees5",
-  "game-of-life",
-  "nbody",
-  "lu-decomp"
-]
-
-# orderedTags = [ t for t in orderedTags if t not in sandmarkTags ]
 
 # ===========================================================================
 
 def filterSome(xs):
   return [x for x in xs if x is not None]
-
-# def seqOverhead(tag):
-#   return sd(averageTime(D, 'mpl-em', tag, 1),averageTime(D, 'mpl', tag, 1))
-# def parOverhead(tag):
-#   return sd(averageTime(D, 'mpl-em', tag, maxp),averageTime(D, 'mpl', tag, maxp))
-# def seqSpaceOverhead(tag):
-#   return sd(averageSpace(D, 'mpl-em', tag, 1),averageSpace(D, 'mpl', tag, 1))
-# def parSpaceOverhead(tag):
-#   return sd(averageSpace(D, 'mpl-em', tag, maxp),averageSpace(D, 'mpl', tag, maxp))
-
-# print "geomean 1-core time overhead", geomean(filterSome([seqOverhead(t) for t in disentangledTags]))
-# print "geomean {}-core time overhead".format(maxp), geomean(filterSome([parOverhead(t) for t in disentangledTags]))
-# print "geomean 1-core space overhead", geomean(filterSome([seqSpaceOverhead(t) for t in disentangledTags]))
-# print "geomean {}-core space overhead".format(maxp), geomean(filterSome([parSpaceOverhead(t) for t in disentangledTags]))
 
 # ===========================================================================
 
@@ -939,7 +736,8 @@ def report_shootout(exp):
     shootout = [
         ("spork2", "mpl-spork-2way", exp),
         ("spork3", "mpl-spork-3way", exp),
-#        ("spork-alt", "mpl-spork-alt", exp)
+        ("pcall", "mpl-hb", exp),
+        ("spork-alt", "mpl-spork-alt", exp)
     ]
     try:
       shootoutBaseline = \
@@ -949,20 +747,13 @@ def report_shootout(exp):
     except:
       shootoutBaseline = None
     
-    headers1 = ['System', 'T(1)', 'T({})'.format(maxp), 'SelfSU', 'SU', 'R(1)', 'R({})'.format(maxp)]
+    headers1 = ['System', *[f'T({p})' for p in P], *[f'SU({p})' for p in P], *[f'R({p})' for p in P]]
     tt = [headers1, "="]
     for name, config, tag in shootout:
-      t1 = tm(averageTime(D, config, tag, 1))
-      tp = tm(averageTime(D, config, tag, maxp))
-      r1 = spg(averageSpace(D, config, tag, 1))
-      rp = spg(averageSpace(D, config, tag, maxp))
       thisRow = [
-        t1,
-        tp,
-        su(sd(t1,tp)),
-        su(sd(shootoutBaseline, tp)),
-        r1,
-        rp
+        *[tm(averageTime(D, config, tag, p)) for p in P],
+        *[su(sd(shootoutBaseline, tm(averageTime(D, config, tag, p)))) for p in P],
+        *[spg(averageSpace(D, config, tag, p)) for p in P]
       ]
       thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
       tt.append(thisRow)
@@ -974,4 +765,5 @@ def report_shootout(exp):
 if __name__ == '__main__':
     with open('exps_to_run.txt', 'r') as fh:
         for exp in fh:
-            report_shootout(exp.strip())
+            if not exp.startswith('#'):
+                report_shootout(exp.strip())

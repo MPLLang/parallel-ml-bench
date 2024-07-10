@@ -15,7 +15,8 @@ def main():
 
     # Read newline-delimited list of experiments
     with open(exps_to_run_file, 'r') as fh:
-        exps_to_keep = [exp for exp in [line.strip() for line in fh] if exp]
+        exps_to_keep = [exp for exp in [line.strip() for line in fh]
+                        if exp and not exp.startswith('#')]
 
     # read input json
     with open(exp_infile, 'r') as fh:
