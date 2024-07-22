@@ -242,7 +242,7 @@ def findTrials(data, config, tag, procs):
 # ======================================================================
 
 def averageTime(data, config, tag, procs, checkExpType=True):
-  trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or (r['exp'] == 'time') ]
+  trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or 'exp' not in r or (r['exp'] == 'time') ]
   tms = [ r['avgtime'] for r in trials if 'avgtime' in r ]
   try:
     return tms[-1]
@@ -250,7 +250,7 @@ def averageTime(data, config, tag, procs, checkExpType=True):
     return None
 
 def averageSpace(data, config, tag, procs, checkExpType=True):
-  trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or r['exp'] == 'space' ]
+  trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or 'exp' not in r or (r['exp'] == 'space') ]
   sp = [ r['space'] for r in trials if 'space' in r ]
 
   try:
@@ -609,6 +609,18 @@ def makeline(row, widths, align):
     i = j
   return (" " * delimWidth).join(bits)
 
+def stripANSI(x):
+  l = 0
+  esc = False
+  for c in x:
+    if esc and x == 'm':
+      esc = False
+    elif x == '\033':
+      esc = True
+    elif not esc:
+      l += 1
+  return l
+
 def table(rows, align=None):
   numCols = max(len(row) for row in rows if not isinstance(row, str))
 
@@ -625,7 +637,8 @@ def table(rows, align=None):
         j += 1
       # rw = len(stripANSI(str(row[i])))
       # rw = len(str(row[i]))
-      rw = len(row[i])
+      #rw = len(row[i])
+      rw = stripANSI(row[i])
       for k in range(i, j):
         w = (rw / (j-i)) + (1 if k < rw % (j-i) else 0)
         widths[k] = max(widths[k], w)
@@ -734,31 +747,36 @@ def defaultAlign(i):
 
 def report_shootout(exp):
     shootout = [
-        ("spork2", "mpl-spork-2way", exp),
-        ("spork3", "mpl-spork-3way", exp),
-        ("pcall", "mpl-hb", exp),
-        ("spork-alt", "mpl-spork-alt", exp)
+        ("mlton", "mlton", exp),
+        ("pcall-1", "mpl-hb-one", exp),
+        ("spork2-1", "mpl-spork-2way-one", exp),
+        ("spork3-1", "mpl-spork-3way-one", exp),
+        ("pcall-4", "mpl-hb-small", exp),
+        ("spork2-4", "mpl-spork-2way-small", exp),
+        ("spork3-4", "mpl-spork-3way-small", exp)
     ]
-    try:
-      shootoutBaseline = \
-        min(filterSome(
-          [tm(averageTime(D, config, tag, 1)) for name,config,tag in shootout]
-        ))
-    except:
-      shootoutBaseline = None
+    # try:
+    #   shootoutBaseline = \
+    #     min(filterSome(
+    #       [tm(averageTime(D, config, tag, 1)) for name,config,tag in shootout]
+    #     ))
+    # except:
+    #   shootoutBaseline = None
     
-    headers1 = ['System', *[f'T({p})' for p in P], *[f'SU({p})' for p in P], *[f'R({p})' for p in P]]
+    headers1 = [exp, *[f'T({p})' for p in P], 'T(1)/mlton', *[f'mlton/T({p})' for p in P if p != 1]]
     tt = [headers1, "="]
+    mlton_time = averageTime(D, "mlton", exp, 1)
     for name, config, tag in shootout:
+      this_times = [averageTime(D, config, tag, p) for p in P]
       thisRow = [
-        *[tm(averageTime(D, config, tag, p)) for p in P],
-        *[su(sd(shootoutBaseline, tm(averageTime(D, config, tag, p)))) for p in P],
-        *[spg(averageSpace(D, config, tag, p)) for p in P]
+        *[tm(t) for t in this_times],
+        tm(averageTime(D, config, tag, 1) / mlton_time),
+        *[(tm(mlton_time / t) if t else "--") for p, t in zip(P, this_times) if p != 1]
       ]
       thisRow = [name] + [str(x) if x is not None else "--" for x in thisRow]
       tt.append(thisRow)
     
-    print(f"{exp} SHOOTOUT")
+    #print(f"{exp} SHOOTOUT")
     print(table(tt, defaultAlign))
     print("")
 

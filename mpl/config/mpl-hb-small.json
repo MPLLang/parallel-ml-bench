@@ -1,0 +1,9 @@
+{
+  "compiler": "/home/coolin/code/mpl/build/bin/mpl",
+  "flags": [
+    "-detect-entanglement", "true",
+    "-mlb-path-var", "GRAINS small",
+    "-mlb-path-var", "PARFOR binsplit"
+  ],
+  "compat": "mpl-hb"
+}

@@ -110,6 +110,8 @@ if __name__ == "__main__":
         prefix = os.path.join(prefix, r['cwd'])
       if not os.path.isfile(os.path.join(prefix, suffix)):
         binsToMake.add((prefix, binFile))
+      else:
+        sys.stderr.write("Missing file " + os.path.join(prefix, suffix) + "\n")
 
     places = set(prefix for (prefix, _) in binsToMake)
 

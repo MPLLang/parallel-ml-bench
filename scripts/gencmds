@@ -20,10 +20,10 @@ def _matches(restriction, assignment):
 
 def _makeCmd(template, assignment):
   cmd = template
-  row = {}
+  #row = {}
 
   for key,value in assignment.items():
-    row[key] = value
+    #row[key] = value
     def replacer(m):
       # first handle possibility of <key>
       if re.match('<{}>'.format(key), m.group(0)):
@@ -37,40 +37,44 @@ def _makeCmd(template, assignment):
     cmd = re.sub(pattern, replacer, cmd)
 
   cmd = re.sub(r'(<[-\w]+\?[^>]*>)', lambda _: "", cmd)
-  row['cmd'] = cmd.strip()
-
-  return row
+  #row['cmd'] = cmd.strip()
+  #return row
+  return cmd
 
 def gencmds(templateSpecs, assignmentGroupSpecs):
   rows = []
   # seen = set()
 
-  for aSpec in assignmentGroupSpecs:
-    x = [[(k, v) for v in vs] for k,vs in aSpec]
-    # x = [[(k, v) for v in vs] for k,vs in aSpec.items()]
-    for assignment in itertools.product(*x):
-      assignment = dict(assignment)
-      for tSpec in templateSpecs:
+  for tSpec in templateSpecs:
+    for aSpec in assignmentGroupSpecs:
+      x = [[(k, v) for v in vs] for k,vs in aSpec]
+      for assignment in itertools.product(*x):
+        assignment = dict(assignment)
         if _matches(tSpec['match'], assignment):
-          row = _makeCmd(tSpec['template'], assignment)
+          row = {}
+          # Save assignments in the dict in case we want to know what generated this
+          for key,value in assignment.items():
+            row[key] = value
+          # Now for each key-value pair in assignment, replace <key> with value
+          for key,value in tSpec.items():
+            if key != 'match':
+              row[key] = _makeCmd(tSpec[key], assignment)
           rows.append(row)
-          break
-
   return rows
 
 
-def jqfilter(selectExpr, rows):
-  allRows = json.dumps(rows)
-  query = ".[] | select({})".format(selectExpr)
-  cmd = ['jq', '-cM', query]
-  jqProcess = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-  output, err = jqProcess.communicate(input=allRows)
+# def jqfilter(selectExpr, rows):
+#   allRows = json.dumps(rows)
+#   query = ".[] | select({})".format(selectExpr)
+#   cmd = ['jq', '-cM', query]
+#   jqProcess = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+#   output, err = jqProcess.communicate(input=allRows)
 
-  newRows = []
-  for line in output.splitlines():
-    newRows.append(json_careful_loads(line))
+#   newRows = []
+#   for line in output.splitlines():
+#     newRows.append(json_careful_loads(line))
 
-  return newRows
+#   return newRows
 
 # scripty part =============================================================
 
@@ -86,13 +90,13 @@ if __name__ == "__main__":
     dest = 'bare',
     help = "don't print each generated command with its assigned keys (json format)")
 
-  parser.add_argument('--procs',
-    default = "1,8",
-    dest = 'procs')
+  #parser.add_argument('--procs',
+  #  default = "1,8",
+  #  dest = 'procs')
 
-  parser.add_argument('--procs_skip_middle',
-    action = 'store_true',
-    dest = 'procs_skip_middle')
+  #parser.add_argument('--procs_skip_middle',
+  #  action = 'store_true',
+  #  dest = 'procs_skip_middle')
 
   parser.add_argument('spec', metavar='SPEC_FILE',
     help = "key/value assignments (json format)")
@@ -117,30 +121,30 @@ if __name__ == "__main__":
 
   templateSpecs = specFileContents['templates']
   globalkvs = specFileContents['globals']
-  selectExpr = specFileContents['jqselect']
+  #selectExpr = specFileContents['jqselect']
   assignmentGroupSpecs = specFileContents['specs']
 
-  try:
-    procs = sorted(args.procs.split(","), key=int)
-    for p in procs:
-      if int(p) < 1:
-        eprint("Invalid processor list given to --procs")
-        sys.exit(1)
-    if len(procs) == 0:
-      eprint("Invalid processor list given to --procs: empty list")
-      sys.exit(1)
-  except:
-    eprint("Invalid processor list given to --procs")
-    sys.exit(1)
+  #try:
+  #  procs = sorted(args.procs.split(","), key=int)
+  #  for p in procs:
+  #    if int(p) < 1:
+  #      eprint("Invalid processor list given to --procs")
+  #      sys.exit(1)
+  #  if len(procs) == 0:
+  #    eprint("Invalid processor list given to --procs: empty list")
+  #    sys.exit(1)
+  #except:
+  #  eprint("Invalid processor list given to --procs")
+  #  sys.exit(1)
 
-  if args.procs_skip_middle:
-    small = procs[0]
-    big = procs[-1]
-    procs = [small, big]
+  #if args.procs_skip_middle:
+  #  small = procs[0]
+  #  big = procs[-1]
+  #  procs = [small, big]
 
-  max_procs = procs[-1]
+  #max_procs = procs[-1]
 
-  selectExpr = '"{}" as $max_procs | {}'.format(max_procs, selectExpr)
+  #selectExpr = '"{}" as $max_procs | {}'.format(max_procs, selectExpr)
 
   for aSpec in assignmentGroupSpecs:
     for key in aSpec:
@@ -154,10 +158,11 @@ if __name__ == "__main__":
         sys.exit(1)
 
   def makeOne(aGroup):
-    return list(aGroup.items()) + list(globalkvs.items()) + [('procs', procs)]
+    return list(aGroup.items()) + list(globalkvs.items())
 
   assignmentGroupSpecs = map(makeOne, assignmentGroupSpecs)
-  rows = jqfilter(selectExpr, gencmds(templateSpecs, assignmentGroupSpecs))
+  #rows = jqfilter(selectExpr, gencmds(templateSpecs, assignmentGroupSpecs))
+  rows = gencmds(templateSpecs, assignmentGroupSpecs)
 
   for row in rows:
     if args.bare:

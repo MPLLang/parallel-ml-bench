@@ -4,11 +4,12 @@ local
   $(SML_LIB)/basis/basis.mlb
   $(SML_LIB)/basis/mlton.mlb
   Grains.$(GRAINS).sml
-  ForkJoinNG.sml
+  PARFOR.sig
   mlton.sml
+  ForkJoinNG.sml
 in
   structure Grains
-  structure ForkJoin
+  structure Parfor
   structure ForkJoinNG
   structure RuntimeStats
 end

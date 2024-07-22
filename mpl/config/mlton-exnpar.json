@@ -1,8 +1,0 @@
-{
-  "compiler": "mlton",
-  "flags": [
-    "-codegen", "c",
-    "-mlb-path-var", "GRAINS small"
-  ],
-  "compat": "mlton-exnpar"
-}

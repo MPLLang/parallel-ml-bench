@@ -2,7 +2,7 @@
   "compiler": "mlton",
   "flags": [
     "-codegen", "c",
-    "-mlb-path-var", "GRAINS small"
+    "-mlb-path-var", "GRAINS one"
   ],
   "compat": "mlton"
 }
