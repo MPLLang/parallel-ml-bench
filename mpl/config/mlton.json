@@ -1,6 +1,8 @@
 {
   "compiler": "mlton",
   "flags": [
+    "-disable-pass", "splitTypes1",
+    "-disable-pass", "splitTypes2",
     "-codegen", "c",
     "-mlb-path-var", "GRAINS one"
   ],

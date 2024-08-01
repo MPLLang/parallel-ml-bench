@@ -7,7 +7,7 @@ fun threatened (i,j) [] = false
     i = x orelse j = y orelse i-j = x-y orelse i+j = x+y
     orelse threatened (i,j) Q
 
-structure Seq = FuncSequence
+(*structure Seq = FuncSequence*)
 
 fun countSol n =
   let
@@ -17,11 +17,12 @@ fun countSol n =
         fun tryCol j =
           if threatened (i, j) b then 0 else search (i+1) ((i,j)::b)
       in
-        if i >= 3 then
+        (* if i >= 3 then *)
           (* if we're already a few levels deep, then just go sequential *)
-          Seq.iterate op+ 0 (Seq.tabulate tryCol n)
-        else
-          Seq.reduce op+ 0 (Seq.tabulate tryCol n)
+          (* Seq.iterate op+ 0 (Seq.tabulate tryCol n) *)
+        (* else *)
+          SeqBasis.reduce 3 op+ 0 (0, n) tryCol
+          (* Seq.reduce op+ 0 (Seq.tabulate tryCol n) *)
       end
   in
     search 0 []

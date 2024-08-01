@@ -1,33 +1,70 @@
 {
   "templates": [
-    {"match": {"compiler": "^mpl-spork"},
-     "cmd": "bin/<bench>.<compiler>-<split>-<grain>.bin @mpl <procs?procs {}> <affinity> heartbeat-tokens 5 -- <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
-     "config": "<compiler>-<split>-<grain>"
+    {"match": {
+        "compiler": "^mpl-spork$",
+        "grain": "^(one|small)$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>-<split>-<grain>.bin @mpl <procs?procs {}> <affinity> heartbeat-tokens 5 -- <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
+     "config": "<compiler>-<split>-<grain>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng"
     },
-    {"match": {"compiler": "^mpl-hb", "split": "^2way$"},
+
+    {"match": {
+        "compiler": "^mpl-spork$",
+        "grain": "^manual$",
+        "split": "^2way$"
+     },
      "cmd": "bin/<bench>.<compiler>-<grain>.bin @mpl <procs?procs {}> <affinity> -- <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
-     "config": "<compiler>-<grain>"
+     "config": "<compiler>-<grain>",
+     "tag": "<tag>",
+     "bench": "<bench>"
     },
+
+    {"match": {
+        "compiler": "^mpl-hb$",
+        "split": "^2way$",
+        "grain": "^(one|small)$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>-<grain>.bin @mpl <procs?procs {}> <affinity> -- <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
+     "config": "<compiler>-<grain>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng"
+    },
+
     {"match": {
         "compiler": "^mlton$",
         "procs": "^1$",
-        "grain": "^one$",
+        "grain": "^manual$",
         "split": "^2way$"
      },
-     "cmd": "bin/<bench>.<compiler>.bin <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
-     "config": "<compiler>"
+     "cmd": "bin/<bench>-ng.<compiler>.bin <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
+     "config": "<compiler>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng"
+    },
+
+    {"match": {
+        "compiler": "^mpl$",
+        "grain": "^manual$",
+        "split": "^2way$"
+     },
+     "cmd": "bin/<bench>.<compiler>.bin @mpl <procs?procs {}> <affinity> -- <args?{} ><args1?{}> -repeat <repeat> -warmup <warmup>",
+     "config": "<compiler>",
+     "tag": "<tag>",
+     "bench": "<bench>"
     }
   ],
 
   "globals": {
     "compiler": [
-      "mlton",
+      "mpl-spork",
       "mpl-hb",
-      "mpl-spork"
+      "mpl"
     ],
     "grain": [
       "one",
-      "small"
+      "manual"
     ],
     "split": [
       "2way",
@@ -40,307 +77,155 @@
       "5"
     ],
     "affinity": [
-      "set-affinity affinity-base 12"
+      ""
+    ],
+    "_old_affinity": [
+        "set-affinity affinity-base 0"
     ],
     "cwd": [
       "mpl"
     ],
     "procs": [
       "1",
-      "8"
+      "72"
     ]
   },
   
   "specs": [
-    {
-      "tag": [
-        "bfs-ng"
-      ],
-      "bench": [
-        "bfs-ng"
-      ],
-      "args": [
-        "../inputs/rmat-10M-symm-bin"
-      ]
-    },
-    {
-      "tag": [
-        "bfs"
-      ],
-      "bench": [
-        "bfs"
-      ],
-      "args": [
-        "../inputs/rmat-10M-symm-bin"
-      ]
-    },
-    {
-      "tag": [
-        "delaunay-ng"
-      ],
-      "bench": [
-        "delaunay-ng"
-      ],
-      "args": [
-        "-input ../inputs/uniform-circle-1M"
-      ]
-    },
-    {
-      "tag": [
-        "delaunay"
-      ],
-      "bench": [
-        "delaunay"
-      ],
-      "args": [
-        "-input ../inputs/uniform-circle-1M"
-      ]
-    },
-    {
-      "tag": [
-        "msort-ng"
-      ],
-      "bench": [
-        "msort-ng"
-      ],
-      "args": [
-        "-N 20000000"
-      ]
-    },
-    {
-      "tag": [
-        "msort"
-      ],
-      "bench": [
-        "msort"
-      ],
-      "args": [
-        "-N 20000000"
-      ]
-    },
-    {
-      "tag": [
-        "primes-ng"
-      ],
-      "bench": [
-        "primes-ng"
-      ],
-      "args": [
-        "-N 100000000"
-      ]
-    },
-    {
-      "tag": [
-        "primes"
-      ],
-      "bench": [
-        "primes"
-      ],
-      "args": [
-        "-N 100000000"
-      ]
-    },
-    {
-      "tag": [
-        "sparse-mxv-ng"
-      ],
-      "bench": [
-        "sparse-mxv-ng"
-      ],
-      "args": [
-        "-n 250000000"
-      ]
-    },
-    {
-      "tag": [
-        "sparse-mxv-csr-ng"
-      ],
-      "bench": [
-        "sparse-mxv-csr-ng"
-      ],
-      "args": [
-        "-n 250000000"
-      ]
-    },
-    {
-      "tag": [
-        "sparse-mxv-csr"
-      ],
-      "bench": [
-        "sparse-mxv-csr"
-      ],
-      "args": [
-        "-n 250000000"
-      ]
-    },
-    {
-      "tag": [
-        "nearest-nbrs-ng"
-      ],
-      "bench": [
-        "nearest-nbrs-ng"
-      ],
-      "args": [
-        "-input ../inputs/uniform-circle-1M"
-      ]
-    },
-    {
-      "tag": [
-        "nearest-nbrs"
-      ],
-      "bench": [
-        "nearest-nbrs"
-      ],
-      "args": [
-        "-input ../inputs/uniform-circle-1M"
-      ]
-    },
-    {
-      "tag": [
-        "map-heavy-ng"
-      ],
-      "bench": [
-        "map-ng"
-      ],
-      "args": [
-        "-n 5000 -fn-cost heavy"
-      ]
-    },
-    {
-      "tag": [
-        "map-light-ng"
-      ],
-      "bench": [
-        "map-ng"
-      ],
-      "args": [
-        "-n 200000000 -fn-cost light"
-      ]
-    },
-    {
-      "tag": [
-        "map-heavy"
-      ],
-      "bench": [
-        "map"
-      ],
-      "args": [
-        "-n 5000 -fn-cost heavy"
-      ]
-    },
-    {
-      "tag": [
-        "map-light"
-      ],
-      "bench": [
-        "map"
-      ],
-      "args": [
-        "-n 200000000 -fn-cost light"
-      ]
-    },
-    {
-      "tag": [
-        "mandelbrot"
-      ],
-      "bench": [
-        "mandelbrot"
-      ],
-      "args": [
-        "-resolution 2500 -top 2 -bot ~2 -left ~3 -right 1 -diverge-thresh 2 -max-iter 30"
-      ]
-    },
-    {
-      "tag": [
-        "mandelbrot-ng"
-      ],
-      "bench": [
-        "mandelbrot-ng"
-      ],
-      "args": [
-        "-resolution 2500 -top 2 -bot ~2 -left ~3 -right 1 -diverge-thresh 2 -max-iter 30"
-      ]
-    },
-    {
-      "tag": ["linefit-ng"],
-      "bench": ["linefit-ng"],
-      "args": ["-n 100000000"]
-    },
-    {
-      "tag": ["linefit"],
-      "bench": ["linefit-opt"],
-      "args": ["-n 100000000"]
-    },
-    {
-      "tag": ["wc-ng"],
-      "bench": ["wc-ng"],
-      "args": ["-infile ../inputs/words256.txt"]
-    },
-    {
-      "tag": ["wc"],
-      "bench": ["wc-opt"],
-      "args": ["-infile ../inputs/words256.txt"]
-    },
-    {
-      "tag": ["nqueens-ng"],
-      "bench": ["nqueens-ng"],
-      "args": ["-N 13"]
-    },
-    {
-      "tag": ["nqueens"],
-      "bench": ["nqueens"],
-      "args": ["-N 13"]
-    },
-    {
-      "tag": [
-        "fork-stress"
-      ],
-      "bench": [
-        "fork-stress"
-      ],
-      "args": [
-        "-width 1000 -length 5000"
-      ]
-    },
-    {
-      "tag": ["grep"],
-      "bench": ["grep"],
-      "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
-    },
-    {
-      "tag": ["grep-ng"],
-      "bench": ["grep-ng"],
-      "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
-    },
-    {
-      "tag": ["bignum-add"],
-      "bench": ["bignum-add"],
-      "args": ["-n 100000000"]
-    },
-    {
-      "tag": ["bignum-add-ng"],
-      "bench": ["bignum-add-ng"],
-      "args": ["-n 100000000"]
-    },
-    {
-      "tag": ["suffix-array"],
-      "bench": ["suffix-array"],
-      "args": ["--benchmark -N 10000000"]
-    },
-    {
-      "tag": ["suffix-array-ng"],
-      "bench": ["suffix-array-ng"],
-      "args": ["--benchmark -N 10000000"]
-    },
-    {
-      "tag": ["triangle-count"],
-      "bench": ["triangle-count"],
-      "args": ["../inputs/rmat-1M-symm-bin"]
-    },
-    {
-      "tag": ["triangle-count-ng"],
-      "bench": ["triangle-count-ng"],
-      "args": ["../inputs/rmat-1M-symm-bin"]
-    }
+    {"tag": ["bfs-ng"],
+     "bench": ["bfs-ng"],
+     "args": ["../inputs/rmat-10M-symm-bin"]},
+
+    {"tag": ["bfs"],
+     "bench": ["bfs"],
+     "args": ["../inputs/rmat-10M-symm-bin"]},
+
+    {"tag": ["delaunay-ng"],
+     "bench": ["delaunay-ng"],
+     "args": ["-input ../inputs/uniform-circle-1M"]},
+
+    {"tag": ["delaunay"],
+     "bench": ["delaunay"],
+     "args": ["-input ../inputs/uniform-circle-1M"]},
+
+    {"tag": ["msort-ng"],
+     "bench": ["msort-ng"],
+     "args": ["-N 20000000"]},
+
+    {"tag": ["msort"],
+     "bench": ["msort"],
+     "args": ["-N 20000000"]},
+
+    {"tag": ["primes-ng"],
+     "bench": ["primes-ng"],
+     "args": ["-N 100000000"]},
+
+    {"tag": ["primes"],
+     "bench": ["primes"],
+     "args": ["-N 100000000"]},
+
+    {"tag": ["sparse-mxv-ng"],
+     "bench": ["sparse-mxv-ng"],
+     "args": ["-n 250000000"]},
+
+    {"tag": ["sparse-mxv-csr-ng"],
+     "bench": ["sparse-mxv-csr-ng"],
+     "args": ["-n 250000000"]},
+
+    {"tag": ["sparse-mxv-csr"],
+     "bench": ["sparse-mxv-csr"],
+     "args": ["-n 250000000"]},
+
+    {"tag": ["nearest-nbrs-ng"],
+     "bench": ["nearest-nbrs-ng"],
+     "args": ["-input ../inputs/uniform-circle-1M"]},
+
+    {"tag": ["nearest-nbrs"],
+     "bench": ["nearest-nbrs"],
+     "args": ["-input ../inputs/uniform-circle-1M"]},
+
+    {"tag": ["map-heavy-ng"],
+     "bench": ["map-ng"],
+     "args": ["-n 5000 -fn-cost heavy"]},
+
+    {"tag": ["map-light-ng"],
+     "bench": ["map-ng"],
+     "args": ["-n 200000000 -fn-cost light"]},
+
+    {"tag": ["map-heavy"],
+     "bench": ["map"],
+     "args": ["-n 5000 -fn-cost heavy"]},
+
+    {"tag": ["map-light"],
+     "bench": ["map"],
+     "args": ["-n 200000000 -fn-cost light"]},
+
+    {"tag": ["mandelbrot"],
+     "bench": ["mandelbrot"],
+     "args": ["-resolution 2500 -top 2 -bot ~2 -left ~3 -right 1 -diverge-thresh 2 -max-iter 30"]},
+
+    {"tag": ["mandelbrot-ng"],
+     "bench": ["mandelbrot-ng"],
+     "args": ["-resolution 2500 -top 2 -bot ~2 -left ~3 -right 1 -diverge-thresh 2 -max-iter 30"]},
+
+    {"tag": ["linefit-ng"],
+     "bench": ["linefit-ng"],
+     "args": ["-n 100000000"]},
+
+    {"tag": ["linefit"],
+     "bench": ["linefit"],
+     "args": ["-n 100000000"]},
+
+    {"tag": ["wc-ng"],
+     "bench": ["wc-ng"],
+     "args": ["-infile ../inputs/words256.txt"]},
+
+    {"tag": ["wc"],
+     "bench": ["wc"],
+     "args": ["-infile ../inputs/words256.txt"]},
+
+    {"tag": ["nqueens-ng"],
+     "bench": ["nqueens-ng"],
+     "args": ["-N 13"]},
+
+    {"tag": ["nqueens"],
+     "bench": ["nqueens"],
+     "args": ["-N 13"]},
+
+    {"tag": ["fork-stress"],
+     "bench": ["fork-stress"],
+     "args": ["-width 1000 -length 5000"]},
+
+    {"tag": ["grep"],
+     "bench": ["grep"],
+     "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]},
+
+    {"tag": ["grep-ng"],
+     "bench": ["grep-ng"],
+     "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]},
+
+    {"tag": ["bignum-add"],
+     "bench": ["bignum-add"],
+     "args": ["-n 100000000"]},
+
+    {"tag": ["bignum-add-ng"],
+     "bench": ["bignum-add-ng"],
+     "args": ["-n 100000000"]},
+
+    {"tag": ["suffix-array"],
+     "bench": ["suffix-array"],
+     "args": ["--benchmark -N 10000000"]},
+
+    {"tag": ["suffix-array-ng"],
+     "bench": ["suffix-array-ng"],
+     "args": ["--benchmark -N 10000000"]},
+
+    {"tag": ["triangle-count"],
+     "bench": ["triangle-count"],
+     "args": ["../inputs/rmat-1M-symm-bin"]},
+
+    {"tag": ["triangle-count-ng"],
+     "bench": ["triangle-count-ng"],
+     "args": ["../inputs/rmat-1M-symm-bin"]}
   ]
 }

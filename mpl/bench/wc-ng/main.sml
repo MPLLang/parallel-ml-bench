@@ -1,5 +1,6 @@
 structure CLA = CommandLineArgs
-structure Seq = ArraySequence
+structure Seq = SeqBasisNG
+structure AS = ArraySlice
 
 val n = CLA.parseInt "n" (1000 * 1000 * 100)
 val filePath = CLA.parseString "infile" ""
@@ -7,7 +8,7 @@ val filePath = CLA.parseString "infile" ""
 val source =
   if filePath = "" then
     (*Seq.tabulate (fn _ => #" ") n*)
-    Seq.tabulate (fn i => Char.chr (Util.hash i mod 255)) n
+    AS.full (Seq.tabulate (0, n) (fn i => Char.chr (Util.hash i mod 255)))
   else
     let
       val (source, tm) = Util.getTime (fn _ => ReadFile.contentsSeq filePath)

@@ -13,6 +13,11 @@ sig
             -> (int * int)
             -> (int -> 'a)
             -> 'a array (* length N+1, for both inclusive and exclusive scan *)
+  (*val scan2: ('a * 'a -> 'a)
+            -> 'a
+            -> (int * int)
+            -> (int -> 'a)
+            -> 'a array*) (* length N+1, for both inclusive and exclusive scan *)
 
   val filter: (int * int) -> (int -> 'a) -> (int -> bool) -> 'a array
 
@@ -93,8 +98,8 @@ struct
     (* end *)
 
 
-  fun scan' grain g b (lo, hi) (f: int -> 'a) =
-    if hi - lo <= grain then
+  fun scan g b (lo, hi) (f: int -> 'a) =
+    if hi - lo <= Grains.block then
       let
         val n = hi - lo
         val result = allocate (n + 1)
@@ -108,13 +113,13 @@ struct
     else
       let
         val n = hi - lo
-        val k = grain
+        val k = Grains.block
         val m = 1 + (n - 1) div k (* number of blocks *)
         val sums = tabulate (0, m) (fn i =>
           let val start = lo + i * k
           in reduce g b (start, Int.min (start + k, hi)) f
           end)
-        val partials = scan' grain g b (0, m) (nth sums)
+        val partials = scan g b (0, m) (nth sums)
         val result = allocate (n + 1)
       in
         parfor (0, m) (fn i =>
@@ -131,8 +136,66 @@ struct
         result
       end
 
-  fun scan g b (lo, hi) (f: int -> 'a) =
-      scan' (if Grains.block = 1 then 100 else Grains.block) g b (lo, hi) f
+  (*fun scan2 (add: 'a * 'a -> 'a) (b: 'a) (i: int , j: int) (f: int -> 'a) =
+      let type ('a, 'b) scandata = {sum: 'a, size: int, shape: 'b}
+          datatype 'a tree = leaf | node of ('a, 'a tree) scandata * ('a, 'a tree) scandata
+          type 'a xtree = ('a, 'a tree) scandata
+
+          fun upsweep' () =
+              let fun init (i: int) =
+                      {sum = f i, size = 1, shape = leaf}
+                  fun step (i: int, t: 'a xtree) =
+                      (* shape of t is leaf *)
+                      {sum = add (#sum t, f i), size = #size t + 1, shape = leaf}
+                  fun merge (t1: 'a xtree, t2: 'a xtree) =
+                      {sum = add (#sum t1, #sum t2),
+                       size = #size t1 + #size t2,
+                       shape = node (t1, t2)}
+              in
+                ForkJoin.pareduceInitStepMerge 100 (* Grains.parfor *) (i, j) init step merge
+              end
+
+          fun upsweep () =
+              let fun step (i: int, t: 'a xtree) =
+                      {sum = add (#sum t, f i), size = #size t + 1, shape = leaf}
+                  fun merge (t1: 'a xtree, t2: 'a xtree) =
+                      {sum = add (#sum t1, #sum t2),
+                       size = #size t1 + #size t2,
+                       shape = node (t1, t2)}
+                  val base = {sum = b, size = 0, shape = leaf}
+              in
+                ForkJoin.pareduce 100 (* Grains.parfor *) (i, j) base step merge
+              end
+
+          fun downsweep (up: 'a xtree): 'a array =
+              let val result = allocate (j - i + 1)
+                  fun flat (acc: 'a) (i: int, j: int) =
+                      if i >= j then
+                        ()
+                      else
+                        (Array.update (result, i, acc);
+                         flat (add (acc, f i)) (i + 1, j))
+                  fun sweep (acc: 'a) (offset: int) (t: 'a xtree) =
+                      case #shape t of
+                          leaf => flat acc (offset, offset + #size t)
+                        | node (t1, t2) =>
+                          (par (fn () => sweep acc offset t1,
+                                fn () => sweep (add (acc, #sum t1)) (offset + #size t1) t2)
+                          ; ())
+              in
+                Array.update (result, j - i, #sum up);
+                sweep b 0 up;
+                result
+              end
+          val t0 = Time.now ()
+          val up = upsweep ()
+          val t1 = Time.now ()
+          val down = downsweep up
+          val t2 = Time.now ()
+      in
+        print ("t1 = " ^ Time.fmt 4 (Time.- (t1, t0)) ^ ", t2 = " ^ Time.fmt 4 (Time.- (t2, t1)) ^ "\n");
+        down
+      end*)
 
   fun filter (lo, hi) f g =
     let

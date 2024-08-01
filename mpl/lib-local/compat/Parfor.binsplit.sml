@@ -1,54 +1,54 @@
 structure Parfor : PARFOR =
 struct
-
+  type word = Word64.word
   val w2i = Word64.toIntX
   val i2w = Word64.fromInt
 
-  fun for (lo, hi) f =
-    if lo >= hi then () else (f lo; for (lo + 1, hi) f)
+  fun for (i: word, j: word) (f: word -> unit): unit =
+      if i >= j then
+        ()
+      else
+        (f i; for (i + 0w1, j) f)
 
-  fun reduce (wlo, whi) z f merge =
-      if wlo >= whi then z else reduce (wlo + 0w1, whi) (merge (z, f (w2i wlo))) f merge
+  fun reduce (i: word, j: word) (z: 'a) (f: word -> 'a) (merge: 'a * 'a -> 'a) =
+      if i >= j then
+        z
+      else
+        reduce (i + 0w1, j) (merge (z, f i)) f merge
 
-  fun parfor ((lo, hi): int * int) (f: int -> unit) =
-    let
-      val wgrain = i2w Grains.parfor
+  fun midpoint (i: word, j: word) =
+      i + (Word64.>> (j - i, 0w1))
 
-      fun loopCheck lo hi =
-        if hi - lo <= wgrain then for (w2i lo, w2i hi) f else loopSplit lo hi
+  fun wparfor (grain: word) ((i, j): word * word) (f: word -> unit) =
+      let fun loop (i, j) =
+              if j - i <= grain then
+                for (i, j) f
+              else
+                let val mid = midpoint (i, j) in
+                  ForkJoin.par (fn _ => loop (i, mid),
+                                fn _ => loop (mid, j));
+                  ()
+                end
+      in
+        loop (i, j)
+      end
 
-      and loopSplit lo hi =
-        let
-          val half = Word64.>> (hi - lo, 0w1)
-          val mid = lo + half
-        in
-          ForkJoin.par (fn _ => loopCheck lo mid, fn _ => loopCheck mid hi);
-          ()
-        end
-    in
-      if hi - lo <= Grains.parfor then for (lo, hi) f
-      else loopSplit (i2w lo) (i2w hi)
-    end
+  fun wpareduce (grain: word) (i: word, j: word) (z: 'a) (f: word -> 'a) (merge: 'a * 'a -> 'a) =
+      let fun loop (i: word, j: word) =
+              if j - i <= grain then
+                reduce (i, j) z f merge
+              else
+                let val mid = midpoint (i, j) in
+                  merge (ForkJoin.par (fn () => loop (i, mid),
+                                       fn () => loop (mid, j)))
+                end
+      in
+        loop (i, j)
+      end
 
-  fun pareduce ((lo, hi): int * int) (z: 'a) (f: int -> 'a) (merge: 'a * 'a -> 'a) =
-    let
-      val wgrain = i2w Grains.parfor
+  fun parfor (i, j) f =
+      wparfor (i2w Grains.parfor) (i2w i, i2w j) (f o w2i)
 
-      fun loopCheck b lo hi =
-        if hi - lo <= wgrain then reduce (lo, hi) b f merge else loopSplit b lo hi
-
-      and loopSplit b lo hi =
-        let
-          val half = Word64.>> (hi - lo, 0w1)
-          val mid = lo + half
-        in
-          merge (ForkJoin.par (fn () => loopCheck b lo mid,
-                               fn () => loopCheck z mid hi))
-        end
-      val wlo = i2w lo
-      val whi = i2w hi
-    in
-      if hi - lo <= Grains.parfor then reduce (wlo, whi) z f merge
-      else loopSplit z wlo whi
-    end
+  fun pareduce (i, j) z f merge =
+      wpareduce (i2w Grains.parfor) (i2w i, i2w j) z (f o w2i) merge
 end

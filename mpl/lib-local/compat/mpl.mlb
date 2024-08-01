@@ -5,13 +5,15 @@ local
   $(SML_LIB)/basis/mlton.mlb
   $(SML_LIB)/basis/mpl.mlb
   $(SML_LIB)/basis/fork-join.mlb
-  Grains.$(GRAINS).sml
-  ForkJoinNG.sml
-  ParFor.$(PARFOR).sml
+  Grains.one.sml (* doesn't get used; just have here for type checking *)
+  PARFOR.sig (* doesn't get used; just have here for type checking *)
+  Parfor.binsplit.sml (* doesn't get used; just have here for type checking *)
+  ForkJoinNG.sml (* doesn't get used; just have here for type checking *)
   mpl.sml
 in
+  structure ForkJoin
   structure Grains
+  structure ForkJoinNG
   structure Parfor
-  (*structure ForkJoinNG*)
   structure RuntimeStats
 end

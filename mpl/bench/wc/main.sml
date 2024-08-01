@@ -1,8 +1,6 @@
 structure CLA = CommandLineArgs
 structure Seq = ArraySequence
 
-structure WC = MkWC(DelayedSeq)
-
 val n = CLA.parseInt "n" (1000 * 1000 * 100)
 val filePath = CLA.parseString "infile" ""
 

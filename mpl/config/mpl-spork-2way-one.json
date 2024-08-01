@@ -1,6 +1,8 @@
 {
-  "compiler": "/home/coolin/code/spork-mpl/build/bin/mpl",
+  "compiler": "/home/colinmcd/mpl/spork-build/bin/mpl",
   "flags": [
+    "-disable-pass", "splitTypes1",
+    "-disable-pass", "splitTypes2",
     "-detect-entanglement", "true",
     "-mlb-path-var", "GRAINS one",
     "-mlb-path-var", "PARFOR binsplit"

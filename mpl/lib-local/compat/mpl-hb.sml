@@ -26,11 +26,14 @@ struct
         (MPL.GC.maxStackFramesWalkedForHeartbeat ())
     }
 
-  fun pct a b =
-    Real.round (100.0 * (Real.fromInt a / Real.fromInt b))
-
   val itos = Int.toString
   val rtos = Real.fmt (StringCvt.FIX (SOME 2))
+
+  fun pct a b =
+      if b = 0 then
+        "NaN"
+      else
+        itos (Real.round (100.0 * (Real.fromInt a / Real.fromInt b)))
 
   fun benchReport {before = b: t, after = a: t} =
     let
@@ -55,16 +58,16 @@ struct
       ( print ("======== Runtime Stats ========\n")
       ; print ("num spawns        " ^ itos numSpawns ^ "\n")
       ; print
-          ("  eager           " ^ itos numEagerSpawns ^ " (" ^ itos eagerp
+          ("  eager           " ^ itos numEagerSpawns ^ " (" ^ eagerp
            ^ "%)\n")
       ; print
-          ("  at heartbeat    " ^ itos numHeartbeatSpawns ^ " (" ^ itos hbp
+          ("  at heartbeat    " ^ itos numHeartbeatSpawns ^ " (" ^ hbp
            ^ "%)\n")
 
       ; print "\n"
       ; print ("num heartbeats    " ^ itos numHeartbeats ^ "\n")
       ; print
-          ("  skipped         " ^ itos numSkippedHeartbeats ^ " (" ^ itos skipp
+          ("  skipped         " ^ itos numSkippedHeartbeats ^ " (" ^ skipp
            ^ "%)\n")
 
       ; print "\n"
