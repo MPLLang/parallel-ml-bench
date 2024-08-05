@@ -2,11 +2,19 @@
 
 set -e
 
+if [ $# -eq 0 ];
+then echo "USAGE
+$0 RESULT_NAME" >&2;
+     exit 1
+fi
+
+
 ROOT=$(git rev-parse --show-toplevel)
 GEN=$ROOT/scripts/gencmds
 RUN=$ROOT/scripts/parruncmds.py
 
-NOW=$(date '+%y%m%d-%H%M%S')
+# NOW=$(date '+%y%m%d-%H%M%S')
+NOW=$1
 # NOW="230217-050444"
 mkdir -p $ROOT/results
 RESULTS=$ROOT/results/$NOW.json
@@ -15,7 +23,7 @@ rm -f $ROOT/mpl/bin/*.bin
 
 $ROOT/filter-exps.py $ROOT/spork-exp-hb.json $ROOT/filtered-exp-hb.json $ROOT/exps_to_run.txt
 
-$GEN $@ $ROOT/filtered-exp-hb.json | taskset -c 0-72 $RUN --compile --output $RESULTS
+$GEN $ROOT/filtered-exp-hb.json | taskset -c 0-72 $RUN --compile --output $RESULTS
 
 echo "[INFO] wrote results to $RESULTS"
 

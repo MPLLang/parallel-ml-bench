@@ -196,9 +196,11 @@ def report_shootout(D, P, exp):
         ("pcall-hb", "mpl-hb-one", exp),
         ("spork-hb-2way", "mpl-spork-2way-one", exp),
         ("spork-hb-3way", "mpl-spork-3way-one", exp),
+        ("spork-hb-alt", "mpl-spork-alt-one", exp),
+        ("spork-hb-sam", "mpl-spork-sam-one", exp),
+        ("spork-hb-simple", "mpl-spork-simple-one", exp),
         ("pcall-manual", "mpl", exp),
         ("spork-manual", "mpl-spork-manual", exp)
-        #("sporkalt-1", "mpl-spork-alt-one", exp),
         #("sporksam-1", "mpl-spork-sam-one", exp),
         #("pcall-4", "mpl-hb-small", exp),
         #("spork2-4", "mpl-spork-2way-small", exp),

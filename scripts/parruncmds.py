@@ -110,10 +110,14 @@ def runcmds(TMPDIR, rows, timeout=600.0, silent=False):
         for fp, p in pool:
             p.start()
         for fp, p in pool:
-            p.join()
-            with open(fp) as fh:
-                yield json.load(fh)
-            os.remove(fp)
+            try:
+                p.join()
+                with open(fp) as fh:
+                    yield json.load(fh)
+            except Exception as e:
+                print(e, file=sys.stderr, flush=True)
+                if p.is_alive():
+                    p.terminate()
 
 # scripty part =============================================================
 
@@ -188,4 +192,6 @@ if __name__ == "__main__":
     try:
         main(TMPDIR)
     finally:
+        for fp in os.listdir(TMPDIR):
+            os.remove(os.path.join(TMPDIR, fp))
         os.rmdir(TMPDIR)

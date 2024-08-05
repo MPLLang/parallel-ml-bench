@@ -68,7 +68,10 @@
     ],
     "split": [
       "2way",
-      "3way"
+      "3way",
+      "alt",
+      "sam",
+      "simple"
     ],
     "warmup": [
       "5"
