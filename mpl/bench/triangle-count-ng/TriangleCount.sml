@@ -1,8 +1,11 @@
 structure TriangleCount =
 struct
+
+  structure Seq = SeqNG
+
   type 'a seq = 'a Seq.t
 
-  structure G = AdjacencyGraph(Int)
+  structure G = AdjacencyGraphNG(Int)
   structure V = G.Vertex
   structure AS = ArraySlice
 
