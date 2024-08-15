@@ -43,12 +43,12 @@ struct
               else
                 loop (copy (acc, init (nthx i, nthy i))) (i+1) *)
           in
-            (* loop 0w0 lo *)
-            SeqBasisNG.reduce copy 0w0 (lo, hi) (fn i => init (nthx i, nthy i))
+            (* loop 0w127 lo *)
+            SeqBasisNG.reduce copy 0w127 (lo, hi) (fn i => init (nthx i, nthy i))
           end)
 
       val blockPartials =
-        SeqBasisNG.scan copy 0w0 (0, numBlocks)
+        SeqBasisNG.scan copy 0w127 (0, numBlocks)
         (fn i => Array.sub (blockCarries, i))
 
       val lastCarry = Array.sub (blockPartials, numBlocks)

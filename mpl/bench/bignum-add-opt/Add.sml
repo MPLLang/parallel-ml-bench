@@ -35,11 +35,11 @@ struct
               else
                 loop (copy (acc, init (nthx i, nthy i))) (i+1)
           in
-            loop 0w0 lo
+            loop 0w127 lo
           end)
 
       val blockPartials =
-        SeqBasis.scan 5000 copy 0w0 (0, numBlocks)
+        SeqBasis.scan 5000 copy 0w127 (0, numBlocks)
         (fn i => Array.sub (blockCarries, i))
 
       val lastCarry = Array.sub (blockPartials, numBlocks)
