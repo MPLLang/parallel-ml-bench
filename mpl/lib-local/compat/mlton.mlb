@@ -3,13 +3,16 @@
 local
   $(SML_LIB)/basis/basis.mlb
   $(SML_LIB)/basis/mlton.mlb
-  Grains.$(GRAINS).sml
+  (*Grains.$(GRAINS).sml*)
+  Grains.mlton.sml
   PARFOR.sig
   mlton.sml
   ForkJoinNG.sml
+  SeqBasisNG.mlton.sml
 in
   structure Grains
   structure Parfor
   structure ForkJoinNG
+  structure SeqBasisNG
   structure RuntimeStats
 end

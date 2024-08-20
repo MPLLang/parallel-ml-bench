@@ -31,7 +31,7 @@ val input =
       let
         val (input, tm) = Util.getTime (fn _ => Seq.tabulate genPoint n)
       in
-        print ("generated input in " ^ Time.fmt 4 tm ^ "s\n");
+        (* print ("generated input in " ^ Time.fmt 4 tm ^ "s\n"); *)
         input
       end
 
@@ -40,7 +40,7 @@ val input =
         val (points, tm) = Util.getTime (fn _ =>
           compactify (ParseFile.readSequencePoint2d filename))
       in
-        print ("parsed input points in " ^ Time.fmt 4 tm ^ "s\n");
+        (* print ("parsed input points in " ^ Time.fmt 4 tm ^ "s\n"); *)
         points
       end
 

@@ -1,7 +1,7 @@
 structure SerialBFS =
 struct
 
-  structure G = AdjacencyGraph(Int)
+  structure G = AdjacencyGraphNG(Int)
 
   fun bfs g s =
     let

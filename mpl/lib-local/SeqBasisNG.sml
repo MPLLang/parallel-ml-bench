@@ -36,7 +36,8 @@ struct
   fun upd a i x = A.update (a, i, x)
   fun nth a i = A.sub (a, i)
 
-  val parfor = Parfor.parfor
+  fun parfor (i: int, j: int) (f: int -> unit) =
+      Parfor.pareduce (i, j) () (fn (i, ()) => f i) (fn ((), ()) => ())
   val par = ForkJoin.par
   val allocate = ForkJoin.alloc
 
@@ -75,7 +76,7 @@ struct
 
 
   fun reduce g b (lo, hi) f =
-    Parfor.pareduce (lo, hi) b f g
+    Parfor.pareduce (lo, hi) b (fn (i, a) => g (a, f i)) g
     (* let *)
     (*   val grain = Grains.parfor *)
     (*   val wgrain = i2w grain *)

@@ -1,5 +1,5 @@
 {
-  "compiler": "mlton",
+  "compiler": "/home/swestric/installs/mlton/build/bin/mlton",
   "flags": [
     "-disable-pass", "splitTypes1",
     "-disable-pass", "splitTypes2",

@@ -1,2 +1,6 @@
 mpl/bin
 figures/
+mpl/lib
+mpl/mpllib
+results/*.json
+inputs/

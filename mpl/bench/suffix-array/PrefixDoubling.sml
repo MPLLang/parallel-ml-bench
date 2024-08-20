@@ -224,9 +224,9 @@ struct
                         else if avgLen >= 16 then 64
                         else 4096
 
-            val () = print ("grain is " ^ (Int.toString grain) ^ "\n")
-            val () = print ("avgLen is " ^ (Int.toString avgLen) ^ "\n")
-            val () = print ("numGroups is " ^ (Int.toString (AS.length activeGroups)) ^ "\n")
+            (* val () = print ("grain is " ^ (Int.toString grain) ^ "\n") *)
+            (* val () = print ("avgLen is " ^ (Int.toString avgLen) ^ "\n") *)
+            (* val () = print ("numGroups is " ^ (Int.toString (AS.length activeGroups)) ^ "\n") *)
 
             (* Its faster to copy all of the ranks instead of just those in
                active groups *)

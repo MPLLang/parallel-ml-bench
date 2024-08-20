@@ -4,7 +4,7 @@ Benchmark.sml
 CommutativeAccum.sml
 AugMap.sml
 
-SeqBasisNG.sml
+(*SeqBasisNG.sml*)
 SeqNG.sml
 QuicksortNG.sml
 MergeNG.sml
@@ -13,4 +13,6 @@ NearestNeighborsNG.sml
 AdjacencyGraphNG.sml
 
 FindFirstNG.sml
+(*DelayedStreamNG.sml*)
+DelayedSeqNG.sml
 OldDelayedSeqNG.sml

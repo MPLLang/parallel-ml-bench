@@ -4,7 +4,7 @@ sig
 end =
 struct
 
-  fun parfor (lo, hi) f = Parfor.parfor (lo, hi) f
+  fun parfor (lo, hi) f = Parfor.pareduce (lo, hi) () (fn (i, ()) => f i) (fn ((), ()) => ())
 
   (*val w2i = Word64.toIntX
   val i2w = Word64.fromInt

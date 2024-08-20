@@ -21,10 +21,10 @@ RESULTS=$ROOT/results/$NOW.json
 
 rm -f $ROOT/mpl/bin/*.bin
 
-$ROOT/filter-exps.py $ROOT/spork-exp-hb.json $ROOT/filtered-exp-hb.json $ROOT/exps_to_run.txt
+$ROOT/filter-exps.py $ROOT/spork-exp-hb.json $ROOT/filtered-exp-hb.json
 
-$GEN $ROOT/filtered-exp-hb.json | taskset -c 0-72 $RUN --compile --output $RESULTS
+$GEN $ROOT/filtered-exp-hb.json | taskset -c 0-71 $RUN --compile --output $RESULTS
 
 echo "[INFO] wrote results to $RESULTS"
 
-$ROOT/results/report-shootout.py
+$ROOT/report-shootout.py

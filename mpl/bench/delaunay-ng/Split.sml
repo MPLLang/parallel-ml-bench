@@ -9,7 +9,7 @@ struct
   structure A = Array
   structure AS = ArraySlice
 
-  structure DS = DelayedSeq
+  structure DS = DelayedSeqNG
   type 'a dseq = 'a DS.t
   type 'a seq = 'a AS.slice
 

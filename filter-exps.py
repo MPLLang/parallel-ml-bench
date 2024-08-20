@@ -4,23 +4,27 @@ import sys
 import json
 
 def main():
-    if len(sys.argv) != 4:
-        print(f'{sys.argv[0]} input.json output.json exps_to_run.txt', file=sys.stderr)
+    if len(sys.argv) != 3:
+        print(f'{sys.argv[0]} input.json output.json', file=sys.stderr)
         exit(1)
 
     # parse args
     exp_infile = sys.argv[1]
     exp_outfile = sys.argv[2]
-    exps_to_run_file = sys.argv[3]
-
-    # Read newline-delimited list of experiments
-    with open(exps_to_run_file, 'r') as fh:
-        exps_to_keep = [exp for exp in [line.strip() for line in fh]
-                        if exp and not exp.startswith('#')]
 
     # read input json
     with open(exp_infile, 'r') as fh:
-        data = json.load(fh)
+        # Delete commented-out lines
+        lines = []
+        for line in fh:
+            line = line.rstrip('\n')
+            ci = line.find('//')
+            if ci != -1:
+                line = line[:ci]
+            lines.append(line)
+        data = json.loads('\n'.join(lines))
+
+    exps_to_keep = data['exps-to-run']
 
     # filter specs to only those in exps_to_keep
     data['specs'] = [spec for spec in data['specs']

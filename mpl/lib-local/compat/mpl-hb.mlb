@@ -9,10 +9,12 @@ local
   PARFOR.sig
   Parfor.$(PARFOR).sml
   ForkJoinNG.sml
+  SeqBasisNG.mpl.sml
   mpl-hb.sml
 in
   structure Grains
   structure ForkJoinNG
   structure Parfor
+  structure SeqBasisNG
   structure RuntimeStats
 end

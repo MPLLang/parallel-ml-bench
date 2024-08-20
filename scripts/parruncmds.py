@@ -20,6 +20,7 @@ def mk_randomstr(n=10):
     return ''.join(random.choice(alpha) for _ in range(n))
 
 NCPU = multiprocessing.cpu_count()
+MAX_COSCHEDULED_EXPS = NCPU // 6
 
 def getGitRoot():
   return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
@@ -92,7 +93,7 @@ def runcmds(TMPDIR, rows, timeout=600.0, silent=False):
         pool = []
         for i in range(row_idx, len(rows)):
             procs = int(rows_sorted_by_procs[i]['procs'])
-            if procs > len(aff):
+            if procs > len(aff) or len(pool) >= MAX_COSCHEDULED_EXPS:
                 row_idx = i
                 break
             if i == len(rows) - 1:

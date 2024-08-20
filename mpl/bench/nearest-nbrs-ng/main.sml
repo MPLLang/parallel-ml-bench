@@ -46,10 +46,10 @@ val input =
 fun nnEx() =
   let
     val (tree, tm) = Util.getTime (fn _ => NN.makeTree leafSize input)
-    val _ = print ("built quadtree in " ^ Time.fmt 4 tm ^ "s\n")
+    (* val _ = print ("built quadtree in " ^ Time.fmt 4 tm ^ "s\n") *)
 
     val (nbrs, tm) = Util.getTime (fn _ => NN.allNearestNeighbors tree)
-    val _ = print ("found all neighbors in " ^ Time.fmt 4 tm ^ "s\n")
+    (* val _ = print ("found all neighbors in " ^ Time.fmt 4 tm ^ "s\n") *)
   in
     (tree, nbrs)
   end

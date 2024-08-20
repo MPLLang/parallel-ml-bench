@@ -11,13 +11,9 @@ end
 (* structure ForkJoin = ForkJoin *)
 structure Parfor : PARFOR =
 struct
-  fun for (lo, hi) f =
-    if lo >= hi then () else (f lo; for (lo + 1, hi) f)
-
   fun reduce (lo, hi) z f merge =
-      if lo >= hi then z else reduce (lo + 1, hi) (merge (z, f lo)) f merge
+      if lo >= hi then z else reduce (lo + 1, hi) (f (lo, z)) f merge
 
-  val parfor = for
   val pareduce = reduce
 end
 

@@ -157,14 +157,14 @@ struct
           let
             val (nextFrontier, tm) = Util.getTime (fn _ => bottomUp frontier)
           in
-            print ("dense  " ^ Time.fmt 4 tm ^ "\n");
+            (* print ("dense  " ^ Time.fmt 4 tm ^ "\n"); *)
             search nextFrontier
           end
         else
           let
             val (nextFrontier, tm) = Util.getTime (fn _ => topDown frontier)
           in
-            print ("sparse " ^ Time.fmt 4 tm ^ "\n");
+            (* print ("sparse " ^ Time.fmt 4 tm ^ "\n"); *)
             search nextFrontier
           end
 

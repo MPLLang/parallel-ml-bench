@@ -1,6 +1,6 @@
 structure DelaunayTriangulation:
 sig
-  val triangulate: Geometry2D.point Seq.t -> int * Topology2D.mesh
+  val triangulate: Geometry2D.point SeqNG.t -> int * Topology2D.mesh
 end =
 struct
 
@@ -21,7 +21,7 @@ struct
   structure NN = NearestNeighborsNG
   structure A = Array
   structure AS = ArraySlice
-  structure DSeq = DelayedSeq
+  structure DSeq = DelayedSeqNG (* SeqNG *)
 
   structure Seq = SeqNG
   structure SeqBasis = SeqBasisNG

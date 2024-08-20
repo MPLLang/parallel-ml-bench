@@ -9,11 +9,13 @@ local
   PARFOR.sig (* doesn't get used; just have here for type checking *)
   Parfor.binsplit.sml (* doesn't get used; just have here for type checking *)
   ForkJoinNG.sml (* doesn't get used; just have here for type checking *)
+  SeqBasisNG.mpl.sml (* doesn't get used; just have here for type checking *)
   mpl.sml
 in
   structure ForkJoin
   structure Grains
   structure ForkJoinNG
   structure Parfor
+  structure SeqBasisNG
   structure RuntimeStats
 end
