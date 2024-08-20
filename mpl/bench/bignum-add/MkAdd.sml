@@ -19,7 +19,7 @@ struct
 
       fun propagate (a, b) =
         if b = 0w127 then a else b
-      val (carries, _) = Seq.scan propagate 0w0 sums
+      val (carries, _) = Seq.scan propagate 0w127 sums
 
       fun f (carry, sum) =
         Word8.andb (Word8.+ (Word8.>> (carry, 0w7), sum), 0wx7F)
