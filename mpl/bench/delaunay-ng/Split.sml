@@ -26,7 +26,7 @@ struct
       val countl = ForkJoin.alloc numBlocks
       val countr = ForkJoin.alloc numBlocks
 
-      val _ = ForkJoinNG.parfor (0, numBlocks) (fn b =>
+      val _ = SeqBasisNG.parfor (0, numBlocks) (fn b =>
         let
           val lo = b * blockSize
           val hi = Int.min (lo + blockSize, n)
@@ -50,7 +50,7 @@ struct
       val left = ForkJoin.alloc totl
       val right = ForkJoin.alloc totr
 
-      val _ = ForkJoinNG.parfor (0, numBlocks) (fn b =>
+      val _ = SeqBasisNG.parfor (0, numBlocks) (fn b =>
         let
           val lo = b * blockSize
           val hi = Int.min (lo + blockSize, n)

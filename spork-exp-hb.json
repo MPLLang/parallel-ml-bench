@@ -7,13 +7,13 @@
       //"mlton"
     ],
     "grain": [
-      "one",
-      "manual"
+      "one"
+      //"manual"
     ],
     "split": [
-      "2way",
-      "3way",
-      "inl"
+      //"2way",
+      "3way"
+      //"inl"
       //"alt",
       //"sam",
       //"simple"
@@ -92,19 +92,19 @@
 
   "exps-to-run": [
     "wc",
-    //"sparse-mxv-csr",
-    "primes"
-    //"linefit",
-    //"grep",
-    //"bfs",
-    //"bignum-add",
-    //"delaunay",
-    //"mandelbrot",
-    //"msort",
-    //"nearest-nbrs",
-    //"suffix-array",
-    //"triangle-count",
-    //"nqueens"
+    "sparse-mxv-csr",
+    "primes",
+    "linefit",
+    "grep",
+    "bfs",
+    "bignum-add",
+    "delaunay",
+    "mandelbrot",
+    "msort",
+    "nearest-nbrs",
+    "suffix-array",
+    "triangle-count",
+    "nqueens"
   ],
   
   "specs": [

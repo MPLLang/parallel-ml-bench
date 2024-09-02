@@ -56,7 +56,7 @@ struct
       val result = ForkJoin.alloc (n+1)
 
       val _ =
-        ForkJoinNG.parfor (0, numBlocks) (fn blockIdx =>
+        SeqBasisNG.parfor (0, numBlocks) (fn blockIdx =>
           let
             val lo = blockIdx * blockSize
             val hi = Int.min (lo + blockSize, n)

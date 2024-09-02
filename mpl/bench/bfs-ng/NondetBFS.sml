@@ -103,7 +103,7 @@ struct
             ~1 = Concurrency.casArray (parent, u) (~1, v)
 
           fun visitNeighbors offset v nghs =
-            ForkJoinNG.parfor (0, Seq.length nghs) (fn i =>
+            SeqBasisNG.parfor (0, Seq.length nghs) (fn i =>
               let val u = Seq.nth nghs i
               in if not (claim (vtoi u, vtoi v))
                  then upd (outNbrs, offset + i, itov (~1))
@@ -144,7 +144,7 @@ struct
            * significantly better granularity control for graphs that have a
            * small number of vertices with huge degree. *)
 
-          val _ = ForkJoinNG.parfor (0, nf) (fn i =>
+          val _ = SeqBasisNG.parfor (0, nf) (fn i =>
             let
               val v = Seq.nth frontier i
             in

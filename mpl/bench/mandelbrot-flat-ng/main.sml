@@ -89,8 +89,8 @@ fun mandelbrot () =
     val numBytesPerRow = Util.ceilDiv w 8
     val data = ForkJoin.alloc (numBytesPerRow * h)
   in
-    ForkJoinNG.parfor (0, h) (fn y =>
-      ForkJoinNG.parfor (0, numBytesPerRow) (fn b =>
+    SeqBasisNG.parfor (0, h) (fn y =>
+      SeqBasisNG.parfor (0, numBytesPerRow) (fn b =>
         let
           val xlo = b * 8
           val xhi = Int.min (xlo + 8, w)

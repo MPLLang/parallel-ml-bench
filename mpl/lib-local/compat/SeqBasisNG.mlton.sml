@@ -8,6 +8,8 @@ sig
 
   val reduce: ('a * 'a -> 'a) -> 'a -> (int * int) -> (int -> 'a) -> 'a
 
+  val parfor: (int * int) -> (int -> unit) -> unit
+
   val scan: ('a * 'a -> 'a)
             -> 'a
             -> (int * int)
@@ -83,26 +85,24 @@ struct
       end
 
   fun filter (lo: int, hi: int) (f: int -> 'a) (g: int -> bool): 'a array =
-    let val n = hi - lo
-        val counts = reduce' 0 (0, n) (fn (i, c) => if g i then c + 1 else c)
+    let val counts = reduce' 0 (lo, hi) (fn (i, c) => if g i then c + 1 else c)
         val result = allocate counts
         fun store (i, c) =
             if g i then (upd result c (f i); c + 1) else c
-        val _ = reduce' 0 (0, n) store
+        val _ = reduce' 0 (lo, hi) store
     in
       result
     end
 
   fun tabFilter (lo: int, hi: int) (f: int -> 'a option): 'a array =
-    let val n = hi - lo
-        fun count (i, c) = if Option.isSome (f i) then c + 1 else c
-        val counts = reduce' 0 (0, n) count
+    let fun count (i, c) = if Option.isSome (f i) then c + 1 else c
+        val counts = reduce' 0 (lo, hi) count
         val result = allocate counts
         fun store (i, c) =
             case f i of
                 NONE => c
               | SOME b => (upd result c b; c + 1)
-        val _ = reduce' 0 (0, n) store
+        val _ = reduce' 0 (lo, hi) store
     in
       result
     end

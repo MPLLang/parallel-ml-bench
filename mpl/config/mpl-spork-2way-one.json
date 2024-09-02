@@ -7,5 +7,5 @@
     "-mlb-path-var", "GRAINS one",
     "-mlb-path-var", "PARFOR binsplit"
   ],
-  "compat": "mpl-hb"
+  "compat": "mpl-spork"
 }

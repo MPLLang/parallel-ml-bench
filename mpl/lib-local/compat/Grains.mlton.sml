@@ -9,7 +9,7 @@ end =
 struct
   type grain = int
 
-  val maxInt = Option.getOpt (Int.maxInt, 2147483648)
+  val maxInt = Option.getOpt (Int.maxInt, 2147483647)
 
   val parfor = CommandLineArgs.parseInt "parfor-grain" maxInt
   val block = CommandLineArgs.parseInt "block-grain" maxInt

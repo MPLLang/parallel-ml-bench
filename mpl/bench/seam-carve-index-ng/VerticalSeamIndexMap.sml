@@ -52,7 +52,7 @@ struct
 
   fun carve ({displacement, domain=(d as ref (h, w)), range=(_, w0)}: t) seam =
     ( d := (h, w-1)
-    ; ForkJoinNG.parfor (0, h) (fn i =>
+    ; SeqBasisNG.parfor (0, h) (fn i =>
         let
           val s = Seq.nth seam i
         in

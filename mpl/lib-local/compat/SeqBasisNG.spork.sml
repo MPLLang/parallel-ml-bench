@@ -8,6 +8,8 @@ sig
 
   val reduce: ('a * 'a -> 'a) -> 'a -> (int * int) -> (int -> 'a) -> 'a
 
+  val parfor: (int * int) -> (int -> unit) -> unit
+
   val scan: ('a * 'a -> 'a)
             -> 'a
             -> (int * int)
@@ -28,17 +30,12 @@ struct
   structure A = Array
   structure AS = ArraySlice
 
-  (*
-  fun upd a i x = Unsafe.Array.update (a, i, x)
-  fun nth a i   = Unsafe.Array.sub (a, i)
-  *)
-
   fun upd a i x = A.update (a, i, x)
   fun nth a i = A.sub (a, i)
 
-  fun parfor (i: int, j: int) (f: int -> unit) =
+  fun __inline_always__ parfor (i: int, j: int) (f: int -> unit) =
       Parfor.pareduce (i, j) () (fn (i, ()) => f i) (fn ((), ()) => ())
-  val par = ForkJoin.par
+  fun __inline_always__ par (f, g) = ForkJoin.par (f, g)
   val allocate = ForkJoin.alloc
 
 
@@ -71,33 +68,8 @@ struct
       end
 
 
-  (* val w2i = Word64.toIntX *)
-  (* val i2w = Word64.fromInt *)
-
-
-  fun reduce g b (lo, hi) f =
+  fun __inline_always__ reduce g b (lo, hi) f =
     Parfor.pareduce (lo, hi) b (fn (i, a) => g (a, f i)) g
-    (* let *)
-    (*   val grain = Grains.parfor *)
-    (*   val wgrain = i2w grain *)
-
-    (*   fun loopCheck lo hi = *)
-    (*     if hi - lo <= wgrain then foldl g (f (w2i lo)) (1 + w2i lo, w2i hi) f *)
-    (*     else loopSplit lo hi *)
-
-    (*   and loopSplit lo hi = *)
-    (*     let *)
-    (*       val half = Word64.>> (hi - lo, 0w1) *)
-    (*       val mid = lo + half *)
-    (*     in *)
-    (*       g (ForkJoin.par (fn _ => loopCheck lo mid, fn _ => loopCheck mid hi)) *)
-    (*     end *)
-    (* in *)
-    (*   if hi - lo <= 0 then b *)
-    (*   else if hi - lo <= grain then foldl g (f lo) (lo + 1, hi) f *)
-    (*   else loopSplit (i2w lo) (i2w hi) *)
-    (* end *)
-
 
   fun scan g b (lo, hi) (f: int -> 'a) =
     if hi - lo <= Grains.block then

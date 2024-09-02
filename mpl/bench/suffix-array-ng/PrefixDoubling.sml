@@ -44,7 +44,7 @@ struct
   end
 
   fun appG f s =
-    ForkJoinNG.parfor (0, AS.length s) (fn i => f (AS.nth s i))
+    SeqBasisNG.parfor (0, AS.length s) (fn i => f (AS.nth s i))
 
   fun initCountingSort str =
     let
@@ -72,7 +72,7 @@ struct
         end
 
       fun updateGroupNum (off, len) =
-        ForkJoinNG.parfor (off, off + len) (fn j =>
+        SeqBasisNG.parfor (off, off + len) (fn j =>
           AS.ASupdate (groupNum, AS.nth sa j, off))
 
       val groups = AS.tabulate (makeGroup offsets n) numGroups
@@ -115,7 +115,7 @@ struct
       val offsets = AS.scanIncl Int.max 0 (AS.tabulate f n)
       val maxOffset = AS.nth offsets (n - 1)
       val groups = AS.tabulate (fn i => (0, 0)) n
-      val () = ForkJoinNG.parfor (1, n) (fn i =>
+      val () = SeqBasisNG.parfor (1, n) (fn i =>
         let
           val off1 = AS.nth offsets (i - 1)
           val off2 = AS.nth offsets i
@@ -198,7 +198,7 @@ struct
                 val names = AS.scanIncl Int.max 0 (AS.tabulate f len)
                 val maxName = AS.nth names (len - 1)
               in
-                ( ForkJoinNG.parfor (1, len) (fn i =>
+                ( SeqBasisNG.parfor (1, len) (fn i =>
                     (let
                        val name = AS.nth names i
                        val name' = AS.nth names (i - 1)
@@ -238,13 +238,13 @@ struct
 
             (* Its faster to copy all of the ranks instead of just those in
                active groups *)
-            val () = ForkJoinNG.parfor (0, n) (fn i =>
+            val () = SeqBasisNG.parfor (0, n) (fn i =>
               let val x = if i + k >= n then ~1 else AS.nth groupNum (i + k)
               in AS.ASupdate (ranks, i, x)
               end)
 
             val newGroups = AS.take aux maxGroups
-            val () = ForkJoinNG.parfor (0, AS.length activeGroups) (fn i =>
+            val () = SeqBasisNG.parfor (0, AS.length activeGroups) (fn i =>
               let
                 val group = AS.nth activeGroups i
                 val start = AS.nth groupStarts i

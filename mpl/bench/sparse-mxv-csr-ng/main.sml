@@ -1,6 +1,6 @@
 structure CLA = CommandLineArgs
 structure Seq = SeqNG
-structure DS = OldDelayedSeqNG
+structure DS = DelayedSeqNG
 structure G = AdjacencyGraph(Int)
 
 structure M = SparseMxV

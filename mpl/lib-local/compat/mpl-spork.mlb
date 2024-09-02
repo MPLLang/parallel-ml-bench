@@ -1,0 +1,20 @@
+../../lib/github.com/mpllang/mpllib/sources.mpl.mlb
+
+local
+  $(SML_LIB)/basis/basis.mlb
+  $(SML_LIB)/basis/mlton.mlb
+  $(SML_LIB)/basis/mpl.mlb
+  $(SML_LIB)/basis/fork-join.mlb
+  Grains.$(GRAINS).sml
+  PARFOR.sig
+  Parfor.$(PARFOR).sml
+  ForkJoinNG.sml
+  SeqBasisNG.spork.sml
+  mpl-hb.sml
+in
+  structure Grains
+  structure ForkJoinNG
+  structure Parfor
+  structure SeqBasisNG
+  structure RuntimeStats
+end

@@ -19,25 +19,25 @@ struct
       fun isSpace a =
         (a = #"\n" orelse a = #"\t" orelse a = #" ")
       (*val isSpace = Char.isSpace*)
-      fun f i =
-        let
-          val si = nth i
-          val wordStart =
-            if (i = 0 orelse isSpace (nth (i - 1))) andalso not (isSpace si) then
-              1
-            else
-              0
-          val lineBreak = if si = #"\n" then 1 else 0
-        in
-          (lineBreak, wordStart)
-        end
+        
       (* val x = Seq.tabulate f (ASeq.length seq)
       val (lines, words) =
         Seq.reduce (fn ((lb1, ws1), (lb2, ws2)) => (lb1 + lb2, ws1 + ws2)) (0, 0) x *)
       val (lines, words) =
         SeqBasisNG.reduce
           (fn ((lb1, ws1), (lb2, ws2)) => (lb1 + lb2, ws1 + ws2)) (0, 0)
-          (0, n) f
+          (0, n)
+          (fn i => let
+             val si = nth i
+             val wordStart =
+                 if (i = 0 orelse isSpace (nth (i - 1))) andalso not (isSpace si) then
+                   1
+                 else
+                   0
+             val lineBreak = if si = #"\n" then 1 else 0
+           in
+             (lineBreak, wordStart)
+           end)
     in
       (lines, words, n)
     end

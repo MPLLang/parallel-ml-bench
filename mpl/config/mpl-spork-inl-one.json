@@ -4,8 +4,8 @@
     "-disable-pass", "splitTypes1",
     "-disable-pass", "splitTypes2",
     "-detect-entanglement", "true",
-    "-mlb-path-var", "GRAINS small",
-    "-mlb-path-var", "PARFOR alt"
+    "-mlb-path-var", "GRAINS one",
+    "-mlb-path-var", "PARFOR inlineable"
   ],
-  "compat": "mpl-hb"
+  "compat": "mpl-spork"
 }

@@ -21,7 +21,7 @@ val _ = print ("n " ^ Int.toString n ^ "\n")
 val _ = print ("fn-cost " ^ fnCost ^ "\n")
 
 fun modify f s =
-  ForkJoinNG.parfor (0, Seq.length s) (fn i =>
+  SeqBasisNG.parfor (0, Seq.length s) (fn i =>
     ArraySlice.update (s, i, f (i, Seq.nth s i)))
 
 fun iteratedHash k x =

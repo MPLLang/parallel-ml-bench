@@ -43,8 +43,11 @@ def renameTag(row):
     return t
 
 def std(tms):
-  avg = sum(tms) / len(tms)
-  return (sum((x - avg)**2 for x in tms) / (len(tms) - 1)) ** 0.5
+  if len(tms) < 2:
+    return 0.0
+  else:
+    avg = sum(tms) / len(tms)
+    return (sum((x - avg)**2 for x in tms) / (len(tms) - 1)) ** 0.5
 
 def parseStats(row):
     newRow = copy.deepcopy(row)

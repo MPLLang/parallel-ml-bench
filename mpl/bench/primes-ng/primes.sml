@@ -23,17 +23,17 @@ fun primes n =
 
     (* val _ = print ("initial mark flags " ^ Int.toString n ^ "\n") *)
     (* initially, mark every number *)
-    val _ = ForkJoinNG.parfor (0, n+1) mark
+    val _ = SeqBasisNG.parfor (0, n+1) mark
 
     (* val _ = print ("unmark multiples " ^ Int.toString n ^ "\n") *)
     (* unmark every multiple of every prime in sqrtPrimes *)
     val _ =
-      ForkJoinNG.parfor (0, Array.length sqrtPrimes) (fn i =>
+      SeqBasisNG.parfor (0, Array.length sqrtPrimes) (fn i =>
         let
           val p = Array.sub (sqrtPrimes, i)
           val numMultiples = n div p - 1
         in
-          ForkJoinNG.parfor (0, numMultiples) (fn j => unmark ((j+2) * p))
+          SeqBasisNG.parfor (0, numMultiples) (fn j => unmark ((j+2) * p))
         end)
       
     (* val _ = print ("filter " ^ Int.toString n ^ "\n") *)

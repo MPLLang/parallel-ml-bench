@@ -52,7 +52,7 @@ struct
             val lo = Int.max (0, jMid-blockHeight+k)
             val hi = Int.min (width, jMid+blockHeight-k)
           in
-            (*Util.for*) ForkJoinNG.parfor (lo, hi) (fn j => setM (i+k, j))
+            (*Util.for*) SeqBasisNG.parfor (lo, hi) (fn j => setM (i+k, j))
           end)
 
       fun lowerTriangle i jMid =
@@ -61,13 +61,13 @@ struct
             val lo = Int.max (0, jMid-k-1)
             val hi = Int.min (width, jMid+k+1)
           in
-            (*Util.for*) ForkJoinNG.parfor (lo, hi) (fn j => setM (i+k, j))
+            (*Util.for*) SeqBasisNG.parfor (lo, hi) (fn j => setM (i+k, j))
           end)
 
       fun setStripStartingAt i =
-        ( ForkJoinNG.parfor (0, numBlocks) (fn b =>
+        ( SeqBasisNG.parfor (0, numBlocks) (fn b =>
             upperTriangle i (b * blockWidth + blockHeight))
-        ; ForkJoinNG.parfor (0, numBlocks+1) (fn b =>
+        ; SeqBasisNG.parfor (0, numBlocks+1) (fn b =>
             lowerTriangle (i+1) (b * blockWidth))
         )
 
@@ -154,7 +154,7 @@ struct
        *)
 
       val X = ForkJoin.alloc N
-      val _ = ForkJoinNG.parfor (0, N) (fn i => Array.update (X, i, ~1))
+      val _ = SeqBasisNG.parfor (0, N) (fn i => Array.update (X, i, ~1))
       fun setX (i, j) x = Array.update (X, i*(#width image) + j, x)
 
       val idx = VSIM.new (#height image, #width image)
