@@ -13,11 +13,8 @@ ROOT=$(git rev-parse --show-toplevel)
 GEN=$ROOT/scripts/gencmds
 RUN=$ROOT/scripts/parruncmds.py
 
-# NOW=$(date '+%y%m%d-%H%M%S')
-NOW=$1
-# NOW="230217-050444"
 mkdir -p $ROOT/results
-RESULTS=$ROOT/results/$NOW.json
+RESULTS=$ROOT/results/$1.json
 
 rm -f $ROOT/mpl/bin/*.bin
 

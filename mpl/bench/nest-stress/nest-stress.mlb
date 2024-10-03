@@ -1,2 +1,4 @@
 ../../lib.mlb
+../../../../mpl/basis-library/mlton/random.sig
+../../../../mpl/basis-library/mlton/random.sml
 main.sml

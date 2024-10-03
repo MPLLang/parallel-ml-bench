@@ -15,11 +15,6 @@ sig
             -> (int * int)
             -> (int -> 'a)
             -> 'a array (* length N+1, for both inclusive and exclusive scan *)
-  (*val scan2: ('a * 'a -> 'a)
-            -> 'a
-            -> (int * int)
-            -> (int -> 'a)
-            -> 'a array*) (* length N+1, for both inclusive and exclusive scan *)
 
   val filter: (int * int) -> (int -> 'a) -> (int -> bool) -> 'a array
 
@@ -108,67 +103,6 @@ struct
         upd result n (nth partials m);
         result
       end
-
-  (*fun scan2 (add: 'a * 'a -> 'a) (b: 'a) (i: int , j: int) (f: int -> 'a) =
-      let type ('a, 'b) scandata = {sum: 'a, size: int, shape: 'b}
-          datatype 'a tree = leaf | node of ('a, 'a tree) scandata * ('a, 'a tree) scandata
-          type 'a xtree = ('a, 'a tree) scandata
-
-          fun upsweep' () =
-              let fun init (i: int) =
-                      {sum = f i, size = 1, shape = leaf}
-                  fun step (i: int, t: 'a xtree) =
-                      (* shape of t is leaf *)
-                      {sum = add (#sum t, f i), size = #size t + 1, shape = leaf}
-                  fun merge (t1: 'a xtree, t2: 'a xtree) =
-                      {sum = add (#sum t1, #sum t2),
-                       size = #size t1 + #size t2,
-                       shape = node (t1, t2)}
-              in
-                ForkJoin.pareduceInitStepMerge 100 (* Grains.parfor *) (i, j) init step merge
-              end
-
-          fun upsweep () =
-              let fun step (i: int, t: 'a xtree) =
-                      {sum = add (#sum t, f i), size = #size t + 1, shape = leaf}
-                  fun merge (t1: 'a xtree, t2: 'a xtree) =
-                      {sum = add (#sum t1, #sum t2),
-                       size = #size t1 + #size t2,
-                       shape = node (t1, t2)}
-                  val base = {sum = b, size = 0, shape = leaf}
-              in
-                ForkJoin.pareduce 100 (* Grains.parfor *) (i, j) base step merge
-              end
-
-          fun downsweep (up: 'a xtree): 'a array =
-              let val result = allocate (j - i + 1)
-                  fun flat (acc: 'a) (i: int, j: int) =
-                      if i >= j then
-                        ()
-                      else
-                        (Array.update (result, i, acc);
-                         flat (add (acc, f i)) (i + 1, j))
-                  fun sweep (acc: 'a) (offset: int) (t: 'a xtree) =
-                      case #shape t of
-                          leaf => flat acc (offset, offset + #size t)
-                        | node (t1, t2) =>
-                          (par (fn () => sweep acc offset t1,
-                                fn () => sweep (add (acc, #sum t1)) (offset + #size t1) t2)
-                          ; ())
-              in
-                Array.update (result, j - i, #sum up);
-                sweep b 0 up;
-                result
-              end
-          val t0 = Time.now ()
-          val up = upsweep ()
-          val t1 = Time.now ()
-          val down = downsweep up
-          val t2 = Time.now ()
-      in
-        print ("t1 = " ^ Time.fmt 4 (Time.- (t1, t0)) ^ ", t2 = " ^ Time.fmt 4 (Time.- (t2, t1)) ^ "\n");
-        down
-      end*)
 
   fun filter (lo, hi) f g =
     let

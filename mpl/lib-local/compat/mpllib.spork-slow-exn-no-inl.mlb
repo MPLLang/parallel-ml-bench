@@ -1,0 +1,82 @@
+$(SML_LIB)/basis/basis.mlb
+
+local
+  $(SML_LIB)/basis/basis.mlb
+  $(SML_LIB)/basis/mlton.mlb
+  $(SML_LIB)/basis/mpl.mlb
+  $(SML_LIB)/basis/fork-join-slow-exn-no-inl.mlb
+
+  local
+    $(SML_LIB)/basis/build/sources.mlb
+  in
+    structure VectorExtra = Vector
+  end
+  ../../lib/github.com/mpllang/mpllib/compat/PosixWriteFile.sml
+  ../../lib/github.com/mpllang/mpllib/compat/mpl.sml
+in
+  structure ForkJoin
+  structure Concurrency
+  structure ReadFile
+  structure WriteFile
+  structure GCStats
+  structure MLton
+  structure VectorExtra
+end
+
+../../lib/github.com/mpllang/mpllib/CommandLineArgs.sml
+../../lib/github.com/mpllang/mpllib/Util.sml
+../../lib/github.com/mpllang/mpllib/SeqBasis.sml
+../../lib/github.com/mpllang/mpllib/SEQUENCE.sml
+local
+  ../../lib/github.com/mpllang/mpllib/ArraySequence.sml
+in
+  structure Seq = ArraySequence
+  structure ArraySequence
+end
+
+../../lib/github.com/mpllang/mpllib/OffsetSearch.sml
+../../lib/github.com/mpllang/mpllib/STREAM.sml
+../../lib/github.com/mpllang/mpllib/DelayedStream.sml
+../../lib/github.com/mpllang/mpllib/RecursiveStream.sml
+../../lib/github.com/mpllang/mpllib/DelayedSeq.sml
+../../lib/github.com/mpllang/mpllib/OldDelayedSeq.sml
+../../lib/github.com/mpllang/mpllib/FuncSequence.sml
+../../lib/github.com/mpllang/mpllib/BinarySearch.sml
+../../lib/github.com/mpllang/mpllib/Merge.sml
+../../lib/github.com/mpllang/mpllib/StableMerge.sml
+../../lib/github.com/mpllang/mpllib/DoubleBinarySearch.sml
+../../lib/github.com/mpllang/mpllib/StableMergeLowSpan.sml
+../../lib/github.com/mpllang/mpllib/StableSort.sml
+../../lib/github.com/mpllang/mpllib/Quicksort.sml
+../../lib/github.com/mpllang/mpllib/Mergesort.sml
+../../lib/github.com/mpllang/mpllib/TreeMatrix.sml
+../../lib/github.com/mpllang/mpllib/AugMap.sml
+../../lib/github.com/mpllang/mpllib/PureSeq.sml
+../../lib/github.com/mpllang/mpllib/SampleSort.sml
+../../lib/github.com/mpllang/mpllib/CountingSort.sml
+../../lib/github.com/mpllang/mpllib/RadixSort.sml
+../../lib/github.com/mpllang/mpllib/Shuffle.sml
+../../lib/github.com/mpllang/mpllib/Tokenize.sml
+../../lib/github.com/mpllang/mpllib/FindFirst.sml
+../../lib/github.com/mpllang/mpllib/Parse.sml
+../../lib/github.com/mpllang/mpllib/ParseFile.sml
+../../lib/github.com/mpllang/mpllib/AdjacencyGraph.sml
+../../lib/github.com/mpllang/mpllib/AdjacencyInt.sml
+../../lib/github.com/mpllang/mpllib/CheckSort.sml
+../../lib/github.com/mpllang/mpllib/Geometry3D.sml
+../../lib/github.com/mpllang/mpllib/Geometry2D.sml
+../../lib/github.com/mpllang/mpllib/Topology2D.sml
+../../lib/github.com/mpllang/mpllib/NearestNeighbors.sml
+../../lib/github.com/mpllang/mpllib/Color.sml
+../../lib/github.com/mpllang/mpllib/PPM.sml
+../../lib/github.com/mpllang/mpllib/ExtraBinIO.sml
+../../lib/github.com/mpllang/mpllib/GIF.sml
+../../lib/github.com/mpllang/mpllib/NewWaveIO.sml
+../../lib/github.com/mpllang/mpllib/Signal.sml
+../../lib/github.com/mpllang/mpllib/MeshToImage.sml
+../../lib/github.com/mpllang/mpllib/MkGrep.sml
+../../lib/github.com/mpllang/mpllib/Hashset.sml
+../../lib/github.com/mpllang/mpllib/Hashtable.sml
+../../lib/github.com/mpllang/mpllib/ParFuncArray.sml
+../../lib/github.com/mpllang/mpllib/ChunkedTreap.sml
+../../lib/github.com/mpllang/mpllib/Benchmark.sml

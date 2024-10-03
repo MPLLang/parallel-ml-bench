@@ -1,67 +1,76 @@
-structure CLA = CommandLineArgs
+(* structure CLA = CommandLineArgs *)
 
-val dimsize = CLA.parseInt "dimsize" 10
+(* val dimsize = CLA.parseInt "dimsize" 10 *)
 
-fun get xs acc =
-   case xs of
-       [] => Word.fromInt acc
-     | (x :: xs) => get xs (Util.hash (x + acc))
+(* fun get xs acc = *)
+(*    case xs of *)
+(*        [] => Word.fromInt acc *)
+(*      | (x :: xs) => get xs (Util.hash (x + acc)) *)
+
+(* fun __inline_always__ dosomething (b: 'a) = *)
+(*     (MLtonRandom.srand (Option.getOpt (MLtonRandom.seed (), 0w13425)); *)
+(*      let val w = MLtonRandom.rand () *)
+(*          val cell = ref (raise Fail "some exception"): 'a ref *)
+(*          val _ = if Word.mod (w, 0w2) = 0w0 then *)
+(*                    cell := b *)
+(*                  else *)
+(*                    raise Fail "another exception" *)
+(*      in *)
+(*        !cell *)
+(*      end) *)
+
+(* val (a, b) = dosomething (0w0, 0w1) *)
+(* val c = dosomething 0w2 *)
+(* val _ = print ("Result is " ^ Word.toString a ^ ", " ^ Word.toString b ^ ", " ^ Word.toString c ^ "\n") *)
 
 fun bench () =
-    (*let val (((a, b), (c, d)), ((e, f), (g, h))) =
-            ForkJoin.par (fn () => ForkJoin.par (fn () => ForkJoin.par (fn () => 0w0, fn () => 0w1),
-                                                 fn () => ForkJoin.par (fn () => 0w2, fn () => 0w3)),
-                          fn () => ForkJoin.par (fn () => ForkJoin.par (fn () => 0w4, fn () => 0w5),
-                                                 fn () => ForkJoin.par (fn () => 0w6, fn () => 0w7)))
-    in
-      a + b + c + d + e + f + g + h 
-    end*)
-    SeqBasisNG.reduce
-      op+ 0w0 (0, dimsize)
-      (fn f =>
-          SeqBasisNG.reduce
-            op+ 0w0 (0, dimsize)
-            (fn g =>
-                SeqBasisNG.reduce
-                  op+ 0w0 (0, dimsize)
-                  (fn h =>
-                      Word.mod (get [f, g, h] 0, 0w2)
-                  )
-            )
-      )
-    (* SeqBasisNG.reduce *)
-    (*   op+ 0w0 (0, dimsize) *)
-    (*   (fn a => *)
-    (*       SeqBasisNG.reduce *)
-    (*         op+ 0w0 (0, dimsize) *)
-    (*         (fn b => *)
-    (*             SeqBasisNG.reduce *)
-    (*               op+ 0w0 (0, dimsize) *)
-    (*               (fn c => *)
-    (*                   SeqBasisNG.reduce *)
-    (*                     op+ 0w0 (0, dimsize) *)
-    (*                     (fn d => *)
-    (*                         SeqBasisNG.reduce *)
-    (*                           op+ 0w0 (0, dimsize) *)
-    (*                           (fn e => *)
-    (*                               SeqBasisNG.reduce *)
-    (*                                 op+ 0w0 (0, dimsize) *)
-    (*                                 (fn f => *)
-    (*                                     SeqBasisNG.reduce *)
-    (*                                       op+ 0w0 (0, dimsize) *)
-    (*                                       (fn g => *)
-    (*                                           SeqBasisNG.reduce *)
-    (*                                             op+ 0w0 (0, dimsize) *)
-    (*                                             (fn h => *)
-    (*                                                 Word.mod (get [a, b, c, d, e, f, g, h] 0, 0w2) *)
-    (*                                             ) *)
-    (*                                       ) *)
-    (*                                 ) *)
-    (*                           ) *)
-    (*                     ) *)
-    (*               ) *)
-    (*         ) *)
-    (*   ) *)
+    (*let val (((a, b), (c, d)), ((e, f), (g, h))) = *)
+(*             ForkJoin.par (fn () => ForkJoin.par (fn () => ForkJoin.par (fn () => 0w0, fn () => 0w1), *)
+(*                                                  fn () => ForkJoin.par (fn () => 0w2, fn () => 0w3)), *)
+(*                           fn () => ForkJoin.par (fn () => ForkJoin.par (fn () => 0w4, fn () => 0w5), *)
+(*                                                  fn () => ForkJoin.par (fn () => 0w6, fn () => 0w7))) *)
+(*     in *)
+(*       a + b + c + d + e + f + g + h  *)
+(*     end*)
+    (* let fun f2 y = (Word.fromInt y; ()) *)
+    (*     fun f1 x = (SeqBasisNG.parfor (0, x) f2) in *)
+    (MLtonRandom.srand (Option.getOpt (MLtonRandom.seed (), 0w13425));
+     op+ (ForkJoin.par (fn () => let val w = MLtonRandom.rand () in if Word.mod (w, 0w2) = 0w0 then raise Fail "body branch" else w end,
+                        fn () => 0w12)))
+    (* SeqBasisNG.reduce op+ 0w0 (0, dimsize) (fn a => SeqBasisNG.reduce op+ 0w0 (0, dimsize) (fn b => SeqBasisNG.reduce op+ 0w0 (0, dimsize) (fn c => Word.mod (get [a, b, c] 0, 0w2)))) *)
+    (*SeqBasisNG.reduce *)
+(*       op+ 0w0 (0, dimsize) *)
+(*       (fn a => *)
+(*           SeqBasisNG.reduce *)
+(*             op+ 0w0 (0, dimsize) *)
+(*             (fn b => *)
+(*                 SeqBasisNG.reduce *)
+(*                   op+ 0w0 (0, dimsize) *)
+(*                   (fn c => *)
+(*                       SeqBasisNG.reduce *)
+(*                         op+ 0w0 (0, dimsize) *)
+(*                         (fn d => *)
+(*                             SeqBasisNG.reduce *)
+(*                               op+ 0w0 (0, dimsize) *)
+(*                               (fn e => *)
+(*                                   SeqBasisNG.reduce *)
+(*                                     op+ 0w0 (0, dimsize) *)
+(*                                     (fn f => *)
+(*                                         SeqBasisNG.reduce *)
+(*                                           op+ 0w0 (0, dimsize) *)
+(*                                           (fn g => *)
+(*                                               SeqBasisNG.reduce *)
+(*                                                 op+ 0w0 (0, dimsize) *)
+(*                                                 (fn h => *)
+(*                                                     Word.mod (get [a, b, c, d, e, f, g, h] 0, 0w2) *)
+(*                                                 ) *)
+(*                                           ) *)
+(*                                     ) *)
+(*                               ) *)
+(*                         ) *)
+(*                   ) *)
+(*             ) *)
+(*       )*)
 
 val result = Benchmark.run "nest-stress" bench
 val _ = print ("result " ^ Word.toString result ^ "\n")

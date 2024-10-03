@@ -1,15 +1,20 @@
-../../lib/github.com/mpllang/mpllib/sources.mpl.mlb
+mpllib.spork-slow-exn.mlb
 
 local
   $(SML_LIB)/basis/basis.mlb
   $(SML_LIB)/basis/mlton.mlb
   $(SML_LIB)/basis/mpl.mlb
-  $(SML_LIB)/basis/fork-join.mlb
+  $(SML_LIB)/basis/fork-join-slow-exn.mlb
   Grains.$(GRAINS).sml
+  PARFOR.sig
+  Parfor.$(PARFOR).sml
   ForkJoinNG.sml
-  mpl-hb-eager.sml
+  SeqBasisNG.spork.sml
+  mpl-hb.sml
 in
   structure Grains
   structure ForkJoinNG
+  structure Parfor
+  structure SeqBasisNG
   structure RuntimeStats
 end

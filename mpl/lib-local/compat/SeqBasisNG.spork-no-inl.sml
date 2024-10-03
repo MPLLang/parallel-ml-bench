@@ -28,9 +28,9 @@ struct
   fun upd a i x = A.update (a, i, x)
   fun nth a i = A.sub (a, i)
 
-  fun __inline_always__ parfor (i: int, j: int) (f: int -> unit) =
-      Parfor.pareduce (i, j) () (fn __inline_always__ (i, ()) => __inline_always__ f i) (fn ((), ()) => ())
-  fun __inline_always__ par (f, g) = ForkJoin.par (f, g)
+  fun parfor (i: int, j: int) (f: int -> unit) =
+      Parfor.pareduce (i, j) () (fn (i, ()) => f i) (fn ((), ()) => ())
+  fun par (f, g) = ForkJoin.par (f, g)
   val allocate = ForkJoin.alloc
 
 
@@ -63,8 +63,8 @@ struct
       end
 
 
-  fun __inline_always__ reduce g b (lo, hi) f =
-      let fun __inline_always__ reduceFn (i, a) = __inline_always__ g (a, __inline_always__ f i) in
+  fun reduce g b (lo, hi) f =
+      let fun reduceFn (i, a) = g (a, f i) in
         Parfor.pareduce (lo, hi) b reduceFn g
       end
 

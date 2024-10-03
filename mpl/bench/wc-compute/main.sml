@@ -10,12 +10,13 @@ val source =
     (*Seq.tabulate (fn _ => #" ") n*)
     (n, fn i => Char.chr (Util.hash i mod 255))
   else
-    let
+    (*let
       val (source, tm) = Util.getTime (fn _ => ReadFile.contentsSeq filePath)
       val _ = print ("loadtime " ^ Time.fmt 3 tm ^ "\n")
     in
       (Seq.length source, Seq.nth source)
-    end
+    end*)
+    (n, fn i => Char.chr (Util.hash i mod 255))
 
 fun task () =
   WC.wc source

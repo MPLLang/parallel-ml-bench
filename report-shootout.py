@@ -12,6 +12,29 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
+def renameConfig(config):
+    m = {
+        'mpl-spork-simple-one': 'spork-simple',
+        'mpl-spork-sam-one': 'spork-sam',
+        'mpl-spork-alt-one': 'spork-alt',
+        'mpl-spork-manual': 'spork-man',
+        'mpl-spork-2way-one': 'spork-2way',
+        'mpl-spork-3way-one': 'spork-3way',
+        'mpl-spork-3way-no-inl-one': 'spork-3way-ni',
+        'mpl-spork-split-one': 'spork-3way-s',
+        'mpl-hb-one': 'pcall-hb',
+        'mpl': 'pcall-man'
+    }
+    if config in m:
+        return m[config]
+    else:
+        return config
+
+def renameTag(row):
+    t = row['tag'].rstrip('-ng')
+    return t
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', nargs=1, metavar='RESULTS_FILE', default=None, required=False)
 parser.add_argument('--csv', nargs='+', metavar='CSV_HEADERS', default=None, required=False)
@@ -35,13 +58,6 @@ def parseTimes(stdout):
     pat = reCompile(r"^time\s+(\d+.\d+).*$")
     return [float(x) for x in pat.findall(stdout)]
 
-def renameConfig(c):
-    return c
-
-def renameTag(row):
-    t = row['tag'].rstrip('-ng')
-    return t
-
 def std(tms):
   if len(tms) < 2:
     return 0.0
@@ -49,13 +65,28 @@ def std(tms):
     avg = sum(tms) / len(tms)
     return (sum((x - avg)**2 for x in tms) / (len(tms) - 1)) ** 0.5
 
+def avg(tms):
+  return sum(tms) / len(tms)
+
+def median(tms):
+  return (tms[(len(tms) - 1)//2] + tms[len(tms)//2]) / 2
+
+def prod(tms):
+  p = 1
+  for tm in tms:
+    p *= tm
+  return p
+
+def geomean(tms):
+  return prod(tms) ** (1 / len(tms)) if tms else None
+
 def parseStats(row):
     newRow = copy.deepcopy(row)
     newRow['procs']  = int(newRow.get('procs', '1'))
     newRow['config'] = renameConfig(row['config'])
     newRow['tag']    = renameTag(row)
     tms = parseTimes(newRow['stdout'] + '\n' + newRow['stderr'])
-    newRow['avgtime'] = sum(tms) / len(tms) if tms else None
+    newRow['avgtime'] = avg(tms) if tms else None
     newRow['mintime'] = min(tms) if tms else None
     newRow['maxtime'] = max(tms) if tms else None
     newRow['stdtime'] = std(tms) if tms else None
@@ -212,15 +243,24 @@ def retrieveAll(D, attr):
 
 # ============================================================================
 
+ratios = []
+
 def report_shootout(D, exp, procs, configs):    
     headers1 = [exp, *[f'T({p})' for p in procs]]
     tt = [headers1, "="]
+    #t3way = None
+    #t3wayni = None
     for config in configs:
         this_times = [averageTime(D, config, exp, p) for p in procs]
         thisRow = [config, *[show(t) if t is not None else "--" for t in this_times]]
         tt.append(thisRow)
-    
+        # if config == 'spork-3way':
+        #   t3way = this_times
+        # elif config == 'spork-3way-ni':
+        #   t3wayni = this_times
     print("")
+    #tt.append(['3way/ni', *[show(t3/t3ni) for t3, t3ni in zip(t3way, t3wayni)]])
+    #ratios.append([t3/t3ni for t3, t3ni in zip(t3way, t3wayni)])
     print(table(tt, defaultAlign))
 
 def report_shootouts(D):
@@ -228,18 +268,32 @@ def report_shootouts(D):
     C = retrieveAll(D, 'config')
     for exp in retrieveAll(D, 'tag'):
         report_shootout(D, exp, P, C)
+    #ratios_inverted = [[rats[i] for rats in ratios] for i in range(len(P))]
+    #for ri in ratios_inverted:
+    #  print(geomean(ri))
+    #print(ratios_inverted)
 
 # ============================================================================
 
-def report_csv(D):
-    # Retrieve (ordered) set of attributes present across all rows
-    attrs = args.csv
-    # Print headers
-    print(",".join(attrs))
+# def report_csv(D):
+#     # Retrieve (ordered) set of attributes present across all rows
+#     attrs = args.csv
+#     # Print headers
+#     print(",".join(attrs))
     
-    # Print rows
-    for row in D:
-        print(",".join(show(row.get(attr, "")) for attr in attrs))
+#     # Print rows
+#     for row in D:
+#         print(",".join(show(row.get(attr, "")) for attr in attrs))
+
+def report_csv(D):
+  P = retrieveAll(D, 'procs')
+  C = retrieveAll(D, 'config')
+  print('exp', 'config', *[f'T({p})' for p in P], sep=', ')
+  for exp in retrieveAll(D, 'tag'):
+    for config in C:
+      ts = [averageTime(D, config, exp, p) for p in P]
+      print(exp, config, *[f'{t:0.4f}' if t else '--' for t in ts], sep=', ')
+        
 
 # ============================================================================
 
@@ -290,22 +344,6 @@ def filter_data_first(D, **kwargs):
 #     #plt.show()
 #     plt.save('img.png')
 
-def rename_exp(config):
-    m = {
-        'mpl-spork-simple-one': 'spork-simple',
-        'mpl-spork-sam-one': 'spork-sam',
-        'mpl-spork-alt-one': 'spork-alt',
-        'mpl-spork-manual': 'spork-man',
-        'mpl-spork-2way-one': 'spork-2way',
-        'mpl-spork-3way-one': 'spork-3way',
-        'mpl-hb-one': 'pcall',
-        'mpl': 'pcall-man'
-    }
-    if config in m:
-        return m[config]
-    else:
-        return config
-
 def report_show_plot(D):
     labels = retrieveAll(D, 'tag') # experiment names ('primes', etc)
     configs = retrieveAll(D, 'config')
@@ -319,7 +357,7 @@ def report_show_plot(D):
     for i in range(len(labels)):
         means[:, i] /= max(means[:, i])
     print(means)
-    pc_labels = [f'{rename_exp(config)}-{p}' for (p, config, d) in data]
+    pc_labels = [f'{renameConfig(config)}-{p}' for (p, config, d) in data]
     
     x = np.arange(len(labels))  # the label locations
     width = 0.35 * 2 / len(pc_labels)  # the width of the bars

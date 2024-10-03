@@ -1,22 +1,17 @@
 {
   "globals": {
     "compiler": [
-      "mpl-spork"
-      //"mpl-hb",
-      //"mpl",
-      //"mlton"
-    ],
-    "grain": [
-      "one"
-      //"manual"
+      "mpl-spork",
+      "mpl-hb",
+      "mpl",
+      "mlton"
     ],
     "split": [
-      //"2way",
-      "3way"
-      //"inl"
-      //"alt",
-      //"sam",
-      //"simple"
+      "2way",
+      "3way",
+      "3way-slow-exn",
+      "3way-slow-exn-no-inl",
+      "2way-slow-exn-no-inl"
     ],
     "warmup": [
       "5.0"
@@ -34,77 +29,82 @@
   },
 
   "templates": [
-    {"match": {
-        "compiler": "^mpl-spork$",
-        "grain": "^(one|small)$"
-     },
-     "cmd": "bin/<bench>-ng.<compiler>-<split>-<grain>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} >heartbeat-tokens 5 -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
-     "config": "<compiler>-<split>-<grain>",
-     "tag": "<tag>",
-     "bench": "<bench>-ng"
-    },
-
-    {"match": {
-        "compiler": "^mpl-spork$",
-        "grain": "^manual$",
-        "split": "^2way$"
-     },
-     "cmd": "bin/<bench>.<compiler>-<grain>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} >heartbeat-tokens 5 -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
-     "config": "<compiler>-<grain>",
-     "tag": "<tag>",
-     "bench": "<bench>"
-    },
-
-    {"match": {
-        "compiler": "^mpl-hb$",
-        "split": "^2way$",
-        "grain": "^(one|small)$"
-     },
-     "cmd": "bin/<bench>-ng.<compiler>-<grain>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
-     "config": "<compiler>-<grain>",
-     "tag": "<tag>",
-     "bench": "<bench>-ng"
-    },
-
+    // single-core mlton
     {"match": {
         "compiler": "^mlton$",
         "procs": "^1$",
-        "grain": "^manual$",
         "split": "^2way$"
      },
      "cmd": "bin/<bench>-ng.<compiler>.bin <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "config": "<compiler>",
      "tag": "<tag>",
-     "bench": "<bench>-ng"
+     "bench": "<bench>-ng",
+     "human": "mlton"
     },
 
+    // pcall with manual grains
     {"match": {
         "compiler": "^mpl$",
-        "grain": "^manual$",
         "split": "^2way$"
      },
      "cmd": "bin/<bench>.<compiler>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} >-- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "config": "<compiler>",
      "tag": "<tag>",
-     "bench": "<bench>"
+     "bench": "<bench>",
+     "human": "pcall-manual-grain"
+    },
+
+    // pcall with auto grains
+    {"match": {
+        "compiler": "^mpl-hb$",
+        "split": "^2way$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "config": "<compiler>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng",
+     "human": "pcall-auto-grain"
+    },
+
+    // spork with manual grains
+    {"match": {
+        "compiler": "^mpl-spork$",
+        "split": "^2way$"
+     },
+     "cmd": "bin/<bench>.<compiler>-manual.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "config": "<compiler>-manual",
+     "tag": "<tag>",
+     "bench": "<bench>",
+     "human": "spork-manual-grain"
+    },
+
+    // spork with auto grains
+    {"match": {
+        "compiler": "^mpl-spork$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "config": "<compiler>-<split>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng",
+     "human": "spork-auto-grain"
     }
   ],
 
   "exps-to-run": [
-    "wc",
-    "sparse-mxv-csr",
-    "primes",
-    "linefit",
-    "grep",
-    "bfs",
-    "bignum-add",
-    "delaunay",
-    "mandelbrot",
-    "msort",
-    "nearest-nbrs",
-    "suffix-array",
-    "triangle-count",
-    "nqueens"
+    "wc"//,
+    //"sparse-mxv-csr",
+    //"primes",
+    //"linefit",
+    //"grep",
+    //"bfs",
+    //"bignum-add",
+    //"delaunay",
+    //"mandelbrot",
+    //"msort",
+    //"nearest-nbrs",
+    //"suffix-array",
+    //"triangle-count",
+    //"nqueens"
   ],
   
   "specs": [
