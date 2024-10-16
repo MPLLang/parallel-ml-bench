@@ -73,7 +73,7 @@ struct
               val k1 = Seq.nth s1 mid1
               val (mid2, found) = bin_search k1 s2 (0, n2)
               val bump = if found then 1 else 0
-              val (l, r) = ForkJoin.par (fn _ => countpar (subs s1 0 mid1) (subs s2 0 mid2),
+              val (l, r) = ForkJoin.par (fn _ => countpar (subs s1 0 mid1) (subs s2 0 (mid2 + 1 - bump)),
                                 fn _ => countpar (subs s1 (mid1 + 1) n1) (subs s2 (mid2 + bump) n2))
             in
               l + bump + r
