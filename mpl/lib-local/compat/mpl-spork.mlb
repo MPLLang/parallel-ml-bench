@@ -1,4 +1,4 @@
-../../lib/github.com/mpllang/mpllib/sources.mpl-spork.mlb
+../../lib/github.com/mpllang/mpllib/sources.mpl.mlb
 
 local
   $(SML_LIB)/basis/basis.mlb

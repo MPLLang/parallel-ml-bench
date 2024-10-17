@@ -11,13 +11,13 @@ local
   in
     structure VectorExtra = Vector
   end
-  ../../lib/github.com/mpllang/mpllib/compat/PosixWriteFile.sml
+  (*../../lib/github.com/mpllang/mpllib/compat/PosixWriteFile.sml*)
   ../../lib/github.com/mpllang/mpllib/compat/mpl.sml
 in
   structure ForkJoin
   structure Concurrency
   structure ReadFile
-  structure WriteFile
+  (*structure WriteFile*)
   structure GCStats
   structure MLton
   structure VectorExtra
@@ -26,6 +26,17 @@ end
 ../../lib/github.com/mpllang/mpllib/CommandLineArgs.sml
 ../../lib/github.com/mpllang/mpllib/Util.sml
 ../../lib/github.com/mpllang/mpllib/SeqBasis.sml
+../../lib/github.com/mpllang/mpllib/SEQUENCE.sml
+local
+  ../../lib/github.com/mpllang/mpllib/ArraySequence.sml
+in
+  structure Seq = ArraySequence
+  structure ArraySequence
+end
+../../lib/github.com/mpllang/mpllib/CommandLineArgs.sml
+../../lib/github.com/mpllang/mpllib/Util.sml
+../../lib/github.com/mpllang/mpllib/SeqBasis.sml
+
 ../../lib/github.com/mpllang/mpllib/SEQUENCE.sml
 local
   ../../lib/github.com/mpllang/mpllib/ArraySequence.sml
@@ -44,8 +55,6 @@ end
 ../../lib/github.com/mpllang/mpllib/BinarySearch.sml
 ../../lib/github.com/mpllang/mpllib/Merge.sml
 ../../lib/github.com/mpllang/mpllib/StableMerge.sml
-../../lib/github.com/mpllang/mpllib/DoubleBinarySearch.sml
-../../lib/github.com/mpllang/mpllib/StableMergeLowSpan.sml
 ../../lib/github.com/mpllang/mpllib/StableSort.sml
 ../../lib/github.com/mpllang/mpllib/Quicksort.sml
 ../../lib/github.com/mpllang/mpllib/Mergesort.sml
