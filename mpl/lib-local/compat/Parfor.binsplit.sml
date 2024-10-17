@@ -4,25 +4,19 @@ struct
   val w2i = Word64.toIntX
   val i2w = Word64.fromInt
 
-  fun midpoint (i: word, j: word) =
-      i + (Word64.>> (j - i, 0w1))
-
-  fun wpareduce (i: word, j: word) (z: 'a) (f: word * 'a -> 'a) (merge: 'a * 'a -> 'a) =
+  fun pareduce (i: int, j: int) (z: 'a) (f: int * 'a -> 'a) (merge: 'a * 'a -> 'a) =
       let fun loop (i: word, j: word) =
               if i + 0w1 >= j then
                 if i >= j then
                   z
                 else
-                  f (i, z)
+                  f (w2i i, z)
               else
-                let val mid = midpoint (i, j) in
+                let val mid = i + (Word64.>> (j - i, 0w1)) in
                   merge (ForkJoin.par (fn () => loop (i, mid),
                                        fn () => loop (mid, j)))
                 end
       in
-        loop (i, j)
+        loop (i2w i, i2w j)
       end
-
-  fun pareduce (i, j) z f merge =
-      wpareduce (i2w i, i2w j) z (fn (w, a) => f (w2i w, a)) merge
 end
