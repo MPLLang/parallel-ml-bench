@@ -20,7 +20,7 @@ def mk_randomstr(n=10):
     return ''.join(random.choice(alpha) for _ in range(n))
 
 NCPU = multiprocessing.cpu_count()
-MAX_COSCHEDULED_EXPS = NCPU // 6
+MAX_COSCHEDULED_EXPS = 1
 
 def getGitRoot():
   return subprocess.Popen(['git', 'rev-parse', '--show-toplevel'],
