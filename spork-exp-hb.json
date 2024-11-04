@@ -10,21 +10,37 @@
       "2way",
       "3way",
       "3way-slow-exn",
+      "3way-no-inl",
       "3way-slow-exn-no-inl",
-      "2way-slow-exn-no-inl"
+      "3way-no-nest"//,
+      //"2way-slow-exn",
+      //"2way-no-inl",
+      //"2way-slow-exn-no-inl"
     ],
     "warmup": [
       "5.0"
     ],
     "repeat": [
-      "5"
+      "20"
     ],
     "cwd": [
       "mpl"
     ],
     "procs": [
       "1",
-      "72"
+      "2",
+      "4",
+      "6",
+      "8",
+      "10",
+      "20",
+      "30",
+      "40",
+      "50",
+      "60",
+      "70",
+      "78",
+      "80"
     ]
   },
 
@@ -45,7 +61,8 @@
     // pcall with manual grains
     {"match": {
         "compiler": "^mpl$",
-        "split": "^2way$"
+        "split": "^2way$",
+        "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>.<compiler>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} >-- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "config": "<compiler>",
@@ -57,7 +74,8 @@
     // pcall with auto grains
     {"match": {
         "compiler": "^mpl-hb$",
-        "split": "^2way$"
+        "split": "^2way$",
+        "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>-ng.<compiler>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "config": "<compiler>",
@@ -69,7 +87,8 @@
     // spork with manual grains
     {"match": {
         "compiler": "^mpl-spork$",
-        "split": "^2way$"
+        "split": "^2way$",
+        "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>.<compiler>-manual.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "config": "<compiler>-manual",
@@ -78,9 +97,23 @@
      "human": "spork-manual-grain"
     },
 
-    // spork with auto grains
+    // spork variants with auto grains
     {"match": {
-        "compiler": "^mpl-spork$"
+        "compiler": "^mpl-spork$",
+        "split": "^(3way-slow-exn|3way-no-inl|3way-slow-exn-no-inl|3way-no-nest)$",
+        "procs": "^(1|80)$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "config": "<compiler>-<split>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng",
+     "human": "spork-auto-grain"
+    },
+
+    // primary spork bench with auto grains and all procs
+    {"match": {
+        "compiler": "^mpl-spork$",
+        "split": "^3way$"
      },
      "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "config": "<compiler>-<split>",
@@ -91,20 +124,22 @@
   ],
 
   "exps-to-run": [
-    "wc"//,
-    //"sparse-mxv-csr",
-    //"primes",
-    //"linefit",
-    //"grep",
-    //"bfs",
-    //"bignum-add",
-    //"delaunay",
-    //"mandelbrot",
-    //"msort",
-    //"nearest-nbrs",
-    //"suffix-array",
-    //"triangle-count",
-    //"nqueens"
+    "map-light",
+    "map-heavy",
+    "wc",
+    "sparse-mxv-csr",
+    "primes",
+    "linefit",
+    "grep",
+    "bfs",
+    "bignum-add",
+    "delaunay",
+    "mandelbrot",
+    "msort",
+    "nearest-nbrs",
+    "suffix-array",
+    "triangle-count",
+    "nqueens"
   ],
   
   "specs": [
@@ -164,13 +199,13 @@
      "bench": ["map-ng"],
      "args": ["-n 5000 -fn-cost heavy"]},
 
-    {"tag": ["map-light-ng"],
-     "bench": ["map-ng"],
-     "args": ["-n 200000000 -fn-cost light"]},
-
     {"tag": ["map-heavy"],
      "bench": ["map"],
      "args": ["-n 5000 -fn-cost heavy"]},
+
+    {"tag": ["map-light-ng"],
+     "bench": ["map-ng"],
+     "args": ["-n 200000000 -fn-cost light"]},
 
     {"tag": ["map-light"],
      "bench": ["map"],

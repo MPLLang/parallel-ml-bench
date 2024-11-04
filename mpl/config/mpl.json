@@ -1,5 +1,5 @@
 {
-  "compiler": "/home/colinmcd/mpl/regular-build/bin/mpl",
+  "compiler": "/home/cc/mpl/regular-build/bin/mpl",
   "flags": [
     "-disable-pass", "splitTypes1",
     "-disable-pass", "splitTypes2",

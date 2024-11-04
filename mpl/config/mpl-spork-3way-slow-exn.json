@@ -1,5 +1,5 @@
 {
-  "compiler": "/home/colinmcd/mpl/spork-build/bin/mpl",
+  "compiler": "/home/cc/mpl/spork-build/bin/mpl",
   "flags": [
     "-disable-pass", "splitTypes1",
     "-disable-pass", "splitTypes2",
