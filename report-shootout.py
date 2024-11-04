@@ -14,15 +14,17 @@ import matplotlib.pyplot as plt
 
 def renameConfig(config):
     m = {
-        'mpl-spork-simple-one': 'spork-simple',
-        'mpl-spork-sam-one': 'spork-sam',
-        'mpl-spork-alt-one': 'spork-alt',
+        'mpl-spork-simple': 'spork-simple',
+        'mpl-spork-sam': 'spork-sam',
+        'mpl-spork-alt': 'spork-alt',
         'mpl-spork-manual': 'spork-man',
-        'mpl-spork-2way-one': 'spork-2way',
-        'mpl-spork-3way-one': 'spork-3way',
-        'mpl-spork-3way-no-inl-one': 'spork-3way-ni',
-        'mpl-spork-split-one': 'spork-3way-s',
-        'mpl-hb-one': 'pcall-hb',
+        'mpl-spork-2way': 'spork-2way',
+        'mpl-spork-3way': 'spork-3way',
+        'mpl-spork-3way-slow-exn': 'spork-3way-sx',
+        'mpl-spork-3way-slow-exn-no-inl': 'spork-3way-sx-ni',
+        'mpl-spork-2way-slow-exn-no-inl': 'spork-2way-sx-ni',
+        'mpl-spork-split': 'spork-3way-s',
+        'mpl-hb': 'pcall-hb',
         'mpl': 'pcall-man'
     }
     if config in m:
@@ -39,6 +41,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--input', nargs=1, metavar='RESULTS_FILE', default=None, required=False)
 parser.add_argument('--csv', nargs='+', metavar='CSV_HEADERS', default=None, required=False)
 parser.add_argument('--plot', nargs=1, metavar='PLOT_FILE', default=None, required=False)
+parser.add_argument('--figs', action='store_true', default=None, required=False)
 args = parser.parse_args()
 
 def json_careful_loads(s):
@@ -93,13 +96,19 @@ def parseStats(row):
     return newRow
 
 def findTrials(data, config, tag, procs):
-    result = []
     for row in data:
         if (row['config'] == config and \
                 row['tag'] == tag and \
                 row['procs'] == procs):
-            result.append(row)
-    return result
+            yield row
+
+def pctdev(data, config, tag, procs):
+  r = next(findTrials(data, config, tag, procs))
+  times = []
+  for line in r['stdout'].split('\n'):
+    if line.startswith('time ') and line.endswith('s'):
+      times.append(float(line.lstrip('time ').rstrip('s')))
+  return (max(times) - min(times)) / max(times)
 
 def averageTime(data, config, tag, procs, checkExpType=True):
     trials = [ r for r in findTrials(data, config, tag, procs) if (not checkExpType) or 'exp' not in r or (r['exp'] == 'time') ]
@@ -273,6 +282,193 @@ def report_shootouts(D):
     #  print(geomean(ri))
     #print(ratios_inverted)
 
+
+# \begin{center}
+# \begin{tabular}{ |c|c|c| } 
+#  \hline
+#  cell1 & cell2 & cell3 \\ 
+#  cell4 & cell5 & cell6 \\ 
+#  cell7 & cell8 & cell9 \\ 
+#  \hline
+# \end{tabular}
+# \end{center}
+
+def latex_table(headers, data):
+  align = '|r|' + '|'.join('c' for _ in headers[1:]) + '|'
+  rows = [[row[0], *[f'{x:0.3f}' for x in row[1:]]] for row in data]
+  heading = ' & '.join(x for x in headers)
+  contents = '\\\\\n  '.join(' & '.join(row) for row in rows)
+  return f'''
+\\begin{{tabular}}{{{align}}}
+  \\hline
+  {heading} \\\\
+  \\hline
+  {contents} \\\\
+  \\hline
+\\end{{tabular}}
+  '''
+
+# table 1: mlton(1) | us(1) | us(80) | overhead us(1)/mlton(1) | speedup mlton(1) / us(80) | speedup us(1) / us(80)
+def report_table_1(D):
+  P = retrieveAll(D, 'procs')
+  minP, maxP = min(P), max(P)
+  headers = [
+    f'exp',
+    f'mlton({minP})',
+    f'spork-hb({minP})',
+    f'spork-hb({maxP})',
+    f'overhead $\\frac{{\\text{{spork-hb({minP})}}}}{{\\text{{mlton({minP})}}}}$',
+    f'speedup $\\frac{{\\text{{mlton({minP})}}}}{{\\text{{spork-hb({maxP})}}}}$',
+    f'speedup $\\frac{{\\text{{spork-hb({minP})}}}}{{\\text{{spork-hb({maxP})}}}}$'
+  ]
+  data = []
+  for exp in retrieveAll(D, 'tag'):
+    mltonMin = averageTime(D, 'mlton', exp, minP)
+    usMin = averageTime(D, 'spork-3way', exp, minP)
+    usMax = averageTime(D, 'spork-3way', exp, maxP)
+    overheadUsMlton = usMin / mltonMin
+    speedupMltonUs = mltonMin / usMax
+    speedupUsUs = usMin / usMax
+    data.append([exp, mltonMin, usMin, usMax, overheadUsMlton, speedupMltonUs, speedupUsUs])
+  return latex_table(headers, data)
+
+# table 2: table mpl-prev(1) | mpl-prev(80) | improvement us(1)/mpl-prev(1) | improvement us(80)/mpl-prev(80)
+def report_table_2(D):
+  P = retrieveAll(D, 'procs')
+  minP, maxP = min(P), max(P)
+  headers = [
+    f'exp',
+    f'pcall-hb({minP})',
+    f'pcall-hb({maxP})',
+    f'spork-hb({minP})',
+    f'spork-hb({maxP})',
+    f'improvement $\\frac{{\\text{{spork-hb({minP})}}}}{{\\text{{pcall-hb({minP})}}}}$',
+    f'improvement $\\frac{{\\text{{spork-hb({maxP})}}}}{{\\text{{pcall-hb({maxP})}}}}$'
+  ]
+  data = []
+  for exp in retrieveAll(D, 'tag'):
+    pcallMin = averageTime(D, 'pcall-hb', exp, minP)
+    pcallMax = averageTime(D, 'pcall-hb', exp, maxP)
+    sporkMin = averageTime(D, 'spork-3way', exp, minP)
+    sporkMax = averageTime(D, 'spork-3way', exp, maxP)
+    data.append([exp, pcallMin, pcallMax, sporkMin, sporkMax, sporkMin / pcallMin, sporkMax / pcallMax])
+  return latex_table(headers, data)
+
+#figure 3: plot speedup plot mlton(1) / us(P), plotted across P
+def report_plot_3(D, ticks=None):
+  if ticks is None:
+    ticks = retrieveAll(D, 'procs')
+  tickmax = max(ticks)
+  X = retrieveAll(D, 'tag')
+  tickstr = ','.join(str(p) for p in ticks)
+
+  cyclelist = '''
+\\pgfplotscreateplotcyclelist{mymarklist}{
+  red,mark=*\\\\
+  green!70!black,mark=square*\\\\
+  blue,mark=triangle*\\\\
+  every mark/.append style={rotate=90},yellow!90!black,mark=triangle*\\\\
+  every mark/.append style={rotate=180},magenta,mark=triangle*\\\\
+  every mark/.append style={rotate=270},brown,mark=triangle*\\\\
+  orange,mark=diamond*\\\\
+  olive,mark=pentagon*\\\\
+  cyan,densely dashed,mark=*\\\\
+  lime,densely dashed,mark=square*\\\\
+  pink,densely dashed,mark=triangle*\\\\
+  every mark/.append style={rotate=90},purple,densely dashed,mark=triangle*\\\\
+  every mark/.append style={rotate=180},teal,densely dashed,mark=triangle*\\\\
+  every mark/.append style={rotate=270},violet,densely dashed,mark=triangle*\\\\
+  gray,densely dashed,mark=diamond*\\\\
+  black,densely dashed,mark=pentagon*\\\\
+}'''.strip(' \n')
+
+  postamble = '\\end{axis}\n\\end{tikzpicture}'
+
+  def mkplot(title, baseline, uselegend, showystuff):
+    ylabel = '\n,ylabel={Speedup}' if showystuff else ''
+    preamble = f'''
+\\begin{{tikzpicture}}
+\\begin{{axis}}[
+    title={{{title}}},
+    xlabel={{Processors}}{ylabel},
+    xmin=0, xmax={tickmax+1},
+    ymin=0, ymax={tickmax+1},
+    xtick={{{tickstr}}},
+    ytick={{{tickstr}}},
+    legend pos=outer north east,
+    ymajorgrids=true,
+    xmajorgrids=true,
+    axis equal image,
+    fill opacity=0.67,
+    draw opacity=1.0,
+    text opacity=1.0,
+    cycle list name=mymarklist,
+    mark options={{solid}}
+%    grid style={{gray}},
+]'''.strip(' \n')
+
+    lines = [preamble]
+    for exp in X:
+      coords = []
+      for p in ticks:
+        t = averageTime(D, 'spork-3way', exp, p)
+        base = averageTime(D, baseline, exp, 1)
+        speedup = base/t
+        coords.append(f'({p}, {speedup:0.3f})')
+      coords = ''.join(coords)
+      lines.append(f'% {exp}\n\\addplot+ coordinates\n  {{{coords}}};')
+    xyline = f'\\addplot[no markers] coordinates {{(0,0) ({tickmax+1},{tickmax+1})}};'
+    lines.append(xyline)
+    if uselegend:
+      legend = ','.join(X)
+      lines.append(f'\\legend{{{legend}}}')
+    lines.append(postamble)
+    return '\n\n'.join(lines)
+  return '\n\n'.join(
+    [cyclelist,
+     mkplot('Speedup vs MLton', 'mlton', False, True),
+     mkplot('Self Speedup', 'spork-3way', True, False)])
+
+#figure 4: overheads of NG vs manual tune
+def report_table_4(D):
+  P = retrieveAll(D, 'procs')
+  minP, maxP = min(P), max(P)
+  headers = [
+    f'exp',
+    f'pcall-grained({minP})',
+    f'pcall-grained({maxP})',
+    f'spork-hb({minP})',
+    f'spork-hb({maxP})',
+    f'overhead $\\frac{{\\text{{spork-hb({minP})}}}}{{\\text{{pcall-grained({minP})}}}}$',
+    f'overhead $\\frac{{\\text{{spork-hb({maxP})}}}}{{\\text{{pcall-grained({maxP})}}}}$'
+  ]
+  data = []
+  for exp in retrieveAll(D, 'tag'):
+    pcallMin = averageTime(D, 'pcall-man', exp, minP)
+    pcallMax = averageTime(D, 'pcall-man', exp, maxP)
+    sporkMin = averageTime(D, 'spork-3way', exp, minP)
+    sporkMax = averageTime(D, 'spork-3way', exp, maxP)
+    data.append([exp, pcallMin, pcallMax, sporkMin, sporkMax, sporkMin / pcallMin, sporkMax / pcallMax])
+  return latex_table(headers, data)
+
+def report_figures(D):
+  table1 = report_table_1(D)
+  table2 = report_table_2(D)
+  plot3 = report_plot_3(D, ticks=[1,10,20,30,40,50,60,70,80])
+  table4 = report_table_4(D)
+  print('TABLE 1')
+  print(table1)
+  print('')
+  print('TABLE 2')
+  print(table2)
+  print('')
+  print('PLOT 3')
+  print(plot3)
+  print('')
+  print('TABLE 4')
+  print(table4)
+
+
 # ============================================================================
 
 # def report_csv(D):
@@ -396,16 +592,20 @@ def report_show_plot(D):
     #fig.tight_layout()
     plt.savefig(args.plot[0], dpi=100.0)
 
+
 # ============================================================================
 
 if __name__ == '__main__':
-    D = loadData()
-    if args.csv:
-        report_csv(D)
-    elif args.plot:
-        report_show_plot(D)
-    else:
-        report_shootouts(D)
+  D = loadData()
+  if args.csv:
+    report_csv(D)
+  elif args.plot:
+    report_show_plot(D)
+  elif args.figs:
+    report_figures(D)
+  else:
+    #report_table(D)
+    report_shootouts(D)
 
 # repeat warmup cmd args bench tag affinity split grain config cwd procs compiler host timestamp stdout stderr elapsed returncode avgtime mintime maxtime stdtime
 # cmd bench tag config cwd procs compiler avgtime mintime maxtime stdtime
