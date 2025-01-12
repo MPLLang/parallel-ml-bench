@@ -185,4 +185,3 @@ val _ =
       )
     end
 
-val _ = GCStats.report ()

@@ -27,4 +27,3 @@ val _ =
     print "\n"
   end
 
-val _ = GCStats.report ()

@@ -418,4 +418,3 @@ val _ = print ("generated image in " ^ Time.fmt 4 (Time.- (t1, t0)) ^ "s\n")
 val (_, tm) = Util.getTime (fn _ => PPM.write filename image)
 val _ = print ("wrote to " ^ filename ^ " in " ^ Time.fmt 4 tm ^ "s\n")
 
-val _ = GCStats.report ()

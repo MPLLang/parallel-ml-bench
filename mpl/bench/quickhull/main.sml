@@ -77,7 +77,6 @@ val _ =
     TextIO.closeOut out
   end
 
-val _ = GCStats.report ()
 
 (* fun dumpPt (x, y) = writeln (rtos x ^ " " ^ rtos y) *)
 (* fun dump pts i =

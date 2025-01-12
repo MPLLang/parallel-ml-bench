@@ -229,4 +229,3 @@ val _ =
       print ("wrote output in " ^ Time.fmt 4 tm ^ "s\n")
     end
 
-val _ = GCStats.report ()

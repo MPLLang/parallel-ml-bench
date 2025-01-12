@@ -14,4 +14,3 @@ val result =
 
 val _ = print ("result " ^ Util.summarizeArraySlice 8 Int32.toString result ^ "\n")
 
-val _ = GCStats.report ()

@@ -53,4 +53,3 @@ val result =
 
 (* val _ = print ("result " ^ Util.summarizeArraySlice 8 (fn x => x) result ^ "\n") *)
 
-val _ = GCStats.report ()

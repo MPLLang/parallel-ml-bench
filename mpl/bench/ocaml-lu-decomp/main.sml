@@ -210,4 +210,3 @@ fun ludEx () =
 
 val _ = Benchmark.run "running LU decomposition" ludEx
 
-val _ = GCStats.report ()

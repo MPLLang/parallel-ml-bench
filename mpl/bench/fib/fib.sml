@@ -39,4 +39,3 @@ val _ =
   else
     print ("correct? no\n")
 
-val _ = GCStats.report ()
