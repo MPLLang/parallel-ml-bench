@@ -1,6 +1,6 @@
 {
   "compiler": "mpl",
-  "mpl-switch-commit": "v0.5",
+  "mpl-switch-commit": "v0.5.2",
   "flags": [],
   "compat": "mpl"
 }
