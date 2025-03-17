@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python3
 
 import itertools
 import re
@@ -63,7 +63,7 @@ def jqfilter(selectExpr, rows):
   allRows = json.dumps(rows)
   query = ".[] | select({})".format(selectExpr)
   cmd = ['jq', '-cM', query]
-  jqProcess = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+  jqProcess = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, text=True)
   output, err = jqProcess.communicate(input=allRows)
 
   newRows = []
