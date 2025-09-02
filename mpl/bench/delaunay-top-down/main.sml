@@ -164,20 +164,10 @@ fun aaLine (x0, y0) (x1, y1) =
       else steepDownLoop (x0, y0)
     end
 
-(*
-val _ = aaLine (0.25, 0.5) (0.25, 0.9) (* vertical *)
-val _ = aaLine (0.25, 0.5) (0.5, 0.9) (* steep up *)
-val _ = aaLine (0.25, 0.5) (0.5, 0.6) (* normal up *)
-val _ = aaLine (0.25, 0.5) (0.5, 0.5) (* horizontal *)
-val _ = aaLine (0.25, 0.5) (0.5, 0.4) (* normal down *)
-val _ = aaLine (0.25, 0.5) (0.5, 0.1) (* steep down *)
-val _ = aaLine (0.25, 0.5) (0.25, 0.1) (* vertical down *)
-*)
-
 (* draw all triangle edges as straight red lines *)
 val _ = ForkJoin.parfor 1000 (0, Seq.length mesh) (fn i =>
   let
-    val _ = print ("triangle number " ^ Int.toString i ^ "\n")
+    (* val _ = print ("triangle number " ^ Int.toString i ^ "\n") *)
     (** cut off anything that is outside the image (not important other than
       * a little faster this way).
       *)
@@ -204,12 +194,12 @@ val _ = ForkJoin.parfor 1000 (0, Seq.length mesh) (fn i =>
       end
 
     val (u, v, w) = Seq.nth mesh i
-    val () = print
-      ("drawing " ^ I.toString u ^ " " ^ I.toString v ^ " " ^ I.toString w
-       ^ "\n")
+  (* val () = print
+    ("drawing " ^ I.toString u ^ " " ^ I.toString v ^ " " ^ I.toString w
+     ^ "\n") *)
   in
-    (** This ensures that each line segment is only drawn once. The person
-      * responsible for drawing it is the triangle with larger id.
+    (** TODO: ensure each line segment is only drawn once? There is overlap
+      * here with adjacent triangles.
       *)
     doLineIf true (w, u);
     doLineIf true (u, v);
