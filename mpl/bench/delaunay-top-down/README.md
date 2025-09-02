@@ -14,7 +14,7 @@ which is another source of overhead. Disentangling the hash table access
 patterns would be interesting to look into; it's not immediately clear to me if
 this is possible.
 
-Some basic tests have been run but more testing is probably required.
+Some basic tests have been run but more testing is required.
 
 ```bash
 [parallel-ml-bench/mpl]$ make delaunay-top-down.mpl.bin
@@ -22,3 +22,7 @@ Some basic tests have been run but more testing is probably required.
 
 # ... see image in result.ppm
 ```
+
+**NOTE (9/2/25)**: Currently, there is an unresolved race condition which
+sometimes results in portions of the triangulation being dropped. It may be a
+bug in the hash table implementation.
