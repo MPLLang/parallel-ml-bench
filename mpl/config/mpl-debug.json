@@ -1,0 +1,17 @@
+{
+  "compiler": "mpl",
+  "mpl-switch-commit": "845f76f",
+  "flags": [
+    "-debug",
+    "true",
+    "-debug-runtime",
+    "true",
+    "-keep",
+    "g",
+    "-keep",
+    "o",
+    "-cc-opt",
+    "-g"
+  ],
+  "compat": "mpl"
+}
