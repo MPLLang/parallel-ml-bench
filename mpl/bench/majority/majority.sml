@@ -1,15 +1,14 @@
 structure CLA = CommandLineArgs
 
 
-val n = CLA.parseInt "n" (1000)
-val check = CLA.parseStrings "desired"
-val desired =
-  if List.length check = 0 then NONE else Word64.fromString (List.hd check)
+val N: int = CLA.parseInt "n" 1000
+val desired: int = CLA.parseInt "desired" 0
+val maj = if desired = 0 then NONE else (SOME desired)
 
 (* TODO: Fix overflow problem *)
 fun makeSequenceGenerator gen =
   let
-    fun generateSequence n majority_opt seed =
+    fun generateSequence (n: int, majority_opt: int option, seed: int) =
       let
         val unshuffled =
           case majority_opt of
@@ -34,17 +33,18 @@ fun makeSequenceGenerator gen =
 
 val seed = 420
 
-val gen = fn i => Util.hash64 (Word64.xorb (Word64.fromInt i, Word64.fromInt seed))
+val gen = fn i => i
+(* Util.hash64 (Word64.xorb (Word64.fromInt i, Word64.fromInt seed)) *)
 (* Word64.fromInt (((Util.hash i) mod 1000) div 500) *)
 
 val w64gen = makeSequenceGenerator gen
 
-val input = w64gen n desired seed
+val input: int ArraySlice.slice = w64gen (N, maj, seed)
 
 
 fun task () =
   let
-    val z = (0w0, 0) (* (candidate, count) *)
+    val z = (0, 0) (* (candidate, count) *)
     (* TODO: reduce conditional checks *)
     fun combine ((lCand, lCount), (rCand, rCount)) =
       case (lCount, rCount, lCand = rCand) of
@@ -57,12 +57,10 @@ fun task () =
     val f = fn i => (Seq.nth input i, 1)
 
   in
-    ForkJoin.reducem combine z (0, n) f
+    ForkJoin.reducem combine z (0, N) f
   end
 
-val (candidate, count) = Benchmark.run "majority-test" task
+val (candidate: int, count: int) = Benchmark.run "majority-test" task
 
-val _ = print ("result: " ^ Word64.fmt StringCvt.DEC candidate ^ "\n")
-val _ = print
-  ("input"
-   ^ Util.summarizeArraySlice 100 (fn w => Int.toString (Word64.toInt w)) input)
+val _ = print ("result: " ^ Int.toString candidate ^ "\n")
+val _ = print ("input" ^ Util.summarizeArraySlice 100 Int.toString input)

@@ -1,6 +1,6 @@
 {
     "compiler": "mpl",
-    "mpl-switch-commit": "845f76f",
+    "mpl-switch-commit": "ed6ab6e",
     "flags": [
         "-default-type",
         "int64",

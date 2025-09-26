@@ -1,1 +1,8 @@
+$(SML_LIB)/basis/basis.mlb
+mpl/lib/github.com/mpllang/mpllib/compat/mpl.mlb
+mpl/lib/github.com/mpllang/mpllib/sources.mpl.mlb
 mpl/lib.mlb
+mpl/bench/majority/majority.mlb
+mpl/bench/majority/majority.sml
+mpl/bench/binary-trees/binary-trees.mlb
+mpl/bench/binary-trees/binary-trees.sml
