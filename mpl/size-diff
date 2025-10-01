@@ -1,0 +1,7 @@
+#!/bin/bash
+
+bench=$1
+original=$(stat -c%s "bin/$bench.mpl-common.bin")
+unrolled=$(stat -c%s "bin/$bench.mpl-unrolled.bin")
+diff=$((unrolled - original))
+echo "$bench: $original -> $unrolled ($diff), % change: $(echo "scale=2; $diff / $original * 100" | bc)%"

@@ -29,7 +29,7 @@ struct
   fun nth a i = A.sub (a, i)
 
   fun parfor (i: int, j: int) (f: int -> unit) =
-      Parfor.pareduce (i, j) () (fn (i, ()) => f i) (fn ((), ()) => ())
+      ForkJoin.parform (i, j) f
   val par = ForkJoin.par
   val allocate = ForkJoin.alloc
 
@@ -64,7 +64,7 @@ struct
 
 
   fun reduce g b (lo, hi) f =
-    Parfor.pareduce (lo, hi) b (fn (i, a) => g (a, f i)) g
+    ForkJoin.pareduce (lo, hi) b (fn (i, a) => g (a, f i)) g
 
   fun scan g b (lo, hi) (f: int -> 'a) =
     if hi - lo <= Grains.block then

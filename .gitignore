@@ -4,3 +4,4 @@ mpl/lib
 mpl/mpllib
 results/*.json
 inputs/
+.vscode

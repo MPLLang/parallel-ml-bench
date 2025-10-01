@@ -36,7 +36,7 @@ fun doLight () =
     print (Util.summarizeArraySlice 8 Int.toString data ^ "\n")
   end
 
-fun doHeavy () =
+(* fun doHeavy () =
   let
     val data = SeqNG.tabulate (fn i => i) n
     val () = Benchmark.run "map heavy" (fn _ =>
@@ -45,10 +45,10 @@ fun doHeavy () =
       ))
   in
     print (Util.summarizeArraySlice 8 Int.toString data ^ "\n")
-  end
+  end *)
 
 val _ =
   case fnCost of
     "light" => doLight ()
-  | "heavy" => doHeavy ()
+  (* | "heavy" => doHeavy () *)
   | _ => checkInput ()
