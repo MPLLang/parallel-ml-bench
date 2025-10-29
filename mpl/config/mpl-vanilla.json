@@ -1,0 +1,14 @@
+{
+    
+    "compiler": "mpl",
+    "mpl-switch-commit": "ed6ab6e",
+    "flags": [
+        "-default-type",
+        "int64",
+        "-default-type",
+        "word64",
+        "-verbose",
+        "3"
+    ],
+    "compat": "mpl"
+}
