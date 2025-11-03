@@ -9,10 +9,16 @@ struct
 
   fun collect kvs =
     let
+      val tm = Timer.start ()
+
       val t = T.make {capacity = Seq.length kvs} (* very rough upper bound *)
 
-      val _ = ForkJoin.parfor 100 (0, Seq.length kvs) (fn i =>
+      val tm = Timer.tick tm "initialize table"
+
+      val _ = ForkJoin.parform (0, Seq.length kvs) (fn i =>
         T.insert_combine t (Seq.nth kvs i))
+
+      val tm = Timer.tick tm "insertions"
 
       val contents = T.unsafe_view_contents t
       val results =
@@ -21,8 +27,12 @@ struct
              (fn i => valOf (DelayedSeq.nth contents i))
              (fn i => Option.isSome (DelayedSeq.nth contents i)))
 
+      val tm = Timer.tick tm "filter slots"
+
       val sorted =
         Mergesort.sort (fn ((k1, v1), (k2, v2)) => K.cmp (k1, k2)) results
+
+      val tm = Timer.tick tm "sorted output"
     in
       sorted
     end

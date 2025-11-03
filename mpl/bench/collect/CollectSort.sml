@@ -18,13 +18,19 @@ struct
       fun key_cmp (kv1, kv2) =
         K.cmp (key kv1, key kv2)
 
+      val t = Timer.start ()
+
       val sorted = Mergesort.sort key_cmp kvs
+
+      val t = Timer.tick t "sort"
 
       val boundaries =
         ArraySlice.full
           (SeqBasis.filter 1000 (0, Seq.length sorted) (fn i => i) (fn i =>
              i = 0
              orelse key_cmp (Seq.nth sorted (i - 1), Seq.nth sorted i) <> EQUAL))
+
+      val t = Timer.tick t "boundaries"
 
       fun make i =
         let
@@ -33,13 +39,19 @@ struct
             if i + 1 = Seq.length boundaries then n
             else Seq.nth (boundaries) (i + 1)
           val k = key (Seq.nth sorted start)
-          val v = SeqBasis.reduce 1000 V.combine V.zero (start, stop) (fn j =>
+          val v = ForkJoin.reducem V.combine V.zero (start, stop) (fn j =>
             value (Seq.nth sorted j))
         in
           (k, v)
         end
+
+      val output = ForkJoin.alloc (Seq.length boundaries)
+      val () = ForkJoin.parform (0, Seq.length boundaries) (fn i =>
+        Array.update (output, i, make i))
+
+      val t = Timer.tick t "make output"
     in
-      Seq.tabulate make (Seq.length boundaries)
+      ArraySlice.full output
     end
 
 end
