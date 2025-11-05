@@ -3,7 +3,7 @@ struct
 
   val for = Util.for
   val par = ForkJoin.par
-  val parfor = ForkJoinNG.parfor
+  val parfor = ForkJoin.parform
   val alloc = ForkJoin.alloc
 
 

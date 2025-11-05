@@ -9,6 +9,7 @@ sig
   val reduce: ('a * 'a -> 'a) -> 'a -> (int * int) -> (int -> 'a) -> 'a
 
   val parfor: (int * int) -> (int -> unit) -> unit
+  val parform: (int * int) -> (int -> unit) -> unit
 
   val scan: ('a * 'a -> 'a)
             -> 'a
@@ -25,11 +26,12 @@ struct
   structure A = Array
   structure AS = ArraySlice
 
-  fun upd a i x = A.update (a, i, x)
-  fun nth a i = A.sub (a, i)
+  fun __inline_always__ upd a i x = A.update (a, i, x)
+  fun __inline_always__ nth a i = A.sub (a, i)
 
-  fun parfor (i: int, j: int) (f: int -> unit) =
-      ForkJoin.parform (i, j) f
+  fun __inline_always__ parfor (i: int, j: int) (f: int -> unit) = __inline_always__ ForkJoin.parform (i, j) f
+  (* fun parfor' (lo: int, hi: int) (f: int -> unit) = ForkJoin.reduce (fn ((),()) => ()) () (lo, hi) f *)
+  val parform = ForkJoin.parform
   val par = ForkJoin.par
   val allocate = ForkJoin.alloc
 
@@ -63,8 +65,8 @@ struct
       end
 
 
-  fun reduce g b (lo, hi) f =
-    ForkJoin.pareduce (lo, hi) b (fn (i, a) => g (a, f i)) g
+  fun __inline_always__ reduce g b (lo, hi) f =
+    __inline_always__ ForkJoin.reducem g b (lo, hi) f
 
   fun scan g b (lo, hi) (f: int -> 'a) =
     if hi - lo <= Grains.block then

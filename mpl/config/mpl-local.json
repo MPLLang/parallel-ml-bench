@@ -1,7 +1,5 @@
 {
-    
-    "compiler": "mpl",
-    "mpl-switch-commit": "ed6ab6e",
+    "compiler": "../../mpl/build/bin/mpl",
     "flags": [
         "-default-type",
         "int64",
@@ -9,6 +7,8 @@
         "word64",
         "-verbose",
         "3",
+        "-keep",
+        "sxml",
         "-diag-pass",
         "closureConvert"
     ],

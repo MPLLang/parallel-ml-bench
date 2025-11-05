@@ -4,7 +4,7 @@ sig
 end =
 struct
 
-  fun parfor (lo, hi) f = Parfor.pareduce (lo, hi) () (fn (i, ()) => f i) (fn ((), ()) => ())
+  fun __inline_always__ parfor (lo, hi) f = __inline_always__ ForkJoin.parform (lo, hi) f
 
   (*val w2i = Word64.toIntX
   val i2w = Word64.fromInt
