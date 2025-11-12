@@ -10,17 +10,16 @@ fi
 
 
 ROOT=$(git rev-parse --show-toplevel)
-GEN=$ROOT/scripts/gencmds
-RUN=$ROOT/scripts/parruncmds.py
 
 mkdir -p $ROOT/results
 RESULTS=$ROOT/results/$1.json
 
 rm -f $ROOT/mpl/bin/*.bin
+rm -f $ROOT/cpp/bin/*.bin
 
 $ROOT/filter-exps.py $ROOT/spork-exp-hb.json $ROOT/filtered-exp-hb.json
 
-$GEN $ROOT/filtered-exp-hb.json | taskset -c 0-79 $RUN --compile --output $RESULTS
+$ROOT/scripts/gencmds $ROOT/filtered-exp-hb.json | tee /dev/stderr | taskset -c 0-79 $ROOT/scripts/parruncmds.py --compile --output $RESULTS
 
 echo "[INFO] wrote results to $RESULTS"
 

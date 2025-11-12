@@ -1,37 +1,37 @@
 {
   "globals": {
     "compiler": [
-      "mpl-spork",
-      "mpl-hb",
-      "mpl",
-      "mlton"
+      // "mpl-spork",
+      //"mpl-hb",
+      "mpl"//,
+      // "mlton",
+      // "mpl-spork-eager",
+      // "mpl-hb-eager"
+
+      //"mlton-dc",
+      //"mpl-no-hb-eager"
+      //"cpp"
     ],
     "split": [
-      "2way",
-      "3way",
-      "3way-slow-exn",
-      "3way-no-inl",
-      "3way-slow-exn-no-inl",
-      "3way-no-nest"//,
+      "2way"//,
+      //"3way"
+      
+      //"3way-slow-exn",
+      //"3way-no-inl",
+      //"3way-slow-exn-no-inl",
+      //"3way-no-nest",
       //"2way-slow-exn",
       //"2way-no-inl",
       //"2way-slow-exn-no-inl"
     ],
     "warmup": [
-      "5.0"
+      "5"
     ],
     "repeat": [
       "20"
     ],
-    "cwd": [
-      "mpl"
-    ],
     "procs": [
       "1",
-      "2",
-      "4",
-      "6",
-      "8",
       "10",
       "20",
       "30",
@@ -39,7 +39,6 @@
       "50",
       "60",
       "70",
-      "78",
       "80"
     ]
   },
@@ -47,17 +46,18 @@
   "templates": [
     // single-core mlton
     {"match": {
-        "compiler": "^mlton$",
+        "compiler": "^mlton(-dc)?$",
         "procs": "^1$",
         "split": "^2way$"
      },
      "cmd": "bin/<bench>-ng.<compiler>.bin <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
      "config": "<compiler>",
      "tag": "<tag>",
      "bench": "<bench>-ng",
-     "human": "mlton"
+     "human": "<compiler>"
     },
-
+    
     // pcall with manual grains
     {"match": {
         "compiler": "^mpl$",
@@ -65,10 +65,38 @@
         "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>.<compiler>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} >-- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
      "config": "<compiler>",
      "tag": "<tag>",
      "bench": "<bench>",
-     "human": "pcall-manual-grain"
+     "human": "pcall-manual-grain-<compiler>"
+    },
+    
+    // eager pcall with manual grains
+    // {"match": {
+    //     "compiler": "^mpl-no-hb-eager$",
+    //     "split": "^2way$",
+    //     "procs": "^(1|80)$"
+    //  },
+    //  "cmd": "bin/<bench>.<compiler>.bin @mpl heartbeat-us 10000000000 <procs?procs {} ><set-affinity?set-affinity {} >-- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+    //  "cwd": "mpl",
+    //  "config": "<compiler>",
+    //  "tag": "<tag>",
+    //  "bench": "<bench>",
+    //  "human": "pcall-no-hb-manual-grain-eager"
+    // },
+
+    {"match": {
+        "compiler": "^mpl-hb-eager$",
+        "split": "^2way$",
+        "procs": "^(1|80)$"
+     },
+     "cmd": "bin/<bench>.<compiler>.bin @mpl heartbeat-us 10000000000 <procs?procs {} ><set-affinity?set-affinity {} >-- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
+     "config": "<compiler>",
+     "tag": "<tag>",
+     "bench": "<bench>",
+     "human": "pcall-hb-manual-grain-eager"
     },
 
     // pcall with auto grains
@@ -78,10 +106,24 @@
         "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>-ng.<compiler>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
      "config": "<compiler>",
      "tag": "<tag>",
      "bench": "<bench>-ng",
      "human": "pcall-auto-grain"
+    },
+
+    {"match": {
+        "compiler": "^mpl-hb$",
+        "split": "^3way$",
+        "procs": "^(1|80)$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
+     "config": "<compiler>-<split>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng",
+     "human": "pcall-auto-grain-<split>"
     },
 
     // spork with manual grains
@@ -91,54 +133,109 @@
         "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>.<compiler>-manual.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
      "config": "<compiler>-manual",
      "tag": "<tag>",
      "bench": "<bench>",
-     "human": "spork-manual-grain"
+     "human": "<compiler>-manual-grain"
+    },
+
+    // eager spork with manual grains
+    {"match": {
+        "compiler": "^mpl-spork-eager$",
+        "split": "^2way$",
+        "procs": "^(1|80)$"
+     },
+     "cmd": "bin/<bench>.<compiler>-manual.bin @mpl heartbeat-us 10000000000 <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
+     "config": "<compiler>-manual",
+     "tag": "<tag>",
+     "bench": "<bench>",
+     "human": "<compiler>-manual-grain-eager"
     },
 
     // spork variants with auto grains
-    {"match": {
-        "compiler": "^mpl-spork$",
-        "split": "^(3way-slow-exn|3way-no-inl|3way-slow-exn-no-inl|3way-no-nest)$",
-        "procs": "^(1|80)$"
-     },
-     "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
-     "config": "<compiler>-<split>",
-     "tag": "<tag>",
-     "bench": "<bench>-ng",
-     "human": "spork-auto-grain"
-    },
+    //{"match": {
+    //    "compiler": "^mpl-spork$",
+    //    "split": "^(3way-slow-exn|3way-no-inl|3way-slow-exn-no-inl|3way-no-nest)$",
+    //    "procs": "^(1|80)$"
+    // },
+    // "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+    // "cwd": "mpl",
+    // "config": "<compiler>-<split>",
+    // "tag": "<tag>",
+    // "bench": "<bench>-ng",
+    // "human": "spork-auto-grain"
+    //},
 
     // primary spork bench with auto grains and all procs
     {"match": {
         "compiler": "^mpl-spork$",
-        "split": "^3way$"
+        //"split": "^3way$"
+        "procs": "^(1|80)$"
      },
      "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
      "config": "<compiler>-<split>",
      "tag": "<tag>",
      "bench": "<bench>-ng",
      "human": "spork-auto-grain"
+    },
+
+    {"match": {
+        "compiler": "^mpl-spork$",
+        "split": "^3way$",
+        "procs": "^(10|20|30|40|50|60|70)$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>-<split>.bin @mpl <procs?procs {} ><set-affinity?set-affinity {} > -- <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
+     "config": "<compiler>-<split>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng",
+     "human": "spork-auto-grain"
+    },
+
+    {"match": {
+        "compiler": "^cpp$",
+        "procs": "(?!1$)",
+        "split": "^2way$"
+     },
+     "cmd": "/home/cc/numactl/numactl -i all -- bin/<bench>.cpp.bin <args?{}> <args1?{}> -repeat 20 -warmup 5",
+     "cwd": "cpp",
+     "env": {"PARLAY_NUM_THREADS": "<procs>"},
+     "config": "<compiler>",
+     "human": "cpp"
+    },
+
+    {"match": {
+        "compiler": "^cpp$",
+        "procs": "1",
+        "split": "^2way$"
+     },
+     "cmd": "bin/<bench>.cpp.bin <args?{}> <args1?{}> -repeat 20 -warmup 5",
+     "cwd": "cpp",
+     "env": {"PARLAY_NUM_THREADS": "<procs>"},
+     "config": "<compiler>",
+     "human": "cpp"
     }
   ],
 
   "exps-to-run": [
-    "map-light",
-    "map-heavy",
-    "wc",
-    "sparse-mxv-csr",
-    "primes",
-    "linefit",
-    "grep",
-    "bfs",
-    "bignum-add",
-    "delaunay",
-    "mandelbrot",
-    "msort",
-    "nearest-nbrs",
-    "suffix-array",
-    "triangle-count",
+    // "map-light",
+    // "map-heavy",
+    // "wc",
+    // "sparse-mxv-csr",
+    // "primes",
+    // "linefit",
+    // "grep",
+    // "bfs",
+    // "bignum-add",
+    // "delaunay",
+    // "mandelbrot",
+    // "msort",
+    // "nearest-nbrs",
+    // "suffix-array",
+    // "triangle-count",
     "nqueens"
   ],
   
@@ -151,6 +248,10 @@
      "bench": ["bfs"],
      "args": ["../inputs/rmat-10M-symm-bin"]},
 
+    {"tag": ["bfs-cpp"],
+     "bench": ["bfs"],
+     "args": ["-infile ../inputs/rmat-10M-symm"]},
+
     {"tag": ["delaunay-ng"],
      "bench": ["delaunay-ng"],
      "args": ["-input ../inputs/uniform-circle-1M"]},
@@ -161,19 +262,19 @@
 
     {"tag": ["msort-ng"],
      "bench": ["msort-ng"],
-     "args": ["-N 20000000"]},
+     "args": ["-n 20000000"]},
 
     {"tag": ["msort"],
      "bench": ["msort"],
-     "args": ["-N 20000000"]},
+     "args": ["-n 20000000"]},
 
     {"tag": ["primes-ng"],
      "bench": ["primes-ng"],
-     "args": ["-N 100000000"]},
+     "args": ["-n 100000000"]},
 
     {"tag": ["primes"],
      "bench": ["primes"],
-     "args": ["-N 100000000"]},
+     "args": ["-n 100000000"]},
 
     {"tag": ["sparse-mxv-ng"],
      "bench": ["sparse-mxv-ng"],
@@ -185,6 +286,10 @@
 
     {"tag": ["sparse-mxv-csr"],
      "bench": ["sparse-mxv-csr"],
+     "args": ["-n 250000000"]},
+
+    {"tag": ["sparse-mxv"],
+     "bench": ["sparse-mxv"],
      "args": ["-n 250000000"]},
 
     {"tag": ["nearest-nbrs-ng"],
@@ -235,13 +340,21 @@
      "bench": ["wc"],
      "args": ["-infile ../inputs/words256.txt"]},
 
+    {"tag": ["wc-old-ng"],
+     "bench": ["wc-old-ng"],
+     "args": ["-infile ../inputs/words256.txt"]},
+
+    {"tag": ["wc-old"],
+     "bench": ["wc-old"],
+     "args": ["-infile ../inputs/words256.txt"]},
+
     {"tag": ["nqueens-ng"],
      "bench": ["nqueens-ng"],
-     "args": ["-N 13"]},
+     "args": ["-n 13"]},
 
     {"tag": ["nqueens"],
      "bench": ["nqueens"],
-     "args": ["-N 13"]},
+     "args": ["-n 13"]},
 
     {"tag": ["fork-stress"],
      "bench": ["fork-stress"],
@@ -251,9 +364,21 @@
      "bench": ["grep"],
      "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]},
 
+    {"tag": ["grep-cpp"],
+     "bench": ["grep"],
+     "args": ["-infile ../inputs/words256-shuffled.txt -pattern EE --benchmark"]},
+
     {"tag": ["grep-ng"],
      "bench": ["grep-ng"],
      "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]},
+
+    // {"tag": ["bignum-add"],
+    //  "bench": ["bignum-add"],
+    //  "args": ["-n 100000000"]},
+
+    // {"tag": ["bignum-add-ng"],
+    //  "bench": ["bignum-add-ng"],
+    //  "args": ["-n 100000000"]},
 
     {"tag": ["bignum-add"],
      "bench": ["bignum-add-opt"],
@@ -265,11 +390,11 @@
 
     {"tag": ["suffix-array"],
      "bench": ["suffix-array"],
-     "args": ["--benchmark -N 10000000"]},
+     "args": ["--benchmark -n 10000000"]},
 
     {"tag": ["suffix-array-ng"],
      "bench": ["suffix-array-ng"],
-     "args": ["--benchmark -N 10000000"]},
+     "args": ["--benchmark -n 10000000"]},
 
     {"tag": ["triangle-count"],
      "bench": ["triangle-count"],

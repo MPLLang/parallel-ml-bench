@@ -17,19 +17,19 @@ fun countSol n =
         fun tryCol j =
           if threatened (i, j) b then 0 else search (i+1) ((i,j)::b)
       in
-        (* if i >= 3 then *)
-          (* if we're already a few levels deep, then just go sequential *)
-          (* Seq.iterate op+ 0 (Seq.tabulate tryCol n) *)
-        (* else *)
-          SeqBasis.reduce 3 op+ 0 (0, n) tryCol
-          (* Seq.reduce op+ 0 (Seq.tabulate tryCol n) *)
+        if i >= 3 then
+        (*   (* if we're already a few levels deep, then just go sequential *) *)
+        (*   Seq.iterate op+ 0 (Seq.tabulate tryCol n) *)
+          SeqBasis.foldl op+ 0 (0, n) tryCol
+        else
+          SeqBasis.reduce 1 op+ 0 (0, n) tryCol
       end
   in
     search 0 []
   end
 
-val n = CommandLineArgs.parseInt "N" 13
-val _ = print ("N " ^ Int.toString n ^ "\n")
+val n = CommandLineArgs.parseInt "n" 13
+val _ = print ("n " ^ Int.toString n ^ "\n")
 
 val msg =
   "counting number of " ^ Int.toString n ^ "x" ^ Int.toString n ^ " solutions"

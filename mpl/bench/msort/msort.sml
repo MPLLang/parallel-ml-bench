@@ -1,7 +1,7 @@
 structure CLA = CommandLineArgs
 
-val n = CLA.parseInt "N" (100 * 1000 * 1000)
-val _ = print ("N " ^ Int.toString n ^ "\n")
+val n = CLA.parseInt "n" (100 * 1000 * 1000)
+val _ = print ("n " ^ Int.toString n ^ "\n")
 
 val _ = print ("generating " ^ Int.toString n ^ " random integers\n")
 

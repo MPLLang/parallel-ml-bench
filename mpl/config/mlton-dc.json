@@ -6,5 +6,5 @@
     "-codegen", "c",
     "-mlb-path-var", "GRAINS one"
   ],
-  "compat": "mlton"
+  "compat": "mlton-dc"
 }

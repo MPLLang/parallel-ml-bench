@@ -5,7 +5,7 @@ val str = CLA.parseString "str" ""
 (* val algo = CLA.parseString "algo" "" *)
 val check = CLA.parseFlag "check"
 val benchmark = CLA.parseFlag "benchmark"
-val benchSize = CLA.parseInt "N" 10000000
+val benchSize = CLA.parseInt "n" 10000000
 val printResult = CLA.parseFlag "print"
 val filename = CLA.parseString "file" ""
 val rep = case (Int.fromString (CLA.parseString "repeat" "1")) of
@@ -81,7 +81,7 @@ fun runBenchmark () =
   let
     fun randChar seed = Char.chr (Util.hash seed mod 256)
     fun randString n = CharVector.tabulate (n, randChar)
-    val _ = print ("N " ^ Int.toString benchSize ^ "\n")
+    val _ = print ("n " ^ Int.toString benchSize ^ "\n")
     val (str, tm1) = Util.getTime (fn _ => randString benchSize)
     val _ = print ("generated input in " ^ Time.fmt 4 tm1 ^ "s\n")
 

@@ -6,7 +6,7 @@ local
   Grains.$(GRAINS).sml
   (*Grains.mlton.sml*)
   PARFOR.sig
-  mlton.sml
+  mlton-dc.sml
   ForkJoinNG.sml
   SeqBasisNG.mpl.sml
 in

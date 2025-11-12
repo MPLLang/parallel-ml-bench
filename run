@@ -1,16 +1,23 @@
 #!/bin/bash
 
+set -e
+
+if [ $# -eq 0 ];
+then echo "USAGE
+$0 RESULT_NAME" >&2;
+     exit 1
+fi
+
 ROOT=$(git rev-parse --show-toplevel)
 GEN=scripts/gencmds
 RUN=scripts/runcmds
 
-NOW=$(date '+%y%m%d-%H%M%S')
 # NOW="230217-050444"
 mkdir -p $ROOT/results
-RESULTS=$ROOT/results/$NOW
+RESULTS=$ROOT/results/$1
 
-rm -f $ROOT/mpl/bin/*.bin
-# rm -f $ROOT/cpp/bin/*.bin
+# rm -f $ROOT/mpl/bin/*.bin
+rm -f $ROOT/cpp/bin/*.bin
 # rm -f $ROOT/ocaml/bin/*.bin
 # rm -f $ROOT/java/*.class
 # rm -f $ROOT/go/bin/*.bin
@@ -24,7 +31,7 @@ rm -f $ROOT/mpl/bin/*.bin
 # | jq -c 'select (.tag == "sparse-mxv" or .tag == "sparse-mxv-ng")' \
 
 ( \
-  $GEN $@ $ROOT/exp-hb.json \
+  $GEN $@ $ROOT/cpp-exp.json \
 ) \
 | $RUN --compile --output $RESULTS
 

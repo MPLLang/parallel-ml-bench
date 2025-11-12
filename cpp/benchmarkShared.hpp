@@ -83,11 +83,14 @@ void launch(const Bench& bench) {
   if (warmup_secs > 0.0f) {
     printf ("======== WARMUP ========\n");
     double warmupStart = get_time();
+    unsigned long warmups = 0;
     while (get_time() - warmupStart < warmup_secs) {
       auto st = get_time();
       bench();
-      printf ("warmup_run %.4lfs\n", get_time() - st);
+      warmups++;
+      //printf ("warmup_run %.4lfs\n", get_time() - st);
     }
+    printf ("%lu warmup runs completed in %lfs\n", warmups, warmup_secs);
     printf ("======== END WARMUP ========\n");
   }
 

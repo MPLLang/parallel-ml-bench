@@ -21,36 +21,50 @@ struct
 
   fun run msg f =
     let
-      val warmup = Time.fromReal (CommandLineArgs.parseReal "warmup" 0.0)
+      (* val warmup = Time.fromReal (CommandLineArgs.parseReal "warmup" 0.0) *)
+      val warmup = CommandLineArgs.parseInt "warmup" 0
       val rep = CommandLineArgs.parseInt "repeat" 1
       val _ =
         if rep >= 1 then ()
         else Util.die "-repeat N must be at least 1"
 
-      val _ = print ("warmup " ^ Time.fmt 4 warmup ^ "\n")
+      (* val _ = print ("warmup " ^ Time.fmt 4 warmup ^ "\n") *)
+      val _ = print ("warmup " ^ Int.toString rep ^ "\n")
       val _ = print ("repeat " ^ Int.toString rep ^ "\n")
-
-      fun warmupLoop count startTime =
-        if Time.>= (Time.- (Time.now (), startTime), warmup) then
-          count (* warmup done! *)
+      
+      fun warmupLoop count =
+        if count <= 0 then
+          ()
         else
-          let
-            val (_, tm) = Util.getTime f
-          in
-            (* print ("warmup_run " ^ Time.fmt 4 tm ^ "s\n"); *)
-            warmupLoop (count + 1) startTime
-          end
+          (f (); warmupLoop (count - 1))
 
-      val _ =
-        if Time.<= (warmup, Time.zeroTime) then ()
-        else let val _ = print ("Warming up for " ^ Real.toString (Time.toReal warmup) ^ "s...\n")
-                 val count = warmupLoop 0 (Time.now())
-                 val _ = print (Int.toString count ^ " warmup runs completed\n")
-             in () end
-        (* else ( print ("====== WARMUP ======\n" ^ msg ^ "\n") *)
-        (*      ; warmupLoop (Time.now ()) *)
-        (*      ; print ("==== END WARMUP ====\n") *)
-        (*      ) *)
+      (* fun warmupLoop count startTime = *)
+      (*   if Time.>= (Time.- (Time.now (), startTime), warmup) then *)
+      (*     count (* warmup done! *) *)
+      (*   else *)
+      (*     let *)
+      (*       val (_, tm) = Util.getTime f *)
+      (*     in *)
+      (*       (* print ("warmup_run " ^ Time.fmt 4 tm ^ "s\n"); *) *)
+      (*       warmupLoop (count + 1) startTime *)
+      (*     end *)
+
+      (* val _ = *)
+      (*   if Time.<= (warmup, Time.zeroTime) then () *)
+      (*   else let val _ = print ("Warming up for " ^ Real.toString (Time.toReal warmup) ^ "s...\n") *)
+      (*            val count = warmupLoop 0 (Time.now()) *)
+      (*            val _ = print (Int.toString count ^ " warmup runs completed\n") *)
+      (*        in () end *)
+      (*   (* else ( print ("====== WARMUP ======\n" ^ msg ^ "\n") *) *)
+      (*   (*      ; warmupLoop (Time.now ()) *) *)
+      (*   (*      ; print ("==== END WARMUP ====\n") *) *)
+      (*   (*      ) *) *)
+      
+      val _ = if warmup <= 0 then () else
+                let val _ = print ("Warming up for " ^ Int.toString warmup ^ " runs...\n")
+                    val ((), t) = Util.getTime (fn () => warmupLoop warmup)
+                    val _ = print ("Finished warming up in " ^ Real.toString (Time.toReal t) ^ "s\n")
+                in () end
 
       val _ = print (msg ^ "\n")
       val s0 = RuntimeStats.get ()

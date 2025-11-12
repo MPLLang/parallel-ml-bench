@@ -59,11 +59,13 @@ def runcmd(i, childidx, rows, fd, aff, timeout=600.0, silent=False):
         affstr += f'{c},'
     affstr = affstr.rstrip(',')
     cwd = row['cwd'] if 'cwd' in row else None
+    env = row['env'] if 'env' in row else None
     subproc = subprocess.Popen(
         f'taskset -c {affstr} {cmd}',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env=env,
         cwd=cwd)
     _currentChildren[childidx] = subproc
   
@@ -136,7 +138,14 @@ def main(TMPDIR):
     if args.bare:
         rows = [{'cmd':x.rstrip('\n')} for x in sys.stdin]
     else:
-        rows = [ json.loads(x) for x in sys.stdin ]
+        #rows = [ json.loads(x) for x in sys.stdin ]
+        rows = []
+        for x in sys.stdin:
+          try:
+            rows.append(json.loads(x))
+          except Exception as e:
+            print(f'failed to load {x}')
+            raise e
   
     if args.compile:
         binsToMake = set()

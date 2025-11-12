@@ -17,7 +17,7 @@ def renameConfig(config):
         'mpl-spork-simple': 'spork-simple',
         'mpl-spork-sam': 'spork-sam',
         'mpl-spork-alt': 'spork-alt',
-        'mpl-spork-manual': 'spork-man',
+        'mpl-spork-manual': 'spork-hb-man',
         'mpl-spork-2way': 'spork-2way',
         'mpl-spork-3way': 'spork-3way',
         'mpl-spork-3way-slow-exn': 'spork-3way-sx',
@@ -25,7 +25,10 @@ def renameConfig(config):
         'mpl-spork-2way-slow-exn-no-inl': 'spork-2way-sx-ni',
         'mpl-spork-split': 'spork-3way-s',
         'mpl-hb': 'pcall-hb',
-        'mpl': 'pcall-man'
+        'mpl': 'pcall-old',
+        'mpl-spork-eager-manual': 'spork-eager-man',
+        'mpl-hb-eager': 'pcall-eager-man',
+        
     }
     if config in m:
         return m[config]

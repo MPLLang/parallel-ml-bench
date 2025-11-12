@@ -10,8 +10,8 @@
 int main(int argc, char** argv) {
   auto infile = deepsea::cmdline::parse_or_default_string("infile", "graph");
   auto source = deepsea::cmdline::parse_or_default_long("source", 0);
-
   Graph G = readGraphFromFile<vertexId,edgeId>(const_cast<char*>(infile.c_str()));
+
   G.addDegrees();
 
   sequence<vertexId> result;
@@ -24,5 +24,5 @@ int main(int argc, char** argv) {
     if (result[i] != -1) numVisited++;
   }
 
-  std::cout << "visited " << numVisited << std::endl;
+  std::cerr << "visited " << numVisited << std::endl;
 }
