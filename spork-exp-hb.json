@@ -1,20 +1,20 @@
 {
   "globals": {
     "compiler": [
-      // "mpl-spork",
-      //"mpl-hb",
-      "mpl"//,
-      // "mlton",
+      "mpl-spork",
+      "mpl-hb",
+      "mpl",
+      "mlton",
+      "mlton-dc"
       // "mpl-spork-eager",
       // "mpl-hb-eager"
 
-      //"mlton-dc",
       //"mpl-no-hb-eager"
       //"cpp"
     ],
     "split": [
-      "2way"//,
-      //"3way"
+      "2way",
+      "3way"
       
       //"3way-slow-exn",
       //"3way-no-inl",
@@ -31,14 +31,14 @@
       "20"
     ],
     "procs": [
-      "1",
-      "10",
-      "20",
-      "30",
-      "40",
-      "50",
-      "60",
-      "70",
+      // "1",
+      // "10",
+      // "20",
+      // "30",
+      // "40",
+      // "50",
+      // "60",
+      // "70",
       "80"
     ]
   },
@@ -46,9 +46,24 @@
   "templates": [
     // single-core mlton
     {"match": {
-        "compiler": "^mlton(-dc)?$",
+        "compiler": "^mlton$",
         "procs": "^1$",
         "split": "^2way$"
+     },
+     "cmd": "bin/<bench>-ng.<compiler>.bin <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
+     "cwd": "mpl",
+     "config": "<compiler>",
+     "tag": "<tag>",
+     "bench": "<bench>-ng",
+     "human": "<compiler>"
+    },
+
+    // Run the mlton-based divide-and-conquer map-light experiment
+    {"match": {
+        "compiler": "^mlton-dc$",
+        "procs": "^1$",
+        "split": "^2way$",
+        "tag": "map-light"
      },
      "cmd": "bin/<bench>-ng.<compiler>.bin <args?{} ><args1?{} ><repeat?-repeat {} ><warmup?-warmup {} >",
      "cwd": "mpl",
@@ -221,21 +236,21 @@
   ],
 
   "exps-to-run": [
-    // "map-light",
-    // "map-heavy",
-    // "wc",
-    // "sparse-mxv-csr",
-    // "primes",
-    // "linefit",
-    // "grep",
-    // "bfs",
-    // "bignum-add",
-    // "delaunay",
-    // "mandelbrot",
-    // "msort",
-    // "nearest-nbrs",
-    // "suffix-array",
-    // "triangle-count",
+    "map-light",
+    "map-heavy",
+    "wc",
+    "sparse-mxv-csr",
+    "primes",
+    "linefit",
+    "grep",
+    "bfs",
+    "bignum-add",
+    "delaunay",
+    "mandelbrot",
+    "msort",
+    "nearest-nbrs",
+    "suffix-array",
+    "triangle-count",
     "nqueens"
   ],
   

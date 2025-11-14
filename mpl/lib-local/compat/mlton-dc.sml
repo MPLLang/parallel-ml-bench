@@ -11,30 +11,16 @@ end
 (* structure ForkJoin = ForkJoin *)
 structure Parfor : PARFOR =
 struct
-  (* use mutually recursive reduces to break tail calls *)
+  fun reduce_dc (i, j) z f merge =
+      if j-i = 1 then f (i, z) else
+      let val mid = i + (j-i) div 2
+      in merge (reduce_dc (i, mid) z f merge,
+                reduce_dc (mid, j) z f merge)
+      end
+  
   fun reduce (lo, hi) z f merge =
-      if hi-lo <= 1 then
-        if lo+1 = hi then
-          f (lo, z)
-        else
-          z
-      else
-        let val mid = lo + (hi-lo) div 2
-        in merge (reduce (lo, mid) z f merge,
-                  reduce (mid, hi) z f merge)
-        end
-
-  (* and reduce' (lo, hi) z f merge = *)
-  (*     if hi-lo <= 1 then *)
-  (*       if lo+1 = hi then *)
-  (*         f (lo, z) *)
-  (*       else *)
-  (*         z *)
-  (*     else *)
-  (*       let val mid = lo + (hi-lo) div 2 *)
-  (*       in merge (reduce (lo, mid) z f merge, *)
-  (*                 reduce (mid, hi) z f merge) *)
-  (*       end *)
+    if lo >= hi then z else
+      reduce_dc (lo, hi) z f merge
 
   val pareduce = reduce
 end
