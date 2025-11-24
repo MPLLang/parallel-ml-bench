@@ -1,87 +1,96 @@
-fun randRange i j =
-    i + Word64.toInt (Word64.mod (Util.hash64 (Word64.fromInt i), Word64.fromInt (j - i)))
+structure CLA = CommandLineArgs
 
+val q = CLA.parseInt "q" 10000
+val n = CLA.parseInt "n" 1000000
+val leaf_size = CLA.parseInt "leaf-size" 100
+val impl = CLA.parseString "impl" "tree"
 
-fun uniform_input n w shuffle =
+val _ = print ("n " ^ Int.toString n ^ "\n")
+val _ = print ("q " ^ Int.toString q ^ "\n")
+val _ = print ("impl " ^ impl ^ "\n")
+val _ = print ("leaf-size " ^ Int.toString leaf_size ^ "\n")
+
+structure It = IntervalTree(val leaf_size = leaf_size)
+
+(* ==========================================================================
+ * random segments
+ *)
+
+val max_size = 1000000000
+
+fun randRange i j seed =
+  i
+  +
+  Word64.toInt (Word64.mod
+    (Util.hash64 (Word64.fromInt seed), Word64.fromInt (j - i)))
+
+fun randSeg seed =
   let
-    fun g i = (randRange 1 w,  i)
-    val pairs = Seq.tabulate (fn i => g i) n
+    val p = randRange 1 max_size seed
+    val space = max_size - p
+    val hi = p + 1 + space div 100
   in
-    pairs
+    (p, randRange p hi (seed + 1))
   end
 
+(* ==========================================================================
+ * input intervals and queries
+ *)
 
-fun eval_build_im n =
-let
-  val max_size = 2147483647
-  val ilint = uniform_input n max_size false
-  val v = Seq.map (fn (i, j) => (i,  (randRange (LargeInt.fromInt i) max_size))) ilint
-  val t0 = Time.now ()
-  val i = IntervalMap.interval_map v n
-  val t1 = Time.now ()
-in
-  (t0, t1, i)
-end
+val input = Seq.tabulate (fn i => randSeg (2 * i)) n
 
-fun eval_queries_im im q =
+fun gen_query i =
+  randRange 1 max_size (2 * n + i)
+
+(* =========================================================================
+ * two benchmark implementations: interval tree, and brute force search
+ *)
+
+fun tree_bench () =
   let
-    val max_size = 2147483647
-    val queries = Seq.map (fn i => (#1 i)) (uniform_input q max_size false)
-    val t0 = Time.now()
-    val r = Seq.map (IntervalMap.stab im) queries
-    val t1 = Time.now()
+    val (t, tm) = Util.getTime (fn () => It.make_tree input)
+    val _ = print ("tick:make_tree:" ^ Time.fmt 4 tm ^ "s\n")
+    val (result, tm) = Util.getTime (fn () =>
+      ArraySlice.full (SeqBasis.tabulate 1 (0, q) (fn i =>
+        It.stab_count t (gen_query i))))
+    val _ = print ("tick:  queries:" ^ Time.fmt 4 tm ^ "s\n")
   in
-    (t0, t1, r)
-  end
-
-fun eval_multi_insert_im im n =
-   let
-    val max_size = 2147483647
-    val ilint = uniform_input n max_size false
-    val v = Seq.map (fn (i, j) => (i,  (randRange (LargeInt.fromInt i) max_size))) ilint
-    val t0 = Time.now ()
-    val i = IntervalMap.multi_insert im v
-    val t1 = Time.now ()
-  in
-    (t0, t1, i)
+    result
   end
 
 
-
-
-fun run_rounds f r =
+fun search_bench () =
   let
-    fun round_rec i diff =
-      if i = 0 then diff
-      else
-        let
-          val (t0, t1, _) = f()
-          val new_diff = Time.- (t1, t0)
-          val _ = print ("round " ^ (Int.toString (r - i + 1)) ^ " in " ^ Time.fmt 4 (new_diff) ^ "s\n")
-        in
-          round_rec (i - 1) (Time.+ (diff, new_diff))
-        end
+    fun search i =
+      let
+        val x = gen_query i
+      in
+        ForkJoin.reducem op+ 0 (0, Seq.length input) (fn j =>
+          let val (a, b) = Seq.nth input j
+          in if a <= x andalso x < b then 1 else 0
+          end)
+      end
   in
-    round_rec r Time.zeroTime
+    ArraySlice.full (SeqBasis.tabulate 1 (0, q) search)
   end
 
-val query_size = CommandLineArgs.parseInt "q" 100000000
-val size = CommandLineArgs.parseInt "n" 100000000
-val rep = CommandLineArgs.parseInt "repeat" 1
+(* ==========================================================================
+ * run benchmark and show results
+ *)
 
-val diff =
-          if query_size = 0 then
-            run_rounds (fn _ => eval_build_im size) rep
-          else
-            let
-              val c = eval_build_im size
-              val curr = eval_queries_im (#3 c)
-            in
-              run_rounds (fn _ => curr query_size) rep
-            end
+val bench =
+  case impl of
+    "tree" => tree_bench
+  | "search" => search_bench
+  | _ => Util.die ("Unknown -impl " ^ impl)
 
-val _ = print ("total " ^ Time.fmt 4 diff ^ "s\n")
-val avg = Time.toReal diff / (Real.fromInt rep)
-val _ = print ("average " ^ Real.fmt (StringCvt.FIX (SOME 4)) avg ^ "s\n")
+val result = Benchmark.run ("interval stab counts: " ^ impl) bench
 
-
+val numHits = Seq.reduce op+ 0 result
+val minHits = Seq.reduce Int.min (valOf Int.maxInt) result
+val maxHits = Seq.reduce Int.max 0 result
+val avgHits = Real.round (Real.fromInt numHits / Real.fromInt q)
+val _ = print ("hits " ^ Int.toString numHits ^ "\n")
+val _ = print ("min " ^ Int.toString minHits ^ "\n")
+val _ = print ("avg " ^ Int.toString avgHits ^ "\n")
+val _ = print ("max " ^ Int.toString maxHits ^ "\n")
