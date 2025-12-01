@@ -1,4 +1,5 @@
 ../../lib.mlb
+BoolTable2D.sml
 SubsetSumTiled.sml
 SubsetSumNaive.sml
 SubsetSumRowMajor.sml

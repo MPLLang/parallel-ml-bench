@@ -1,7 +1,8 @@
 structure CLA = CommandLineArgs
 
 val impl = CLA.parseString "impl" "tiled"
-val bag_str = CLA.parseString "bag" "1,5,1,3,3,10,1,5,1,3,9,1,100,5,2,3,10,1,8,8,8,8,1,3,2,1,5,10,10000000,10000"
+val bag_str = CLA.parseString "bag"
+  "1,5,1,3,3,10,1,5,1,3,9,1,100,5,2,3,10,1,8,8,8,8,1,3,2,1,5,10,10000000,10000"
 val goal = CLA.parseInt "goal" 10010021
 val unsafe_skip_table_set = CLA.parseFlag "unsafe_skip_table_set"
 
@@ -28,10 +29,12 @@ val _ = print ("impl " ^ impl ^ "\n")
 
 fun bench () =
   case impl of
-    "tiled" => SubsetSumTiled.subset_sum {unsafe_skip_table_set = unsafe_skip_table_set}
-    (bag, goal)
-  | "row-major" => SubsetSumRowMajor.subset_sum {unsafe_skip_table_set = unsafe_skip_table_set}
-    (bag, goal)
+    "tiled" =>
+      SubsetSumTiled.subset_sum {unsafe_skip_table_set = unsafe_skip_table_set}
+        (bag, goal)
+  | "row-major" =>
+      SubsetSumRowMajor.subset_sum
+        {unsafe_skip_table_set = unsafe_skip_table_set} (bag, goal)
   | "naive" => SubsetSumNaive.subset_sum (bag, goal)
   | _ => Util.die ("unknown -impl " ^ impl ^ "\n")
 
