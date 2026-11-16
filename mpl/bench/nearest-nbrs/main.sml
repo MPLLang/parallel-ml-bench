@@ -70,7 +70,6 @@ val _ =
   if filename <> "" then ()
   else ( print ("to see output, use -output and -resolution arguments\n" ^
                 "for example: nn -N 10000 -output result.ppm -resolution 1000\n")
-       ; GCStats.report ()
        ; OS.Process.exit OS.Process.success
        )
 
