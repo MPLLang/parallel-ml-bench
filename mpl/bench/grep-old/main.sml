@@ -26,7 +26,3 @@ val _ =
   if benchmark then ()
   else
     ArraySlice.app (fn c => TextIO.output1 (TextIO.stdOut, c)) output
-
-val _ =
-  if benchmark then GCStats.report ()
-  else ()

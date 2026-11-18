@@ -98,7 +98,3 @@ fun runBenchmark () =
   end
 
 val _ = if benchmark then runBenchmark () else ()
-
-val _ =
-  if benchmark then GCStats.report ()
-  else ()
