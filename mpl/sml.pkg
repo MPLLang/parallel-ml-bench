@@ -1,3 +1,3 @@
 require {
-  github.com/mpllang/mpllib 0.5.0 #6cfabda8fd78ffc8d9739abc456a7009bebb50a9
+  github.com/mpllang/mpllib 0.0.0-20261119195300+06b8a55d60aad20453d987bcbc79784807dda0ad
 }

@@ -102,6 +102,11 @@
         "args": ["EE ../inputs/words256-shuffled.txt --benchmark"]
       },
       {
+        "tag": ["grep-long-line"],
+        "bench": ["grep"],
+        "args": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab ../inputs/grep-long-line.txt --benchmark"]
+      },
+      {
         "tag": ["bfs"],
         "bench": ["bfs"],
         "args": ["../inputs/rmat-10M-symm-bin --no-dir-opt"]

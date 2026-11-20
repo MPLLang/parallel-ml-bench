@@ -24,6 +24,40 @@ if [[ ! -f $ROOT/inputs/words256-shuffled.txt ]]; then
   mpl/bin/shuf.mlton.bin $inf -o $outf;
 fi
 
+# Input for grep where early exit within a single line matters (e.g.
+# FindFirst.findFirstNondet vs FindFirst.findFirst). Search with pattern
+# 'a'*63 + 'b'.
+#
+# The file is 20,000 short lines (40-120 random lowercase chars; every 10th
+# one contains the pattern), with one long line inserted in the middle. The
+# long line is 32M chars of 'a' with a single 'b' at index 16.4M, just past
+# one of findFirst's doubling-chunk boundaries (1000*(2^14-1) = 16,383,000),
+# so findFirst scans the entire remaining chunk while findFirstNondet abandons
+# it after the match. Every position of the long line is expensive to check
+# (63 comparisons before failing), so the long line dominates the run time.
+# Expected number of matching lines: 2001.
+if [[ ! -f $ROOT/inputs/grep-long-line.txt ]]; then
+  echo "[INFO] Generating 'grep-long-line.txt'...";
+  python3 -I -c '
+import sys, random
+rng = random.Random(15210)
+pat = b"a" * 63 + b"b"
+alpha = b"abcdefghijklmnopqrstuvwxyz"
+num_short = 20000
+n, p = 32000000, 16400000
+long_line = bytearray(b"a" * n); long_line[p] = ord("b")
+with open(sys.argv[1], "wb") as f:
+  for i in range(num_short):
+    if i == num_short // 2:
+      f.write(long_line); f.write(b"\n")
+    line = bytes(rng.choice(alpha) for _ in range(rng.randint(40, 120)))
+    if i % 10 == 0:
+      k = rng.randint(0, len(line))
+      line = line[:k] + pat + line[k:]
+    f.write(line); f.write(b"\n")
+' $ROOT/inputs/grep-long-line.txt
+fi
+
 echo "[INFO] Generating graphs..."
 TMP=$(mktemp -d)
 ( \

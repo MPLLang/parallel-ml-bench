@@ -66,7 +66,7 @@ struct
     end *)
 
   val ffGrain = CommandLineArgs.parseInt "ff-grain" 1000
-  val findFirst = FindFirst.findFirst ffGrain
+  val findFirst = FindFirst.findFirstNondet ffGrain
 
   fun grep pat source =
     let
